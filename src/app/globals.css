@@ -1,26 +1,245 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-title: var(--font-gt-mechanik), sans-serif;
+  --font-sans: var(--font-sf-pro), -apple-system, BlinkMacSystemFont, sans-serif;
+  --color-nuvi: #4EA7EB;
+  --color-nuvi-dark: #0082F6;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* 1. Botões Principais (Glossy Blue Pill) */
+.nuvi-btn,
+.nuvi-btn-sm,
+.nuvi-copy-btn,
+.liquid-submit-btn,
+.auth-submit-btn {
+  height: 52px;
+  padding: 0 26px;
+  border-radius: 9999px;
+  background-color: #4EA7EB;
+  border: 1.5px solid rgba(255, 255, 255, 0.42);
+  box-shadow:
+    inset 0 0 12px rgba(255, 255, 255, 0.42),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.52);
+  font-family: var(--font-sf-pro), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  outline: none;
+  transition: filter 0.2s ease, transform 0.2s ease;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.nuvi-btn:hover:not(:disabled),
+.nuvi-btn-lg:hover:not(:disabled),
+.btn-comecar:hover:not(:disabled),
+.nuvi-btn-sm:hover:not(:disabled),
+.nuvi-copy-btn:hover:not(:disabled),
+.liquid-submit-btn:hover:not(:disabled),
+.auth-submit-btn:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: scale(1.01);
+}
+
+.nuvi-btn:active:not(:disabled),
+.nuvi-btn-lg:active:not(:disabled),
+.btn-comecar:active:not(:disabled),
+.nuvi-btn-sm:active:not(:disabled),
+.nuvi-copy-btn:active:not(:disabled),
+.liquid-submit-btn:active:not(:disabled),
+.auth-submit-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.nuvi-btn:disabled,
+.nuvi-btn-lg:disabled,
+.btn-comecar:disabled,
+.nuvi-btn-sm:disabled,
+.nuvi-copy-btn:disabled,
+.liquid-submit-btn:disabled,
+.auth-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Variante Grande (Hero / CTA Principal) */
+.nuvi-btn-lg,
+.btn-comecar {
+  height: 80px;
+  padding: 0 42px;
+  border-radius: 9999px;
+  background-color: #4EA7EB;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    inset 0 0 16px rgba(255, 255, 255, 0.55),
+    inset 0 2px 3px rgba(255, 255, 255, 0.65);
+  font-family: var(--font-sf-pro), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  outline: none;
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+/* Variante Pequena (Compacta) */
+.nuvi-btn-sm,
+.nuvi-copy-btn {
+  height: 44px;
+  padding: 0 20px;
+  font-size: 14px;
+}
+
+/* 2. Botão / Badge Liquid Glass (Translúcido) */
+.nuvi-glass-pill,
+.liquid-glass-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.26) 0%,
+    rgba(255, 255, 255, 0.07) 50%,
+    rgba(255, 255, 255, 0.16) 100%
+  );
+  backdrop-filter: blur(18px) saturate(190%) brightness(1.04);
+  -webkit-backdrop-filter: blur(18px) saturate(190%) brightness(1.04);
+  box-shadow:
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 1.5px 0 rgba(255, 255, 255, 0.22),
+    inset 0 0 10px 0 rgba(255, 255, 255, 0.1);
+  font-family: var(--font-sf-pro), -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.24s ease,
+    box-shadow 0.24s ease;
+}
+
+.nuvi-glass-pill:hover,
+.liquid-glass-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.36) 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.24) 100%
+  );
+  box-shadow:
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 1.5px 0 rgba(255, 255, 255, 0.32),
+    inset 0 0 12px 0 rgba(255, 255, 255, 0.16),
+    0 6px 18px rgba(0, 0, 0, 0.14);
+}
+
+/* 3. Inputs (Formulário e Pílula Liquid Glass) */
+.nuvi-input,
+.form-input {
+  width: 100%;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  padding: 0 16px;
+  color: #FFFFFF;
+  font-family: var(--font-sf-pro), -apple-system, sans-serif;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.nuvi-input::placeholder,
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.nuvi-input:focus,
+.form-input:focus {
+  border-color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.nuvi-input-pill,
+.liquid-input-pill {
+  height: 80px;
+  width: 100%;
+  max-width: 590px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 10px 32px;
+  box-sizing: border-box;
+}
+
+/* 4. Cartões (Glass Card Escuro/Translúcido & Modal Claro) */
+.nuvi-glass-card,
+.auth-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 28px;
+  padding: 36px 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+}
+
+.nuvi-modal-card,
+.modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 36px;
+  padding: 48px 36px;
+  color: #111827;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+}
+
+/* 5. Tipografia Base Nuvi */
+.nuvi-title {
+  font-family: var(--font-gt-mechanik), -apple-system, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.nuvi-text {
+  font-family: var(--font-sf-pro), -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.01em;
 }
