@@ -7,14 +7,13 @@ import {
   Add01Icon,
   ArrowUpRight01Icon,
   InboxCheckIcon,
-  Message02Icon,
   Notification02Icon,
   Search01Icon,
-  SparkleIcon,
   Tick02Icon,
   Video01Icon,
 } from "@hugeicons/core-free-icons";
 import SquircleTile from "@/app/components/squircle/SquircleTile";
+import AiOrb from "./AiOrb";
 import PerformanceCard from "./PerformanceCard";
 import WalletModal from "./WalletModal";
 import { MobileTabBar, Sidebar, type NavKey } from "./Sidebar";
@@ -68,6 +67,17 @@ export default function NuviDashboard() {
   // TODO: ligar à API de notificações (valor provisório para o visual).
   const [notifications, setNotifications] = useState(6);
   const searchRef = useRef<HTMLInputElement>(null);
+  const topRef = useRef<HTMLDivElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Header sem divisão: só ganha vidro quando o conteúdo passa por baixo.
+  useEffect(() => {
+    const el = topRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setScrolled(!e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -101,9 +111,16 @@ export default function NuviDashboard() {
           />
 
           <div className="relative flex flex-1 flex-col lg:min-h-0 lg:overflow-y-auto">
+            <div ref={topRef} aria-hidden className="h-px" />
             {/* Header */}
-            <header className="sticky top-0 z-30 px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8 [background:linear-gradient(180deg,rgba(247,248,250,0.85),rgba(247,248,250,0.55))]">
-              <div className="mx-auto flex max-w-[1360px] items-center gap-4">
+            <header className="sticky top-0 z-30 -mt-px px-4 py-4 sm:px-6 lg:px-8">
+              <div
+                aria-hidden
+                className={`pointer-events-none absolute inset-0 -bottom-6 bg-[#F7F8FA]/70 backdrop-blur-xl transition-opacity duration-300 [mask-image:linear-gradient(to_bottom,#000_55%,transparent)] ${
+                  scrolled ? "opacity-100" : "opacity-0"
+                }`}
+              />
+              <div className="relative mx-auto flex max-w-[1360px] items-center gap-4">
                 <h1 className="text-[28px] font-bold leading-none tracking-[-0.03em]">
                   Início
                 </h1>
@@ -155,13 +172,16 @@ export default function NuviDashboard() {
                 </div>
 
                 <div className="ml-auto flex items-center gap-2.5 md:ml-0">
-                  <IconButton
-                    label="Nuvi IA"
+                  <button
+                    type="button"
                     onClick={() => setActiveNav("ia")}
-                    active={activeNav === "ia"}
+                    aria-label="Nuvi IA"
+                    title="Nuvi IA"
+                    aria-pressed={activeNav === "ia"}
+                    className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-transform duration-300 hover:scale-[1.06] active:scale-95"
                   >
-                    <HugeiconsIcon icon={SparkleIcon} size={19} strokeWidth={1.8} />
-                  </IconButton>
+                    <AiOrb size={40} />
+                  </button>
                   <IconButton
                     label={
                       notifications > 0 ? `Notificações, ${notifications} por ler` : "Notificações"
@@ -353,16 +373,6 @@ export default function NuviDashboard() {
           </div>
         </div>
       </div>
-
-      {/* Suporte */}
-      <button
-        type="button"
-        aria-label="Ajuda"
-        title="Ajuda"
-        className="fixed right-5 bottom-24 z-40 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-[#0A0A0A] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_10px_24px_-8px_rgba(15,23,42,0.5)] transition-transform duration-300 hover:scale-105 active:scale-95 lg:right-6 lg:bottom-6"
-      >
-        <HugeiconsIcon icon={Message02Icon} size={21} strokeWidth={1.8} />
-      </button>
 
       <MobileTabBar active={activeNav} onChange={setActiveNav} />
 
