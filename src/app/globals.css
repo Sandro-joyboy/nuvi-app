@@ -286,3 +286,115 @@
   font-family: var(--font-sf-pro), -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: -0.01em;
 }
+/* ============================================================
+   6. Cantos contínuos (Apple squircle)
+   Skill: .claude/skills/squircle — superelipse em vez de arco.
+   Browsers com `corner-shape` recebem o canto contínuo nativo;
+   os restantes ficam com o border-radius normal.
+   ============================================================ */
+@supports (corner-shape: squircle) {
+  .sq {
+    corner-shape: superellipse(1.4);
+  }
+}
+
+/* ============================================================
+   7. Liquid Glass (tema claro) — superfícies do painel
+   ============================================================ */
+.lg-surface {
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 0 0 0.5px rgba(15, 23, 42, 0.07),
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 12px 32px -18px rgba(15, 23, 42, 0.12);
+}
+
+.lg-control {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.66) 100%
+  );
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.04),
+    0 0 0 0.5px rgba(15, 23, 42, 0.12),
+    0 2px 6px -2px rgba(15, 23, 42, 0.1);
+  transition:
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.lg-control:hover:not(:disabled) {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.04),
+    0 0 0 0.5px rgba(15, 23, 42, 0.14),
+    0 6px 16px -6px rgba(15, 23, 42, 0.16);
+}
+
+.lg-control:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.lg-control:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Vidro tingido (sobre superfícies azuis) */
+.lg-tint {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.35);
+  transition: background 0.2s ease, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lg-tint:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+}
+
+.lg-tint:active {
+  transform: scale(0.96);
+}
+
+/* Foco visível consistente (teclado) */
+.nuvi-dash :focus-visible {
+  outline: 2px solid #0082f6;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-control,
+  .lg-tint {
+    transition: none;
+  }
+  .lg-control:active:not(:disabled),
+  .lg-tint:active {
+    transform: none;
+  }
+}
