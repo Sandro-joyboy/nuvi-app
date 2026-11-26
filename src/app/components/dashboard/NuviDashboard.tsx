@@ -6,14 +6,11 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Add01Icon,
   ArrowUpRight01Icon,
-  Cancel01Icon,
-  DashboardSquare01Icon,
   InboxCheckIcon,
   Message02Icon,
   Notification02Icon,
-  Rocket01Icon,
   Search01Icon,
-  SparklesIcon,
+  SparkleIcon,
   Tick02Icon,
   Video01Icon,
 } from "@hugeicons/core-free-icons";
@@ -36,10 +33,12 @@ function IconButton({
   label,
   children,
   onClick,
+  active,
 }: {
   label: string;
   children: React.ReactNode;
   onClick?: () => void;
+  active?: boolean;
 }) {
   return (
     <button
@@ -47,7 +46,10 @@ function IconButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="lg-control relative flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-[#1F2937]"
+      aria-pressed={active}
+      className={`lg-control relative flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full ${
+        active ? "text-[#0076E8]" : "text-[#4B5563]"
+      }`}
     >
       {children}
     </button>
@@ -59,12 +61,12 @@ const ghostCta =
 
 export default function NuviDashboard() {
   const [activeNav, setActiveNav] = useState<NavKey>("inicio");
-  const [showBanner, setShowBanner] = useState(true);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [balance, setBalance] = useState(0);
   const [walletOpen, setWalletOpen] = useState(false);
-  const [unread, setUnread] = useState(true);
+  // TODO: ligar à API de notificações (valor provisório para o visual).
+  const [notifications, setNotifications] = useState(6);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -99,38 +101,6 @@ export default function NuviDashboard() {
           />
 
           <div className="relative flex flex-1 flex-col lg:min-h-0 lg:overflow-y-auto">
-            {/* Banner de onboarding — progresso visual em vez de texto */}
-            {showBanner && (
-              <div className="px-4 pt-3 sm:px-6 lg:px-8">
-                <div className="lg-surface sq mx-auto flex max-w-[1360px] items-center gap-3 rounded-[20px] py-2 pr-2 pl-3">
-                  <SquircleTile size={30} colors={["#5DB6F5", "#0076E8"]}>
-                    <HugeiconsIcon
-                      icon={Rocket01Icon}
-                      size={15}
-                      strokeWidth={2}
-                      className="text-white"
-                    />
-                  </SquircleTile>
-                  <p className="min-w-0 truncate text-[13.5px] font-semibold">
-                    Primeira campanha
-                  </p>
-                  <div className="ml-auto flex items-center gap-1">
-                    <Link href="/onboarding" className="nuvi-btn-sm sq !h-8 !px-4 !text-[13px]">
-                      Continuar
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => setShowBanner(false)}
-                      aria-label="Fechar aviso"
-                      className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[#8A919E] transition-colors hover:bg-[#0F172A]/[0.05] hover:text-[#0A0A0A]"
-                    >
-                      <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={2.2} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Header */}
             <header className="sticky top-0 z-30 px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8 [background:linear-gradient(180deg,rgba(247,248,250,0.85),rgba(247,248,250,0.55))]">
               <div className="mx-auto flex max-w-[1360px] items-center gap-4">
@@ -184,35 +154,29 @@ export default function NuviDashboard() {
                   )}
                 </div>
 
-                <div className="ml-auto flex items-center gap-2 md:ml-0">
-                  {/* Nuvi IA — anel em gradiente, centro em vidro */}
-                  <button
-                    type="button"
+                <div className="ml-auto flex items-center gap-2.5 md:ml-0">
+                  <IconButton
+                    label="Nuvi IA"
                     onClick={() => setActiveNav("ia")}
-                    aria-label="Nuvi IA"
-                    aria-pressed={activeNav === "ia"}
-                    className="group relative inline-flex h-10 shrink-0 cursor-pointer rounded-full bg-[conic-gradient(from_180deg,#4EA7EB,#7C5CF2,#E35DB8,#FF9F45,#4EA7EB)] p-[1.5px] shadow-[0_4px_14px_-6px_rgba(124,92,242,0.45)] transition-transform duration-300 hover:scale-[1.03] active:scale-95"
+                    active={activeNav === "ia"}
                   >
-                    <span className="flex h-full items-center gap-1.5 rounded-full bg-white/92 pr-3.5 pl-3 backdrop-blur-xl transition-colors group-hover:bg-white/80">
-                      <HugeiconsIcon
-                        icon={SparklesIcon}
-                        size={17}
-                        strokeWidth={2}
-                        className="text-[#7C5CF2]"
-                      />
-                      <span className="bg-gradient-to-r from-[#2F8CE8] via-[#7C5CF2] to-[#D8509F] bg-clip-text text-[13.5px] font-bold tracking-[-0.01em] text-transparent">
-                        IA
-                      </span>
-                    </span>
-                  </button>
-                  <IconButton label="Personalizar">
-                    <HugeiconsIcon icon={DashboardSquare01Icon} size={18} strokeWidth={1.8} />
+                    <HugeiconsIcon icon={SparkleIcon} size={19} strokeWidth={1.8} />
                   </IconButton>
-                  <IconButton label="Notificações" onClick={() => setUnread(false)}>
-                    <HugeiconsIcon icon={Notification02Icon} size={18} strokeWidth={1.8} />
-                    {unread && (
-                      <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-[#FF3B30] ring-2 ring-white" />
+                  <IconButton
+                    label={
+                      notifications > 0 ? `Notificações, ${notifications} por ler` : "Notificações"
+                    }
+                    onClick={() => setNotifications(0)}
+                  >
+                    <HugeiconsIcon icon={Notification02Icon} size={19} strokeWidth={1.8} />
+                    {notifications > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#FF3B30] px-1 text-[10.5px] font-semibold text-white tabular-nums ring-2 ring-white">
+                        {notifications > 9 ? "9+" : notifications}
+                      </span>
                     )}
+                  </IconButton>
+                  <IconButton label="Conta Moco">
+                    <span className="text-[14px] font-medium text-[#6B7280]">M</span>
                   </IconButton>
                 </div>
               </div>

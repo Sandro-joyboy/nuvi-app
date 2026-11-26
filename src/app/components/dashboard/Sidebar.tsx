@@ -2,13 +2,12 @@
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Analytics01Icon,
   BubbleChatIcon,
-  Compass01Icon,
+  ChartColumnIcon,
+  DiscoverCircleIcon,
+  DollarCircleIcon,
+  Globe02Icon,
   Megaphone01Icon,
-  SparklesIcon,
-  Target02Icon,
-  Wallet01Icon,
 } from "@hugeicons/core-free-icons";
 import SquircleTile from "@/app/components/squircle/SquircleTile";
 import { NuviMark } from "@/app/components/brand/NuviLogo";
@@ -26,17 +25,17 @@ export type NavKey =
 interface NavItem {
   key: Exclude<NavKey, "inicio" | "ia">;
   label: string;
-  icon: typeof SparklesIcon;
+  icon: typeof DiscoverCircleIcon;
   badge?: string;
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { key: "descobrir", label: "Descobrir", icon: Compass01Icon },
-  { key: "campanhas", label: "Campanhas", icon: Target02Icon },
+  { key: "descobrir", label: "Descobrir", icon: DiscoverCircleIcon },
+  { key: "campanhas", label: "Campanhas", icon: Globe02Icon },
   { key: "mensagens", label: "Mensagens", icon: BubbleChatIcon },
   { key: "anuncios", label: "Anúncios", icon: Megaphone01Icon, badge: "Novo" },
-  { key: "analises", label: "Análises", icon: Analytics01Icon },
-  { key: "pagamentos", label: "Pagamentos", icon: Wallet01Icon },
+  { key: "analises", label: "Análises", icon: ChartColumnIcon },
+  { key: "pagamentos", label: "Pagamentos", icon: DollarCircleIcon },
 ];
 
 interface SidebarProps {
