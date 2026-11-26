@@ -11,8 +11,7 @@ import {
   Megaphone01Icon,
   MoreHorizontalIcon,
 } from "@hugeicons/core-free-icons";
-import SquircleTile from "@/app/components/squircle/SquircleTile";
-import { NuviMark } from "@/app/components/brand/NuviLogo";
+import Image from "next/image";
 
 export type NavKey =
   | "inicio"
@@ -59,14 +58,16 @@ export function Sidebar({ active, onChange }: SidebarProps) {
           onClick={() => onChange("inicio")}
           aria-label="Início"
           aria-current={active === "inicio" ? "page" : undefined}
-          className="rounded-[14px] transition-transform duration-300 hover:scale-[1.05] active:scale-95"
+          className="rounded-full transition-transform duration-300 hover:scale-[1.05] active:scale-95"
         >
-          <SquircleTile
-            size={44}
-            colors={["#5DB6F5", "#0076E8"]}
-          >
-            <NuviMark className="h-[17px] w-[26px] text-white" />
-          </SquircleTile>
+          <Image
+            src="/nuvi-cloud.png"
+            alt=""
+            width={46}
+            height={46}
+            priority
+            className="h-[46px] w-[46px] rounded-full shadow-[0_4px_12px_-4px_rgba(0,90,180,0.35)]"
+          />
         </button>
 
         <nav className="mt-6 flex w-full flex-col items-center gap-1">
@@ -128,7 +129,11 @@ export function Sidebar({ active, onChange }: SidebarProps) {
 }
 
 /** Tab bar flutuante em vidro (mobile): o essencial + "Mais". */
-export function MobileTabBar({ active, onChange }: SidebarProps) {
+export function MobileTabBar({
+  active,
+  onChange,
+  scrolled = false,
+}: SidebarProps & { scrolled?: boolean }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const primary = NAV_ITEMS.filter((i) => i.primary);
@@ -190,7 +195,20 @@ export function MobileTabBar({ active, onChange }: SidebarProps) {
 
       <nav
         aria-label="Navegação principal"
-        className="lg-surface flex items-center gap-1 rounded-full px-1.5 py-1.5"
+        className="flex items-center gap-1 rounded-full px-1.5 py-1.5"
+        style={{
+          // Em repouso: vidro claro. Ao rolar: liquid glass mais transparente,
+          // com mais desfoque e saturação, deixando ver o conteúdo por baixo.
+          background: scrolled
+            ? "linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.28))"
+            : "rgba(255,255,255,0.86)",
+          backdropFilter: scrolled ? "blur(22px) saturate(200%)" : "blur(16px) saturate(160%)",
+          WebkitBackdropFilter: scrolled ? "blur(22px) saturate(200%)" : "blur(16px) saturate(160%)",
+          boxShadow: scrolled
+            ? "inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(255,255,255,0.35), 0 0 0 0.5px rgba(15,23,42,0.1), 0 12px 30px -10px rgba(15,23,42,0.28)"
+            : "inset 0 1px 0 rgba(255,255,255,0.95), 0 0 0 0.5px rgba(15,23,42,0.08), 0 8px 24px -12px rgba(15,23,42,0.18)",
+          transition: "background 300ms ease, box-shadow 300ms ease",
+        }}
       >
         {primary.map((item) => {
           const isActive = active === item.key;

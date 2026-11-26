@@ -414,3 +414,31 @@
   .ai-orb-clouds,
   .ai-orb-rim { animation: none; }
 }
+
+/* ============================================================
+   9. Scroll do painel (estilo macOS: fino, discreto, sem trilho)
+   ============================================================ */
+.nuvi-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15, 23, 42, 0.16) transparent;
+  scrollbar-gutter: stable;
+}
+.nuvi-scroll:hover {
+  scrollbar-color: rgba(15, 23, 42, 0.3) transparent;
+}
+.nuvi-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.nuvi-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.nuvi-scroll::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 9999px;
+  background-clip: padding-box;
+  background-color: rgba(15, 23, 42, 0.16);
+}
+.nuvi-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(15, 23, 42, 0.32);
+}

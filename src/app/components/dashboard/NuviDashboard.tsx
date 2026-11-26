@@ -70,7 +70,7 @@ export default function NuviDashboard() {
   const topRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
-  // Header sem divisão: só ganha vidro quando o conteúdo passa por baixo.
+  // Estado de scroll: a tab bar mobile passa a liquid glass ao rolar.
   useEffect(() => {
     const scroller = topRef.current?.parentElement;
     if (!scroller) return;
@@ -115,21 +115,10 @@ export default function NuviDashboard() {
             className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(60%_60%_at_15%_0%,rgba(78,167,235,0.16),transparent_70%),radial-gradient(40%_50%_at_90%_10%,rgba(175,82,222,0.08),transparent_70%)]"
           />
 
-          <div className="relative flex flex-1 flex-col lg:min-h-0 lg:overflow-y-auto">
+          <div className="nuvi-scroll relative flex flex-1 flex-col lg:min-h-0 lg:overflow-y-auto">
             <div ref={topRef} aria-hidden className="h-px" />
             {/* Header */}
-            <header className="sticky top-0 z-30 -mt-px px-4 py-4 sm:px-6 lg:px-8">
-              {/* Liquid glass do header: só com conteúdo por baixo */}
-              <div
-                aria-hidden
-                className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${
-                  scrolled ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                <div className="absolute inset-0 bg-[#F7F8FA]/65 [-webkit-backdrop-filter:blur(24px)_saturate(180%)] [backdrop-filter:blur(24px)_saturate(180%)]" />
-                {/* Transição suave para o conteúdo (sem linha dura) */}
-                <div className="absolute inset-x-0 top-full h-5 bg-gradient-to-b from-[#F7F8FA]/65 to-transparent" />
-              </div>
+            <header className="relative z-30 -mt-px px-4 py-4 sm:px-6 lg:px-8">
               <div className="relative mx-auto flex max-w-[1360px] items-center gap-4">
                 <h1 className="text-[28px] font-bold leading-none tracking-[-0.03em]">
                   Início
@@ -384,7 +373,7 @@ export default function NuviDashboard() {
         </div>
       </div>
 
-      <MobileTabBar active={activeNav} onChange={setActiveNav} />
+      <MobileTabBar active={activeNav} onChange={setActiveNav} scrolled={scrolled} />
 
       <WalletModal
         open={walletOpen}

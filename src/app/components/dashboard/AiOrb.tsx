@@ -1,4 +1,4 @@
-// Orbe da Nuvi IA — anel de luz azul nítido, com núcleo branco.
+// Orbe da Nuvi IA — anel de luz azul nítido, centro transparente.
 // Três anéis em conic-gradient rodam a velocidades diferentes, com desfoque
 // leve, para dar o efeito de redemoinho. Só anima transform; com
 // "reduzir movimento" fica parada.
@@ -20,12 +20,6 @@ export default function AiOrb({ size = 40, className = "" }: AiOrbProps) {
       className={`relative inline-block shrink-0 ${className}`}
       style={{ width: size, height: size }}
     >
-      {/* Halo exterior */}
-      <span
-        className="absolute -inset-[12%] rounded-full bg-[radial-gradient(circle,rgba(96,165,250,0.35)_40%,rgba(167,139,250,0.12)_60%,transparent_72%)]"
-        style={{ filter: blur(0.025) }}
-      />
-
       {/* Anel principal */}
       <span
         className="ai-orb-clouds absolute inset-0 rounded-full bg-[conic-gradient(from_200deg,#BFE6FF,#6FC3FF_20%,#2F80F5_42%,#3B6CF6_55%,#9CD8FF_72%,#E3F4FF_86%,#BFE6FF)]"
@@ -42,12 +36,6 @@ export default function AiOrb({ size = 40, className = "" }: AiOrbProps) {
       <span
         className="ai-orb-wobble absolute inset-[10%] rounded-full opacity-70 bg-[conic-gradient(from_300deg,transparent_55%,#5EEBFF_70%,transparent_82%)]"
         style={{ mask: RING_MASK, WebkitMask: RING_MASK, filter: blur(0.004) }}
-      />
-
-      {/* Núcleo branco */}
-      <span
-        className="absolute inset-[30%] rounded-full bg-white"
-        style={{ filter: blur(0.01) }}
       />
     </span>
   );

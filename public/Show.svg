@@ -3,13 +3,13 @@
 <g opacity="0.5" filter="url(#filter1_f_1_623)">
 <path d="M34.5241 20C26.5068 20 20 26.5082 20 34.5241C20 42.5428 26.5068 49.0481 34.5241 49.0481C42.5559 49.0481 49.0481 42.5428 49.0481 34.5241C49.0481 26.5082 42.5559 20 34.5241 20V20Z" fill="#2297FF"/>
 </g>
-<g clip-path="url(#nv-glass-clip)"><g filter="url(#nv-glass-blur)">
+<g clip-path="url(#nv-glass-clip)"><use xlink:href="#stroke0_1_623" fill="#FFFFFF"/><g filter="url(#nv-glass-blur)" opacity="0.85">
 <path d="M34.5241 4.79102C18.112 4.79102 4.79199 18.114 4.79199 34.5231C4.79199 50.9382 18.112 64.2551 34.5241 64.2551C50.9659 64.2551 64.2561 50.9382 64.2561 34.5231C64.2561 18.114 50.9659 4.79102 34.5241 4.79102V4.79102Z" fill="url(#paint0_linear_1_623)"/>
 <g opacity="0.5" filter="url(#filter1_f_1_623)">
 <path d="M34.5241 20C26.5068 20 20 26.5082 20 34.5241C20 42.5428 26.5068 49.0481 34.5241 49.0481C42.5559 49.0481 49.0481 42.5428 49.0481 34.5241C49.0481 26.5082 42.5559 20 34.5241 20V20Z" fill="#2297FF"/>
 </g>
-</g><use xlink:href="#stroke0_1_623" fill="#FFFFFF" fill-opacity="0.18"/></g><g>
-<use xlink:href="#stroke0_1_623" fill="#95CDFF" fill-opacity="0.28"/>
+</g><use xlink:href="#stroke0_1_623" fill="#FFFFFF" fill-opacity="0.32"/></g><g>
+<use xlink:href="#stroke0_1_623" fill="#95CDFF" fill-opacity="0.55"/>
 <mask id="stroke1_1_623" maskUnits="userSpaceOnUse" x="8.19629" y="25.8145" width="93" height="70" fill="black">
 <rect fill="white" x="8.19629" y="25.8145" width="93" height="70"/>
 <use xlink:href="#stroke0_1_623"/>
@@ -23,7 +23,7 @@
 </mask>
 <path d="M67.5597 60.9772C67.5597 68.2331 61.6278 74.165 54.3719 74.165C47.063 74.165 41.1312 68.2331 41.1312 60.9772C41.1312 60.0768 41.2371 59.2294 41.396 58.382H41.6608C47.5397 58.382 52.3063 53.7213 52.5182 47.8953C53.1008 47.7894 53.7363 47.7365 54.3719 47.7365C61.6278 47.7365 67.5597 53.6683 67.5597 60.9772Z" stroke-width="0.4" stroke="url(#paint3_linear_1_623)" stroke-opacity="0.5" mask="url(#stroke3_1_623)"/>
 </g>
-<defs><filter id="nv-glass-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter><clipPath id="nv-glass-clip"><use xlink:href="#stroke0_1_623"/></clipPath>
+<defs><filter id="nv-glass-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="11"/></filter><clipPath id="nv-glass-clip"><use xlink:href="#stroke0_1_623"/></clipPath>
 <clipPath id="bgblur_0_1_623_clip_path" transform="translate(8.20801 8.20898)"><path d="M34.5241 4.79102C18.112 4.79102 4.79199 18.114 4.79199 34.5231C4.79199 50.9382 18.112 64.2551 34.5241 64.2551C50.9659 64.2551 64.2561 50.9382 64.2561 34.5231C64.2561 18.114 50.9659 4.79102 34.5241 4.79102Z"/>
 </clipPath><filter id="filter1_f_1_623" x="0" y="0" width="69.0481" height="69.0481" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
@@ -51,7 +51,7 @@
 </linearGradient>
 <linearGradient id="paint2_linear_1_623" x1="65.6859" y1="52.5089" x2="36.2471" y2="53.4687" gradientUnits="userSpaceOnUse">
 <stop stop-color="white"/>
-<stop offset="1" stop-color="white" stop-opacity="0.2"/>
+<stop offset="1" stop-color="white"/>
 </linearGradient>
 <linearGradient id="paint3_linear_1_623" x1="66.4273" y1="61.5097" x2="40.7329" y2="62.5801" gradientUnits="userSpaceOnUse">
 <stop stop-color="white"/>

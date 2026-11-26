@@ -177,11 +177,11 @@ export default function PerformanceCard() {
                       setRange(key);
                       setHover(null);
                     }}
-                    className={`h-7 min-w-11 cursor-pointer rounded-full px-2.5 text-[12px] font-semibold uppercase tabular-nums transition-all duration-300 ${
+                    className={`h-7 cursor-pointer rounded-full px-3 text-[12px] font-semibold whitespace-nowrap tabular-nums transition-all duration-300 ${
                       sel ? "lg-control text-[#0A0A0A]" : "text-[#6B7280] hover:text-[#0A0A0A]"
                     }`}
                   >
-                    {key}
+                    {RANGE_DAYS[key]} dias
                   </button>
                 );
               })}

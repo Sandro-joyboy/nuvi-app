@@ -3,13 +3,13 @@
 <g opacity="0.5" filter="url(#filter0_f_1_245)">
 <path d="M49.9995 25.6647L37.0987 38.6518L21.9948 29.3556C20.0157 28.1372 20.4168 25.1314 22.6464 24.4843L58.3061 14.108C60.334 13.5212 62.2089 15.4224 61.6017 17.4597L51.0212 53.0826C50.3586 55.3118 47.3866 55.6979 46.1853 53.7074L37.0987 38.6518" fill-rule="evenodd" clip-rule="evenodd" fill="#9112D2"/>
 </g>
-<g clip-path="url(#nv-glass-clip)"><g filter="url(#nv-glass-blur)">
+<g clip-path="url(#nv-glass-clip)"><use xlink:href="#stroke0_1_245" fill="#FFFFFF"/><g filter="url(#nv-glass-blur)" opacity="0.85">
 <path d="M53.1005 20.7649L31.4679 42.542L6.14136 26.9538C2.8227 24.9107 3.49536 19.8706 7.23395 18.7855L67.0292 1.38625C70.4296 0.402163 73.5736 3.59015 72.5553 7.00638L54.8137 66.74C53.7026 70.478 48.719 71.1253 46.7048 67.7877L31.4679 42.542" fill-rule="evenodd" clip-rule="evenodd" fill="url(#paint0_linear_1_245)"/>
 <g opacity="0.5" filter="url(#filter0_f_1_245)">
 <path d="M49.9995 25.6647L37.0987 38.6518L21.9948 29.3556C20.0157 28.1372 20.4168 25.1314 22.6464 24.4843L58.3061 14.108C60.334 13.5212 62.2089 15.4224 61.6017 17.4597L51.0212 53.0826C50.3586 55.3118 47.3866 55.6979 46.1853 53.7074L37.0987 38.6518" fill-rule="evenodd" clip-rule="evenodd" fill="#9112D2"/>
 </g>
-</g><use xlink:href="#stroke0_1_245" fill="#FFFFFF" fill-opacity="0.18"/></g><g>
-<use xlink:href="#stroke0_1_245" fill="#E6BFF9" fill-opacity="0.28"/>
+</g><use xlink:href="#stroke0_1_245" fill="#FFFFFF" fill-opacity="0.32"/></g><g>
+<use xlink:href="#stroke0_1_245" fill="#E6BFF9" fill-opacity="0.55"/>
 <mask id="stroke1_1_245" maskUnits="userSpaceOnUse" x="1.52588e-05" y="15.0801" width="87" height="88" fill="black">
 <rect fill="white" x="1.52588e-05" y="15.0801" width="87" height="88"/>
 <use xlink:href="#stroke0_1_245"/>
@@ -20,7 +20,7 @@
 <rect x="39.875" y="59.4609" width="29" height="5" rx="2.5" transform="rotate(-45 39.875 59.4609)" fill="url(#paint2_linear_1_245)"/>
 <rect x="40.1579" y="59.4609" width="28.6" height="4.6" rx="2.3" transform="rotate(-45 40.1579 59.4609)" stroke="url(#paint3_linear_1_245)" stroke-width="0.4"/>
 </g>
-<defs><filter id="nv-glass-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter><clipPath id="nv-glass-clip"><use xlink:href="#stroke0_1_245"/></clipPath>
+<defs><filter id="nv-glass-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="11"/></filter><clipPath id="nv-glass-clip"><use xlink:href="#stroke0_1_245"/></clipPath>
 <filter id="filter0_f_1_245" x="6.71779" y="0" width="69" height="69" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
 <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
@@ -47,7 +47,7 @@
 </linearGradient>
 <linearGradient id="paint2_linear_1_245" x1="66.8189" y1="60.3638" x2="35.5978" y2="66.2679" gradientUnits="userSpaceOnUse">
 <stop stop-color="white"/>
-<stop offset="1" stop-color="white" stop-opacity="0.2"/>
+<stop offset="1" stop-color="white"/>
 </linearGradient>
 <linearGradient id="paint3_linear_1_245" x1="44.4913" y1="60.0434" x2="45.3825" y2="66.4448" gradientUnits="userSpaceOnUse">
 <stop stop-color="white" stop-opacity="0.25"/>
