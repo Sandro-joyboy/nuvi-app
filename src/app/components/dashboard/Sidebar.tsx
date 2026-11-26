@@ -15,7 +15,6 @@ import Image from "next/image";
 
 export type NavKey =
   | "inicio"
-  | "ia"
   | "descobrir"
   | "campanhas"
   | "mensagens"
@@ -24,7 +23,7 @@ export type NavKey =
   | "pagamentos";
 
 interface NavItem {
-  key: Exclude<NavKey, "inicio" | "ia">;
+  key: Exclude<NavKey, "inicio">;
   label: string;
   icon: typeof DiscoverCircleIcon;
   badge?: string;

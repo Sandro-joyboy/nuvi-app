@@ -13,7 +13,6 @@ import {
   Video01Icon,
 } from "@hugeicons/core-free-icons";
 import SquircleTile from "@/app/components/squircle/SquircleTile";
-import AiOrb from "./AiOrb";
 import PerformanceCard from "./PerformanceCard";
 import WalletModal from "./WalletModal";
 import { MobileTabBar, Sidebar, type NavKey } from "./Sidebar";
@@ -171,16 +170,9 @@ export default function NuviDashboard() {
                 </div>
 
                 <div className="ml-auto flex items-center gap-2.5 md:ml-0">
-                  <button
-                    type="button"
-                    onClick={() => setActiveNav("ia")}
-                    aria-label="Nuvi IA"
-                    title="Nuvi IA"
-                    aria-pressed={activeNav === "ia"}
-                    className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-transform duration-300 hover:scale-[1.06] active:scale-95"
-                  >
-                    <AiOrb size={40} />
-                  </button>
+                  <Link href="/onboarding" className="nuvi-create-btn">
+                    Criar
+                  </Link>
                   <IconButton
                     label={
                       notifications > 0 ? `Notificações, ${notifications} por ler` : "Notificações"

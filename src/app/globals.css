@@ -400,19 +400,48 @@
 }
 
 /* ============================================================
-   8. Orbe da Nuvi IA (anel de luz)
+   8. Botão "Criar" — vidro fosco azul (brilho central, luz na base)
    ============================================================ */
-@keyframes ai-orb-spin {
-  to { transform: rotate(360deg); }
+.nuvi-create-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px; /* = botões de ícone do header (h-11) */
+  padding: 0 22px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #0b3a78;
+  white-space: nowrap;
+  background:
+    radial-gradient(60% 62% at 50% 20%, rgba(30, 132, 255, 0.85) 0%, rgba(80, 160, 255, 0.5) 45%, rgba(170, 210, 255, 0) 80%),
+    radial-gradient(45% 48% at 50% 108%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 72%),
+    linear-gradient(180deg, #d6e8ff 0%, #b3d3ff 55%, #e2efff 100%);
+  /* Mesmo aro e sombra dos botões de vidro (lg-control), com um toque azul */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.55),
+    0 0 0 0.5px rgba(15, 23, 42, 0.12),
+    0 2px 6px -2px rgba(15, 23, 42, 0.1),
+    0 6px 14px -8px rgba(0, 110, 255, 0.35);
+  transition:
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.2s ease,
+    box-shadow 0.2s ease;
 }
-.ai-orb-clouds { animation: ai-orb-spin 7s linear infinite; }
-.ai-orb-rim { animation: ai-orb-spin 11s linear infinite reverse; }
-.ai-orb-wobble { animation: ai-orb-spin 4.5s linear infinite; }
-
+.nuvi-create-btn:hover {
+  filter: brightness(1.03) saturate(1.1);
+}
+.nuvi-create-btn:active {
+  transform: scale(0.96); /* igual aos outros botões de vidro */
+}
 @media (prefers-reduced-motion: reduce) {
-  .ai-orb-wobble,
-  .ai-orb-clouds,
-  .ai-orb-rim { animation: none; }
+  .nuvi-create-btn { transition: none; }
+  .nuvi-create-btn:hover,
+  .nuvi-create-btn:active { transform: none; }
 }
 
 /* ============================================================
