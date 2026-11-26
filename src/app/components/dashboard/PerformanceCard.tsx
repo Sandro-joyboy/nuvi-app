@@ -2,16 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Add01Icon,
-  Cancel01Icon,
-  Comment01Icon,
-  EyeIcon,
-  FavouriteIcon,
-  Share08Icon,
-  TradeUpIcon,
-} from "@hugeicons/core-free-icons";
-import SquircleTile from "@/app/components/squircle/SquircleTile";
+import { Add01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { Card, SectionHeader, ViewAllButton } from "./ui";
 
 type RangeKey = "7d" | "30d" | "90d";
@@ -23,15 +14,16 @@ interface Metric {
   /** Cor de sistema (Apple) para a série. */
   color: string;
   tint: string;
-  icon: typeof EyeIcon;
+  /** Ícone de vidro em /public (export do Figma). */
+  icon: string;
 }
 
 const METRICS: Metric[] = [
-  { key: "views", label: "Visualizações", color: "#0082F6", tint: "#E8F3FF", icon: EyeIcon },
-  { key: "engagement", label: "Engajamento", color: "#FF9500", tint: "#FFF4E5", icon: TradeUpIcon },
-  { key: "likes", label: "Curtidas", color: "#FF2D55", tint: "#FFEAEE", icon: FavouriteIcon },
-  { key: "comments", label: "Comentários", color: "#34C759", tint: "#EAF9EE", icon: Comment01Icon },
-  { key: "shares", label: "Partilhas", color: "#AF52DE", tint: "#F6ECFB", icon: Share08Icon },
+  { key: "views", label: "Visualizações", color: "#0082F6", tint: "#E8F3FF", icon: "/Show.svg" },
+  { key: "engagement", label: "Engajamento", color: "#FF9500", tint: "#FFF4E5", icon: "/Chart.svg" },
+  { key: "likes", label: "Curtidas", color: "#FF2D55", tint: "#FFEAEE", icon: "/Heart.svg" },
+  { key: "comments", label: "Comentários", color: "#34C759", tint: "#EAF9EE", icon: "/Chat.svg" },
+  { key: "shares", label: "Partilhas", color: "#AF52DE", tint: "#F6ECFB", icon: "/Send.svg" },
 ];
 
 const RANGE_DAYS: Record<RangeKey, number> = { "7d": 7, "30d": 30, "90d": 90 };
@@ -216,11 +208,14 @@ export default function PerformanceCard() {
               }`}
             >
               <span className="flex items-center justify-between">
-                <SquircleTile size={34} colors={[m.tint, m.tint]} glass={false}>
-                  <span style={{ color: m.color }} className="flex">
-                    <HugeiconsIcon icon={m.icon} size={17} strokeWidth={1.9} />
-                  </span>
-                </SquircleTile>
+                {/* eslint-disable-next-line @next/next/no-img-element -- SVG estático pequeno */}
+                <img
+                  src={m.icon}
+                  alt=""
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 object-contain"
+                />
                 <span className="rounded-full bg-[#0F172A]/[0.05] px-1.5 py-0.5 text-[11px] font-medium text-[#6B7280] tabular-nums">
                   0%
                 </span>

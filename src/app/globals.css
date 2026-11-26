@@ -400,19 +400,14 @@
 }
 
 /* ============================================================
-   8. Orbe da Nuvi IA (bolha de vidro líquido)
+   8. Orbe da Nuvi IA (anel de luz)
    ============================================================ */
 @keyframes ai-orb-spin {
   to { transform: rotate(360deg); }
 }
-@keyframes ai-orb-wobble {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  33% { transform: scale(1.025, 0.98) rotate(4deg); }
-  66% { transform: scale(0.98, 1.02) rotate(-3deg); }
-}
-.ai-orb-wobble { animation: ai-orb-wobble 6s ease-in-out infinite; }
-.ai-orb-clouds { animation: ai-orb-spin 14s linear infinite; }
-.ai-orb-rim { animation: ai-orb-spin 22s linear infinite reverse; }
+.ai-orb-clouds { animation: ai-orb-spin 7s linear infinite; }
+.ai-orb-rim { animation: ai-orb-spin 11s linear infinite reverse; }
+.ai-orb-wobble { animation: ai-orb-spin 4.5s linear infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .ai-orb-wobble,
