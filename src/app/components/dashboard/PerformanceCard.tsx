@@ -11,10 +11,10 @@ type MetricKey = "views" | "engagement" | "likes" | "comments" | "shares";
 interface Metric {
   key: MetricKey;
   label: string;
-  /** Cor de sistema (Apple) para a série. */
+  /** Cor da série = cor principal do ícone. */
   color: string;
   tint: string;
-  /** Ícone de vidro em /public (export do Figma). */
+  /** Ícone de vidro em /public, recolorido para a cor da série. */
   icon: string;
 }
 

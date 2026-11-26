@@ -72,11 +72,16 @@ export default function NuviDashboard() {
 
   // Header sem divisão: só ganha vidro quando o conteúdo passa por baixo.
   useEffect(() => {
-    const el = topRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => setScrolled(!e.isIntersecting));
-    io.observe(el);
-    return () => io.disconnect();
+    const scroller = topRef.current?.parentElement;
+    if (!scroller) return;
+    const onScroll = () => setScrolled(scroller.scrollTop > 4 || window.scrollY > 4);
+    onScroll();
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      scroller.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -98,7 +103,7 @@ export default function NuviDashboard() {
   );
 
   return (
-    <div className="nuvi-dash flex min-h-dvh w-full bg-[#EEF1F5] lg:h-dvh lg:min-h-0 font-sans text-[#0A0A0A]">
+    <div className="nuvi-dash flex min-h-dvh w-full bg-[#EEF1F5] lg:h-dvh lg:min-h-0 lg:overflow-hidden font-sans text-[#0A0A0A]">
       <Sidebar active={activeNav} onChange={setActiveNav} />
 
       {/* Painel principal — cartão flutuante como no macOS */}
@@ -114,12 +119,17 @@ export default function NuviDashboard() {
             <div ref={topRef} aria-hidden className="h-px" />
             {/* Header */}
             <header className="sticky top-0 z-30 -mt-px px-4 py-4 sm:px-6 lg:px-8">
+              {/* Liquid glass do header: só com conteúdo por baixo */}
               <div
                 aria-hidden
-                className={`pointer-events-none absolute inset-0 -bottom-6 bg-[#F7F8FA]/70 backdrop-blur-xl transition-opacity duration-300 [mask-image:linear-gradient(to_bottom,#000_55%,transparent)] ${
+                className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${
                   scrolled ? "opacity-100" : "opacity-0"
                 }`}
-              />
+              >
+                <div className="absolute inset-0 bg-[#F7F8FA]/65 [-webkit-backdrop-filter:blur(24px)_saturate(180%)] [backdrop-filter:blur(24px)_saturate(180%)]" />
+                {/* Transição suave para o conteúdo (sem linha dura) */}
+                <div className="absolute inset-x-0 top-full h-5 bg-gradient-to-b from-[#F7F8FA]/65 to-transparent" />
+              </div>
               <div className="relative mx-auto flex max-w-[1360px] items-center gap-4">
                 <h1 className="text-[28px] font-bold leading-none tracking-[-0.03em]">
                   Início
