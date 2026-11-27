@@ -1130,41 +1130,70 @@ function InitialAvatar({ text, muted }: { text: string; muted?: boolean }) {
 function PlanSection() {
   const { balance, openWallet } = useDashboard();
   const settings = useWorkspaceSettings();
+  const [plansOpen, setPlansOpen] = useState(false);
 
   return (
     <>
-      <SectionHeader title="Plano & Pagamento" subtitle="O teu plano e como carregas a carteira." />
+      <SectionHeader title="Plano & Pagamento" subtitle="A tua subscrição, a carteira e como pagas." />
 
-      {/* Plano */}
-      <section className="sq relative mb-6 overflow-hidden rounded-[24px] bg-gradient-to-b from-[#4EA7EB] to-[#0076E8] p-5 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.55),0_18px_40px_-18px_rgba(0,118,232,0.6)] sm:p-6">
-        <div aria-hidden className="pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-white/20 blur-3xl" />
-        <div className="relative flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <span className="lg-tint inline-flex rounded-full px-3 py-1 text-[11.5px] font-semibold">Plano atual</span>
-            <p className="mt-3 text-[26px] leading-none font-bold tracking-[-0.03em]">Gratuito</p>
-            <p className="mt-2 max-w-[400px] text-[13px] leading-snug text-white/80">
-              Sem mensalidade. Pagas em Kwanzas só pelos conteúdos que aprovas.
+      {/* Subscrição da plataforma */}
+      <section aria-labelledby="sub-title" className="lg-surface sq mb-6 overflow-hidden rounded-[24px]">
+        <div className="flex items-center gap-3.5 p-4 sm:p-5">
+          <Image
+            src="/nuvi-cloud.png"
+            alt=""
+            width={48}
+            height={48}
+            className="h-12 w-12 shrink-0 rounded-full shadow-[0_4px_12px_-4px_rgba(0,90,180,0.35)]"
+          />
+          <div className="min-w-0 flex-1">
+            <p id="sub-title" className="truncate text-[15.5px] font-bold tracking-[-0.015em] text-(--nv-text)">
+              Sem plano ativo
             </p>
+            <p className="truncate text-[12.5px] text-(--nv-text-3)">Subscrição da plataforma Nuvi</p>
           </div>
-          <div className="text-right">
-            <p className="text-[12px] font-medium text-white/75">Saldo da carteira</p>
-            <p className="font-title text-[28px] leading-tight font-bold tracking-[-0.03em] tabular-nums">{fmtKz(balance)}</p>
-          </div>
+          <p className="shrink-0 text-right">
+            <span className="font-title text-[24px] leading-none font-bold tracking-[-0.03em] text-(--nv-text) tabular-nums">
+              {fmtKz(0)}
+            </span>
+            <span className="block text-[11.5px] text-(--nv-text-3)">por mês</span>
+          </p>
         </div>
-        <div className="relative mt-5 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={openWallet}
-            className="sq inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-full bg-white px-5 text-[13.5px] font-semibold text-[#0A0A0A] transition-transform hover:scale-[1.01] active:scale-[0.98]"
-          >
-            <HugeiconsIcon icon={Add01Icon} size={15} strokeWidth={2.4} className="text-[#0076E8]" />
-            Carregar carteira
-          </button>
-          <Link href="/painel/pagamentos" className="lg-tint sq inline-flex h-10 items-center rounded-full px-4 text-[13.5px] font-semibold">
-            Ver pagamentos
-          </Link>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-(--nv-line) bg-(--nv-fill-2) px-4 py-3 sm:px-5">
+          <p className="text-[12.5px] text-(--nv-text-3)">Sem mensalidade. Pagas só os conteúdos que aprovas.</p>
+          <div className="ml-auto flex gap-2">
+            <button
+              type="button"
+              onClick={() => document.getElementById("dados-fiscais")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+              className={`${ghostBtn} !h-10`}
+            >
+              Detalhes de faturação
+            </button>
+            <button type="button" onClick={() => setPlansOpen(true)} className="nuvi-btn-sm sq !h-10 !px-5 !text-[13.5px]">
+              Mudar plano
+            </button>
+          </div>
         </div>
       </section>
+
+      <Group title="Carteira" subtitle="Saldo em Kwanzas para pagar criadores.">
+        <Row
+          icon={Wallet02Icon}
+          title={fmtKz(balance)}
+          body="Disponível para pagamentos."
+          control={
+            <div className="flex gap-2">
+              <Link href="/painel/pagamentos" className={`${ghostBtn} hidden sm:inline-flex`}>
+                Ver pagamentos
+              </Link>
+              <button type="button" onClick={openWallet} className={ghostBtn}>
+                <HugeiconsIcon icon={Add01Icon} size={14} strokeWidth={2.4} className="text-[#0076E8]" />
+                Carregar
+              </button>
+            </div>
+          }
+        />
+      </Group>
 
       <Group title="Métodos de carregamento" subtitle="Disponíveis para todas as contas em Angola.">
         <Row
@@ -1188,6 +1217,7 @@ function PlanSection() {
         />
       </Group>
 
+      <div id="dados-fiscais" className="scroll-mt-6" />
       <Group title="Dados fiscais" subtitle="Aparecem em todas as faturas.">
         <Row
           icon={Invoice01Icon}
@@ -1201,7 +1231,92 @@ function PlanSection() {
           }
         />
       </Group>
+      <PlansModal open={plansOpen} onClose={() => setPlansOpen(false)} />
     </>
+  );
+}
+
+
+const PLANS: { name: string; body: string; features: string[] }[] = [
+  { name: "Essencial", body: "Para marcas a começar com criadores.", features: ["Até 3 campanhas ativas", "Mensagens com criadores", "Pagamentos em Kwanzas"] },
+  { name: "Pro", body: "Para marcas que lançam todos os meses.", features: ["Campanhas ilimitadas", "Equipa com várias pessoas", "Relatórios de desempenho"] },
+  { name: "Agência", body: "Para gerir várias marcas num só sítio.", features: ["Vários espaços de trabalho", "Aprovações por cliente", "Apoio dedicado"] },
+];
+
+function PlansModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  if (!open) return null;
+  return <PlansModalBody onClose={onClose} />;
+}
+
+function PlansModalBody({ onClose }: { onClose: () => void }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  useDialog(true, onClose, panelRef);
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-(--nv-scrim) backdrop-blur-[3px] sm:items-center sm:p-4"
+      onPointerDown={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="plans-title"
+        className="nuvi-step sq nuvi-scroll max-h-[90dvh] w-full max-w-[640px] overflow-y-auto rounded-t-[28px] bg-(--nv-glass-strong) p-6 shadow-[inset_0_1px_0_var(--nv-glass-edge),0_0_0_0.5px_var(--nv-line),0_30px_80px_-20px_var(--nv-shadow)] backdrop-blur-2xl sm:rounded-[28px]"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 id="plans-title" className="text-[20px] font-bold tracking-[-0.022em] text-(--nv-text)">
+              Planos da Nuvi
+            </h3>
+            <p className="mt-0.5 text-[13px] text-(--nv-text-3)">
+              Os planos pagos estão a chegar. Até lá, usas a Nuvi sem mensalidade.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            className="lg-control flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-(--nv-text)"
+          >
+            <HugeiconsIcon icon={Cancel01Icon} size={16} strokeWidth={2} />
+          </button>
+        </div>
+
+        <div className="sq mt-5 flex items-center justify-between gap-3 rounded-[18px] border border-[#4EA7EB]/40 bg-(--nv-accent-soft) px-4 py-3">
+          <div>
+            <p className="text-[14px] font-semibold text-(--nv-text)">Sem plano · {fmtKz(0)} por mês</p>
+            <p className="text-[12.5px] text-(--nv-text-2)">Lança campanhas e paga só os conteúdos que aprovas.</p>
+          </div>
+          <StatusPill tone="accent">Atual</StatusPill>
+        </div>
+
+        <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {PLANS.map((p) => (
+            <li key={p.name} className="sq flex flex-col rounded-[20px] border border-(--nv-line) bg-(--nv-solid) p-4">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[15px] font-bold text-(--nv-text)">{p.name}</p>
+                <StatusPill tone="neutral">Em breve</StatusPill>
+              </div>
+              <p className="mt-1 text-[12.5px] leading-snug text-(--nv-text-3)">{p.body}</p>
+              <ul className="mt-3 flex flex-col gap-1.5">
+                {p.features.map((f) => (
+                  <li key={f} className="flex items-start gap-1.5 text-[12.5px] text-(--nv-text-2)">
+                    <HugeiconsIcon icon={Tick02Icon} size={14} strokeWidth={2.4} className="mt-px shrink-0 text-[#4EA7EB]" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-5 flex justify-end">
+          <button type="button" onClick={onClose} className="nuvi-btn-sm sq !h-10 !px-6 !text-[13.5px]">
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
