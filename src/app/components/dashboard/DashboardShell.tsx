@@ -176,7 +176,11 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       return setComposeOpen(true);
     }
     if (id === "add-funds") return setWalletOpen(true);
-    if (id === "logout") return router.push("/entrar");
+    if (id === "logout") {
+      // Apaga o cookie de sessão no servidor e volta ao ecrã de entrada.
+      void fetch("/api/auth/logout", { method: "POST" }).finally(() => router.replace("/entrar"));
+      return;
+    }
   };
 
   return (

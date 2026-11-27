@@ -13,7 +13,7 @@ const MIN_SECRET_LENGTH = 32;
  * Em produção exige OTP_SECRET real: sem ela, qualquer pessoa com a chave
  * pública do repositório poderia forjar códigos válidos.
  */
-function getOtpSecret(): string {
+export function getOtpSecret(): string {
   const secret = process.env.OTP_SECRET?.trim();
   if (process.env.NODE_ENV !== "production") {
     return secret || DEV_FALLBACK_SECRET;

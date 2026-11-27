@@ -29,6 +29,8 @@ interface EmailCodeFlowProps {
   emailPlaceholder?: string;
   /** Conteúdo extra por baixo do formulário (links, termos). */
   below?: React.ReactNode;
+  /** Antes do formulário (ex.: "Continuar com Google"). */
+  above?: React.ReactNode;
   onVerified: (email: string) => void;
   /** Enviado com a verificação (ex.: cadastro de marca → e-mail de boas-vindas). */
   verifyExtra?: { intent: "signup" | "login"; role?: "marca" | "criador" };
@@ -44,6 +46,7 @@ export default function EmailCodeFlow({
   emailLabel = "E-mail",
   emailPlaceholder = "nome@email.com",
   below,
+  above,
   onVerified,
   verifyExtra,
   onStepChange,
@@ -114,7 +117,9 @@ export default function EmailCodeFlow({
     <div>
       <PageTitle eyebrow={eyebrow} title={title} subtitle={subtitle} />
 
-      <form noValidate onSubmit={onEmailSubmit} className="mt-8 flex flex-col gap-4">
+      {above && <div className="mt-8">{above}</div>}
+
+      <form noValidate onSubmit={onEmailSubmit} className={`${above ? "mt-5" : "mt-8"} flex flex-col gap-4`}>
         <Field
           label={emailLabel}
           type="email"

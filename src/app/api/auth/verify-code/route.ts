@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import { cookies } from "next/headers";
 import { OTP_COOKIE_NAME, verifyOtpToken } from "@/lib/otp";
+import { createSessionToken, SESSION_COOKIE, sessionCookieOptions } from "@/lib/session";
 import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
@@ -41,6 +42,8 @@ export async function POST(request: NextRequest) {
     }
 
     cookieStore.delete(OTP_COOKIE_NAME);
+    // Código certo: a sessão fica iniciada neste browser.
+    cookieStore.set(SESSION_COOKIE, createSessionToken({ email, provider: "email" }), sessionCookieOptions);
 
     // Conta nova: e-mail de boas-vindas depois de responder (não atrasa o ecrã).
     const role = body.role === "marca" || body.role === "criador" ? body.role : null;

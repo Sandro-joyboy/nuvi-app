@@ -6,24 +6,33 @@ import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import EmailCodeFlow from "./EmailCodeFlow";
+import { GoogleButton, GoogleError, useQueryParam } from "./GoogleButton";
 import ThemeToggle from "./ThemeToggle";
 import Confetti from "@/app/components/celebration/Confetti";
 import { markWelcome } from "@/app/components/celebration/welcome";
 import { AuthShell, PageTitle, secondaryBtn, textLink } from "./ui";
+import { safeNextClient } from "./next";
 
 /* ---------------- Entrar ---------------- */
 
 export function LoginScreen() {
   const router = useRouter();
   const [codeStep, setCodeStep] = useState(false);
+  const next = safeNextClient(useQueryParam("next"));
   return (
     <AuthShell back={{ href: "/" }} logo={!codeStep} corner={<ThemeToggle />}>
       <EmailCodeFlow
         title="Entrar na Nuvi"
-        subtitle="Sem senhas: enviamos um código para o teu e-mail."
+        subtitle="Entra com o Google ou recebe um código no teu e-mail. Sem senhas."
         submitLabel="Continuar"
         verifyExtra={{ intent: "login" }}
-        onVerified={() => router.push("/painel")}
+        onVerified={() => router.replace(next)}
+        above={
+          <div className="flex flex-col gap-4">
+            <GoogleError />
+            <GoogleButton intent="login" />
+          </div>
+        }
         onStepChange={(s) => setCodeStep(s === "code")}
         below={
           <p className="text-center text-[13.5px] text-(--nv-text-3)">
@@ -77,6 +86,14 @@ export function SignupScreen({ role }: { role: "marca" | "criador" }) {
         emailPlaceholder={c.emailPlaceholder}
         submitLabel="Criar conta"
         verifyExtra={{ intent: "signup", role }}
+        above={
+          role === "marca" ? (
+            <div className="flex flex-col gap-4">
+              <GoogleError />
+              <GoogleButton intent="signup" />
+            </div>
+          ) : undefined
+        }
         onVerified={(email) => {
           if (role === "marca") {
             // Celebração no painel, quando a marca lá chegar pela primeira vez.
