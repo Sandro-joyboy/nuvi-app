@@ -23,56 +23,33 @@ function getLogoAttachment() {
   };
 }
 
-function wrapVerificationEmailHtml(code: string): string {
-  const spacedCode = code.split("").join(" ");
+const BRAND_BLUE = "#4EA7EB";
 
+/** Moldura comum dos e-mails: topo azul com o logótipo e cartão branco. */
+function layoutHtml(title: string, inner: string): string {
   return `
     <!DOCTYPE html>
     <html lang="pt">
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Confirma o teu e-mail - Nuvi</title>
+      <title>${title} - Nuvi</title>
     </head>
     <body style="margin: 0; padding: 0; background-color: #F4F6F9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #F4F6F9; padding: 32px 16px;">
         <tr>
           <td align="center">
             <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 520px; background-color: #FFFFFF; border-radius: 22px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);">
-              
-              <!-- Topo com Logotipo Completo Oficial da Nuvi -->
               <tr>
-                <td align="center" style="background-color: #0082F6; padding: 28px 32px; text-align: center;">
+                <td align="center" style="background-color: ${BRAND_BLUE}; padding: 28px 32px; text-align: center;">
                   <img src="cid:nuvilogo" alt="nuvi" width="141" height="26" style="display: block; margin: 0 auto; border: 0; outline: none; max-width: 141px; height: auto;" />
                 </td>
               </tr>
-
-              <!-- Conteúdo do Template -->
               <tr>
                 <td align="center" style="padding: 36px 32px 38px 32px; text-align: center;">
-                  <h1 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #111827;">
-                    Confirma o teu e-mail
-                  </h1>
-                  <p style="margin: 0 0 28px 0; font-size: 14px; color: #6B7280; line-height: 1.5;">
-                    Usa este código para continuar na Nuvi
-                  </p>
-
-                  <!-- Caixa do Código -->
-                  <div style="background-color: #F4F5F7; border-radius: 14px; padding: 26px 20px; text-align: center; margin: 0 0 28px 0;">
-                    <span style="font-size: 36px; font-weight: 800; letter-spacing: 6px; color: #0A0A0A; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace, sans-serif;">
-                      ${spacedCode}
-                    </span>
-                  </div>
-
-                  <p style="margin: 0 0 12px 0; font-size: 13px; color: #6B7280;">
-                    Este código expira em 10 minutos.
-                  </p>
-                  <p style="margin: 0; font-size: 13px; color: #6B7280; line-height: 1.5;">
-                    Se não pediste este código, podes ignorar este e-mail.
-                  </p>
+                  ${inner}
                 </td>
               </tr>
-
             </table>
           </td>
         </tr>
@@ -82,52 +59,53 @@ function wrapVerificationEmailHtml(code: string): string {
   `;
 }
 
-export async function sendVerificationCodeEmail({
-  email,
-  code,
-}: {
-  email: string;
-  code: string;
-}): Promise<{ success: boolean; previewUrl?: string; error?: string }> {
-  const { host, port, user, pass, from } = getEmailConfig();
+function wrapVerificationEmailHtml(code: string): string {
+  const spacedCode = code.split("").join(" ");
+  return layoutHtml(
+    "Confirma o teu e-mail",
+    `
+      <h1 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #111827;">
+        Confirma o teu e-mail
+      </h1>
+      <p style="margin: 0 0 28px 0; font-size: 14px; color: #6B7280; line-height: 1.5;">
+        Usa este código para continuar na Nuvi
+      </p>
+      <div style="background-color: #F4F5F7; border-radius: 14px; padding: 26px 20px; text-align: center; margin: 0 0 28px 0;">
+        <span style="font-size: 36px; font-weight: 800; letter-spacing: 6px; color: #0A0A0A; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace, sans-serif;">
+          ${spacedCode}
+        </span>
+      </div>
+      <p style="margin: 0 0 12px 0; font-size: 13px; color: #6B7280;">
+        Este código expira em 10 minutos.
+      </p>
+      <p style="margin: 0; font-size: 13px; color: #6B7280; line-height: 1.5;">
+        Se não pediste este código, podes ignorar este e-mail.
+      </p>
+    `
+  );
+}
 
-  const html = wrapVerificationEmailHtml(code);
-  const text = `Confirma o teu e-mail\n\nUsa este código para continuar na Nuvi: ${code}\n\nEste código expira em 10 minutos.\nSe não pediste este código, podes ignorar este e-mail.`;
+type SendResult = { success: boolean; previewUrl?: string; error?: string };
+
+/** Envia por SMTP; em desenvolvimento sem SMTP usa uma conta de teste (Ethereal). */
+async function deliver(
+  mail: { to: string; subject: string; html: string; text: string },
+  label: string,
+  /** Linha extra para a consola em desenvolvimento (ex.: o código). */
+  devNote = ""
+): Promise<SendResult> {
+  const { host, port, user, pass, from } = getEmailConfig();
+  const message = { from, ...mail, attachments: [getLogoAttachment()] };
 
   if (user && pass) {
     try {
-      const transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
-        auth: { user, pass },
-      });
-
-      const info = await transporter.sendMail({
-        from,
-        to: email,
-        subject: `${code} é o teu código da Nuvi`,
-        html,
-        text,
-        attachments: [getLogoAttachment()],
-      });
-
-      console.log(
-        "[Nodemailer] Código de verificação enviado com sucesso para:",
-        email,
-        info.messageId
-      );
+      const transporter = nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass } });
+      const info = await transporter.sendMail(message);
+      console.log(`[Nodemailer] ${label} enviado para:`, mail.to, info.messageId);
       return { success: true };
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Erro desconhecido ao enviar email";
-      console.error(
-        "[Nodemailer] Falha ao enviar email para:",
-        email,
-        errorMessage
-      );
+      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao enviar email";
+      console.error(`[Nodemailer] Falha ao enviar ${label} para:`, mail.to, errorMessage);
       // O detalhe do SMTP fica nos logs; o utilizador recebe uma mensagem genérica.
       return { success: false, error: "Não foi possível enviar o e-mail. Tenta de novo daqui a pouco." };
     }
@@ -139,37 +117,103 @@ export async function sendVerificationCodeEmail({
     return { success: false, error: "O envio de e-mails não está disponível de momento." };
   }
 
-  // Fallback de desenvolvimento caso SMTP_PASS não esteja configurado
   try {
     const testAccount = await nodemailer.createTestAccount();
     const transporter = nodemailer.createTransport({
       host: testAccount.smtp.host,
       port: testAccount.smtp.port,
       secure: testAccount.smtp.secure,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
+      auth: { user: testAccount.user, pass: testAccount.pass },
     });
-
-    const info = await transporter.sendMail({
-      from,
-      to: email,
-      subject: `${code} é o teu código da Nuvi`,
-      html,
-      text,
-      attachments: [getLogoAttachment()],
-    });
-
+    const info = await transporter.sendMail(message);
     const previewUrl = nodemailer.getTestMessageUrl(info) || undefined;
-    console.info(
-      `[Nuvi OTP - Teste] Código para ${email}: ${code}${
-        previewUrl ? ` | Preview: ${previewUrl}` : ""
-      }`
-    );
+    console.info(`[Nuvi ${label} - Teste] ${mail.to}${devNote}${previewUrl ? ` | Preview: ${previewUrl}` : ""}`);
     return { success: true, previewUrl };
   } catch {
-    console.info(`[Nuvi OTP - Local] Código para ${email}: ${code}`);
+    console.info(`[Nuvi ${label} - Local] ${mail.to}${devNote} (sem envio)`);
     return { success: true };
   }
+}
+
+export async function sendVerificationCodeEmail({ email, code }: { email: string; code: string }): Promise<SendResult> {
+  return deliver(
+    {
+      to: email,
+      subject: `${code} é o teu código da Nuvi`,
+      html: wrapVerificationEmailHtml(code),
+      text: `Confirma o teu e-mail\n\nUsa este código para continuar na Nuvi: ${code}\n\nEste código expira em 10 minutos.\nSe não pediste este código, podes ignorar este e-mail.`,
+    },
+    "Código de verificação",
+    ` | código: ${code}`
+  );
+}
+
+/* ---------------- Boas-vindas ---------------- */
+
+const WELCOME = {
+  marca: {
+    title: "A tua marca está na Nuvi",
+    lead: "A conta está pronta. Agora é contigo: lança a primeira campanha e recebe conteúdo de criadores.",
+    steps: [
+      ["Cria a primeira campanha", "Objetivo, público e orçamento em poucos minutos."],
+      ["Recebe criadores", "Os criadores certos candidatam-se à tua campanha."],
+      ["Aprova e paga em Kwanzas", "Só pagas o conteúdo que aprovares."],
+    ],
+    cta: "Abrir o painel",
+    path: "/painel",
+  },
+  criador: {
+    title: "Bem-vindo à Nuvi",
+    lead: "A tua conta de criador está pronta. Vamos avisar-te quando houver campanhas para ti.",
+    steps: [
+      ["Completa o teu perfil", "Nicho, redes sociais e exemplos de conteúdo."],
+      ["Recebe convites", "As marcas encontram-te em Descobrir."],
+      ["Cria e recebe", "Pagamento em Kwanzas após aprovação."],
+    ],
+    cta: "Abrir a Nuvi",
+    path: "/",
+  },
+} as const;
+
+export function wrapWelcomeEmailHtml(role: "marca" | "criador", appUrl: string): string {
+  const c = WELCOME[role];
+  const steps = c.steps
+    .map(
+      ([t, d], i) => `
+        <tr>
+          <td valign="top" style="width: 36px; padding: 0 0 16px 0;">
+            <div style="width: 28px; height: 28px; border-radius: 14px; background-color: #EAF5FD; color: ${BRAND_BLUE}; font-size: 13px; font-weight: 700; line-height: 28px; text-align: center;">${i + 1}</div>
+          </td>
+          <td valign="top" style="padding: 3px 0 16px 0; text-align: left;">
+            <div style="font-size: 14px; font-weight: 600; color: #111827;">${t}</div>
+            <div style="font-size: 13px; color: #6B7280; line-height: 1.5;">${d}</div>
+          </td>
+        </tr>`
+    )
+    .join("");
+  return layoutHtml(
+    c.title,
+    `
+      <div style="font-size: 40px; line-height: 1; margin: 0 0 14px 0;">🎉</div>
+      <h1 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #111827;">${c.title}</h1>
+      <p style="margin: 0 0 28px 0; font-size: 14px; color: #6B7280; line-height: 1.6;">${c.lead}</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #F7F9FC; border-radius: 16px; padding: 20px 20px 4px 20px; margin: 0 0 28px 0;">${steps}</table>
+      <a href="${appUrl}${c.path}" style="display: inline-block; background-color: ${BRAND_BLUE}; color: #FFFFFF; font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 28px; border-radius: 999px;">${c.cta}</a>
+      <p style="margin: 28px 0 0 0; font-size: 12px; color: #9CA3AF; line-height: 1.5;">Recebeste este e-mail porque criaste uma conta na Nuvi com este endereço.</p>
+    `
+  );
+}
+
+export async function sendWelcomeEmail({
+  email,
+  role,
+  appUrl,
+}: {
+  email: string;
+  role: "marca" | "criador";
+  appUrl: string;
+}): Promise<SendResult> {
+  const c = WELCOME[role];
+  const text = `${c.title}\n\n${c.lead}\n\n${c.steps.map(([t, d], i) => `${i + 1}. ${t} — ${d}`).join("\n")}\n\n${c.cta}: ${appUrl}${c.path}\n\nRecebeste este e-mail porque criaste uma conta na Nuvi com este endereço.`;
+  return deliver({ to: email, subject: c.title, html: wrapWelcomeEmailHtml(role, appUrl), text }, "E-mail de boas-vindas");
 }

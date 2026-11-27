@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import EmailCodeFlow from "./EmailCodeFlow";
+import Confetti from "@/app/components/celebration/Confetti";
+import { markWelcome } from "@/app/components/celebration/welcome";
 import { AuthShell, PageTitle, secondaryBtn, textLink } from "./ui";
 
 /* ---------------- Entrar ---------------- */
@@ -22,6 +24,7 @@ export function LoginScreen() {
         title="Entrar na Nuvi"
         subtitle="Sem senhas: enviamos um código para o teu e-mail."
         submitLabel="Continuar"
+        verifyExtra={{ intent: "login" }}
         onVerified={() => router.push("/painel")}
         onStepChange={(s) => setCodeStep(s === "code")}
         below={
@@ -75,7 +78,14 @@ export function SignupScreen({ role }: { role: "marca" | "criador" }) {
         emailLabel={c.emailLabel}
         emailPlaceholder={c.emailPlaceholder}
         submitLabel="Criar conta"
-        onVerified={(email) => (role === "marca" ? router.push("/onboarding") : setDone(email))}
+        verifyExtra={{ intent: "signup", role }}
+        onVerified={(email) => {
+          if (role === "marca") {
+            // Celebração no painel, quando a marca lá chegar pela primeira vez.
+            markWelcome({ role, email });
+            router.push("/onboarding");
+          } else setDone(email);
+        }}
         onStepChange={(s) => setCodeStep(s === "code")}
         below={
           <div className="flex flex-col items-center gap-1.5 text-[13.5px] text-(--nv-text-3)">
@@ -103,7 +113,8 @@ export function SignupScreen({ role }: { role: "marca" | "criador" }) {
 function CreatorWelcome({ email }: { email: string }) {
   return (
     <AuthShell logo={false}>
-      <div className="text-center">
+      <Confetti />
+      <div className="nuvi-welcome text-center">
         <span className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-(--nv-success-soft) text-[#34C759]">
           <HugeiconsIcon icon={CheckmarkCircle02Icon} size={32} strokeWidth={1.8} />
         </span>
@@ -113,7 +124,7 @@ function CreatorWelcome({ email }: { email: string }) {
             <>
               Bem-vindo à Nuvi. Avisamos-te em{" "}
               <strong className="font-semibold break-all text-(--nv-text)">{email}</strong> quando houver
-              campanhas para ti.
+              campanhas para ti. Enviámos-te um e-mail de boas-vindas.
             </>
           }
         />

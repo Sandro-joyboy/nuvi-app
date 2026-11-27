@@ -30,6 +30,8 @@ interface EmailCodeFlowProps {
   /** Conteúdo extra por baixo do formulário (links, termos). */
   below?: React.ReactNode;
   onVerified: (email: string) => void;
+  /** Enviado com a verificação (ex.: cadastro de marca → e-mail de boas-vindas). */
+  verifyExtra?: { intent: "signup" | "login"; role?: "marca" | "criador" };
   /** Muda o botão voltar do ecrã conforme o passo. */
   onStepChange?: (step: "email" | "code") => void;
 }
@@ -43,6 +45,7 @@ export default function EmailCodeFlow({
   emailPlaceholder = "nome@email.com",
   below,
   onVerified,
+  verifyExtra,
   onStepChange,
 }: EmailCodeFlowProps) {
   const [step, setStep] = useState<"email" | "code">("email");
@@ -102,6 +105,7 @@ export default function EmailCodeFlow({
         previewUrl={previewUrl}
         onChangeEmail={() => goTo("email")}
         onVerified={() => onVerified(email)}
+        verifyExtra={verifyExtra}
       />
     );
   }
@@ -149,6 +153,7 @@ function CodeStep({
   previewUrl,
   onChangeEmail,
   onVerified,
+  verifyExtra,
 }: {
   email: string;
   resend: () => Promise<boolean>;
@@ -157,6 +162,7 @@ function CodeStep({
   previewUrl: string | null;
   onChangeEmail: () => void;
   onVerified: () => void;
+  verifyExtra?: EmailCodeFlowProps["verifyExtra"];
 }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -179,7 +185,7 @@ function CodeStep({
       const res = await fetch("/api/auth/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code: value }),
+        body: JSON.stringify({ email, code: value, ...verifyExtra }),
       });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) {

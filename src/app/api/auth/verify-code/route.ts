@@ -1,10 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { cookies } from "next/headers";
 import { OTP_COOKIE_NAME, verifyOtpToken } from "@/lib/otp";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as { email?: string; code?: string };
+    const body = (await request.json()) as {
+      email?: string;
+      code?: string;
+      /** Cadastro (envia boas-vindas) ou entrada. */
+      intent?: "signup" | "login";
+      role?: "marca" | "criador";
+    };
     const email = body.email?.trim().toLowerCase();
     const code = body.code?.trim();
 
@@ -34,6 +41,16 @@ export async function POST(request: NextRequest) {
     }
 
     cookieStore.delete(OTP_COOKIE_NAME);
+
+    // Conta nova: e-mail de boas-vindas depois de responder (não atrasa o ecrã).
+    const role = body.role === "marca" || body.role === "criador" ? body.role : null;
+    if (body.intent === "signup" && role) {
+      const appUrl = request.nextUrl.origin;
+      after(async () => {
+        const sent = await sendWelcomeEmail({ email, role, appUrl });
+        if (!sent.success) console.error("[Nuvi] Boas-vindas não enviadas para:", email);
+      });
+    }
 
     return NextResponse.json({
       ok: true,

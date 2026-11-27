@@ -26,6 +26,8 @@ import AccountMenu from "./AccountMenu";
 import ProfileModal from "./ProfileModal";
 import { applyTheme, useProfile, useThemePref } from "./prefs";
 import { markCampaignSeen, useCampaign } from "@/app/components/onboarding/campaign";
+import WelcomeDialog from "@/app/components/celebration/WelcomeDialog";
+import { dismissWelcome, useWelcome } from "@/app/components/celebration/welcome";
 
 // Novidades do produto (conteúdo local até existir API de notificações).
 const INITIAL_NOTIFICATIONS: NotificationItem[] = [
@@ -101,13 +103,14 @@ export default function NuviDashboard() {
   const themePref = useThemePref();
   const router = useRouter();
   const campaign = useCampaign();
+  const welcome = useWelcome();
 
   // Confirmação "campanha criada": aparece uma vez e some sozinha.
   useEffect(() => {
-    if (!campaign?.justCreated) return;
+    if (!campaign?.justCreated || welcome) return;
     const t = setTimeout(markCampaignSeen, 6000);
     return () => clearTimeout(t);
-  }, [campaign?.justCreated]);
+  }, [campaign?.justCreated, welcome]);
   const topRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
@@ -416,7 +419,19 @@ export default function NuviDashboard() {
 
       <MobileTabBar active={activeNav} onChange={setActiveNav} scrolled={scrolled} />
 
-      {campaign?.justCreated && (
+      {welcome?.role === "marca" && (
+        <WelcomeDialog
+          email={welcome.email}
+          brandName={campaign?.brandName || undefined}
+          campaignCreated={!!campaign?.justCreated}
+          onClose={() => {
+            dismissWelcome();
+            markCampaignSeen();
+          }}
+        />
+      )}
+
+      {campaign?.justCreated && !welcome && (
         <div
           role="status"
           className="nuvi-pop lg-surface sq fixed top-4 left-1/2 z-[70] flex -translate-x-1/2 items-center gap-3 rounded-full py-2 pr-2 pl-3.5"

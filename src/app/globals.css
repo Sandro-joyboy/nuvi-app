@@ -578,6 +578,11 @@ html[data-theme="dark"] .nuvi-dash .nuvi-scroll::-webkit-scrollbar-thumb {
   to { transform: none; opacity: 1; }
 }
 .nuvi-sheet { animation: nuvi-sheet-in 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes nuvi-welcome-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+.nuvi-welcome { animation: nuvi-welcome-in 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes nuvi-step-in {
   from { transform: translateY(8px); opacity: 0; }
   to { transform: none; opacity: 1; }
@@ -588,5 +593,6 @@ html[data-theme="dark"] .nuvi-dash .nuvi-scroll::-webkit-scrollbar-thumb {
 @media (prefers-reduced-motion: reduce) {
   .nuvi-sheet,
   .nuvi-pop,
+  .nuvi-welcome,
   .nuvi-step { animation: none; }
 }
