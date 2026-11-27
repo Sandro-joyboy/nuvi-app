@@ -40,9 +40,9 @@ export function AuthShell({ children, back, aside, width = "sm", footer = true, 
         <div className={`w-full ${WIDTHS[width]}`}>
           {/* Marca por cima do título, na mesma coluna */}
           <div className="mb-6 flex items-center gap-3 sm:mb-8">
-            {/* Voltar: ao lado da marca no telemóvel, no canto superior esquerdo em ecrãs largos */}
+            {/* Voltar no canto superior esquerdo, na mesma linha do tema */}
             {back && (
-              <div className="sm:absolute sm:top-6 sm:left-8">
+              <div className="absolute top-4 left-4 sm:top-6 sm:left-8">
                 <BackButton {...back} />
               </div>
             )}

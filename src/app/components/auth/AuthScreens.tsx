@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import EmailCodeFlow from "./EmailCodeFlow";
+import ThemeToggle from "./ThemeToggle";
 import Confetti from "@/app/components/celebration/Confetti";
 import { markWelcome } from "@/app/components/celebration/welcome";
 import { AuthShell, PageTitle, secondaryBtn, textLink } from "./ui";
@@ -16,10 +17,7 @@ export function LoginScreen() {
   const router = useRouter();
   const [codeStep, setCodeStep] = useState(false);
   return (
-    <AuthShell
-      back={{ href: "/" }}
-      logo={!codeStep}
-    >
+    <AuthShell back={{ href: "/" }} logo={!codeStep} corner={<ThemeToggle />}>
       <EmailCodeFlow
         title="Entrar na Nuvi"
         subtitle="Sem senhas: enviamos um código para o teu e-mail."
@@ -70,7 +68,7 @@ export function SignupScreen({ role }: { role: "marca" | "criador" }) {
   if (done) return <CreatorWelcome email={done} />;
 
   return (
-    <AuthShell back={{ href: "/" }} logo={!codeStep}>
+    <AuthShell back={{ href: "/" }} logo={!codeStep} corner={<ThemeToggle />}>
       <EmailCodeFlow
         eyebrow={c.eyebrow}
         title={c.title}
@@ -112,7 +110,7 @@ export function SignupScreen({ role }: { role: "marca" | "criador" }) {
 
 function CreatorWelcome({ email }: { email: string }) {
   return (
-    <AuthShell logo={false}>
+    <AuthShell logo={false} corner={<ThemeToggle />}>
       <Confetti />
       <div className="nuvi-welcome text-center">
         <span className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-(--nv-success-soft) text-[#34C759]">
