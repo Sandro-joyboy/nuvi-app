@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Add01Icon,
@@ -16,12 +17,36 @@ import SquircleTile from "@/app/components/squircle/SquircleTile";
 import PerformanceCard from "./PerformanceCard";
 import WalletModal from "./WalletModal";
 import { MobileTabBar, Sidebar, type NavKey } from "./Sidebar";
-import { Card, EmptyState, SectionHeader, ViewAllButton } from "./ui";
+import { Avatar, Card, EmptyState, SectionHeader, ViewAllButton } from "./ui";
+import CommandPalette, { type CommandId } from "./CommandPalette";
+import NotificationsSheet, { type NotificationItem } from "./NotificationsSheet";
+import AccountMenu from "./AccountMenu";
+import ProfileModal from "./ProfileModal";
+import { applyTheme, useProfile, useThemePref } from "./prefs";
 
-const QUICK_ACTIONS = [
-  { label: "Criar campanha", hint: "Campanhas", href: "/onboarding" },
-  { label: "Descobrir criadores", hint: "Descobrir", href: "#descobrir" },
-  { label: "Carregar carteira", hint: "Carteira", href: "#carteira" },
+// Novidades do produto (conteúdo local até existir API de notificações).
+const INITIAL_NOTIFICATIONS: NotificationItem[] = [
+  {
+    id: "carteira-aoa",
+    title: "Carteira em Kwanzas",
+    body: "Carrega saldo por Multicaixa Express ou referência bancária e paga criadores em AOA.",
+    tag: "Novidade · Carteira",
+    read: false,
+  },
+  {
+    id: "anuncios",
+    title: "Anúncios chegaram à Nuvi",
+    body: "Impulsiona os melhores vídeos dos criadores no Instagram, Facebook e TikTok.",
+    tag: "Novidade · Anúncios",
+    read: false,
+  },
+  {
+    id: "boas-vindas",
+    title: "Bem-vindo à Nuvi",
+    body: "Cria a tua primeira campanha e começa a receber conteúdos de criadores.",
+    tag: "Primeiros passos",
+    read: false,
+  },
 ];
 
 const fmtKz = (n: number) => `${n.toLocaleString("pt-PT")} Kz`;
@@ -32,11 +57,13 @@ function IconButton({
   children,
   onClick,
   active,
+  className = "",
 }: {
   label: string;
   children: React.ReactNode;
   onClick?: () => void;
   active?: boolean;
+  className?: string;
 }) {
   return (
     <button
@@ -45,8 +72,8 @@ function IconButton({
       title={label}
       onClick={onClick}
       aria-pressed={active}
-      className={`lg-control relative flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full ${
-        active ? "text-[#0076E8]" : "text-[#4B5563]"
+      className={`lg-control relative flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full ${className} ${
+        active ? "text-[#0076E8]" : "text-(--nv-text-2)"
       }`}
     >
       {children}
@@ -55,17 +82,21 @@ function IconButton({
 }
 
 const ghostCta =
-  "lg-control sq inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold text-[#0A0A0A]";
+  "lg-control sq inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold text-(--nv-text)";
 
 export default function NuviDashboard() {
   const [activeNav, setActiveNav] = useState<NavKey>("inicio");
-  const [query, setQuery] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [balance, setBalance] = useState(0);
   const [walletOpen, setWalletOpen] = useState(false);
-  // TODO: ligar à API de notificações (valor provisório para o visual).
-  const [notifications, setNotifications] = useState(6);
-  const searchRef = useRef<HTMLInputElement>(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+  const unread = notifications.filter((n) => !n.read).length;
+  const profile = useProfile();
+  const themePref = useThemePref();
+  const router = useRouter();
   const topRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
@@ -83,34 +114,58 @@ export default function NuviDashboard() {
     };
   }, []);
 
+  // ⌘K / Ctrl+K abre e fecha a pesquisa
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        searchRef.current?.focus();
-      }
-      if (e.key === "Escape" && document.activeElement === searchRef.current) {
-        searchRef.current?.blur();
+        setPaletteOpen((v) => !v);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const results = QUICK_ACTIONS.filter((a) =>
-    a.label.toLowerCase().includes(query.trim().toLowerCase())
-  );
+  // Tema "Sistema": acompanha a mudança de claro/escuro do sistema operativo
+  useEffect(() => {
+    applyTheme(themePref);
+    if (themePref !== "system") return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => applyTheme("system");
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [themePref]);
+
+  const closePalette = useCallback(() => setPaletteOpen(false), []);
+  const closeNotif = useCallback(() => setNotifOpen(false), []);
+  const closeAccount = useCallback(() => setAccountOpen(false), []);
+  const closeProfile = useCallback(() => setProfileOpen(false), []);
+
+  const runCommand = (id: CommandId) => {
+    if (id.startsWith("nav:")) return setActiveNav(id.slice(4) as NavKey);
+    if (id === "create-campaign") return router.push("/onboarding");
+    if (id === "new-message") return setActiveNav("mensagens");
+    if (id === "add-funds") return setWalletOpen(true);
+    if (id === "logout") return router.push("/");
+  };
 
   return (
-    <div className="nuvi-dash flex min-h-dvh w-full bg-[#EEF1F5] lg:h-dvh lg:min-h-0 lg:overflow-hidden font-sans text-[#0A0A0A]">
-      <Sidebar active={activeNav} onChange={setActiveNav} />
+    <div className="nuvi-dash flex min-h-dvh w-full bg-(--nv-bg) lg:h-dvh lg:min-h-0 lg:overflow-hidden font-sans text-(--nv-text)">
+      <Sidebar
+        active={activeNav}
+        onChange={setActiveNav}
+        avatar={<Avatar profile={profile} size={40} />}
+        accountOpen={accountOpen}
+        onAccount={() => setAccountOpen((v) => !v)}
+      />
 
       {/* Painel principal — cartão flutuante como no macOS */}
       <div className="flex min-w-0 flex-1 flex-col lg:py-2 lg:pr-2">
-        <div className="sq relative flex min-h-dvh flex-1 flex-col overflow-clip bg-[#F7F8FA] lg:min-h-0 lg:overflow-hidden lg:rounded-[32px] lg:shadow-[0_0_0_0.5px_rgba(15,23,42,0.08),0_10px_40px_-20px_rgba(15,23,42,0.18)]">
+        <div className="sq relative flex min-h-dvh flex-1 flex-col overflow-clip bg-(--nv-panel) lg:min-h-0 lg:overflow-hidden lg:rounded-[32px] lg:shadow-[0_0_0_0.5px_rgba(15,23,42,0.08),0_10px_40px_-20px_rgba(15,23,42,0.18)]">
           {/* Luz ambiente para o vidro ter o que refratar */}
           <div
             aria-hidden
+            style={{ opacity: "var(--nv-ambient)" }}
             className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(60%_60%_at_15%_0%,rgba(78,167,235,0.16),transparent_70%),radial-gradient(40%_50%_at_90%_10%,rgba(175,82,222,0.08),transparent_70%)]"
           />
 
@@ -123,72 +178,53 @@ export default function NuviDashboard() {
                   Início
                 </h1>
 
-                {/* Pesquisa */}
-                <div className="relative ml-auto hidden w-full max-w-[380px] md:block lg:mx-auto">
-                  <label className="lg-control sq flex h-10 items-center gap-2.5 rounded-full px-3.5 focus-within:shadow-[inset_0_1px_0_#fff,0_0_0_1px_#0082F6,0_0_0_4px_rgba(0,130,246,0.14)]">
-                    <HugeiconsIcon
-                      icon={Search01Icon}
-                      size={16}
-                      strokeWidth={2}
-                      className="shrink-0 text-[#8A919E]"
-                    />
-                    <span className="sr-only">Pesquisar</span>
-                    <input
-                      ref={searchRef}
-                      type="search"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      onFocus={() => setSearchOpen(true)}
-                      onBlur={() => setSearchOpen(false)}
-                      placeholder="Pesquisar"
-                      className="w-full bg-transparent text-[14px] outline-none placeholder:text-[#8A919E] [&::-webkit-search-cancel-button]:hidden"
-                    />
-                    <kbd className="rounded-[7px] bg-[#0F172A]/[0.05] px-1.5 py-0.5 font-sans text-[11px] font-medium text-[#6B7280]">
-                      ⌘K
-                    </kbd>
-                  </label>
-
-                  {searchOpen && (
-                    <div className="lg-surface sq absolute top-12 right-0 left-0 z-40 rounded-[20px] p-1.5">
-                      {results.length > 0 ? (
-                        results.map((a) => (
-                          <Link
-                            key={a.label}
-                            href={a.href}
-                            onMouseDown={(e) => e.preventDefault()}
-                            className="flex items-center justify-between rounded-[14px] px-3 py-2.5 text-[13.5px] font-medium transition-colors hover:bg-[#0082F6]/[0.07] hover:text-[#0076E8]"
-                          >
-                            {a.label}
-                            <span className="text-[12px] text-[#8A919E]">{a.hint}</span>
-                          </Link>
-                        ))
-                      ) : (
-                        <p className="px-3 py-2.5 text-[13px] text-[#6B7280]">Sem resultados</p>
-                      )}
-                    </div>
-                  )}
-                </div>
+                {/* Pesquisa: abre a paleta de comandos */}
+                <button
+                  type="button"
+                  onClick={() => setPaletteOpen(true)}
+                  aria-haspopup="dialog"
+                  aria-keyshortcuts="Meta+K Control+K"
+                  className="lg-control sq ml-auto hidden h-10 w-full max-w-[380px] cursor-pointer items-center gap-2.5 rounded-full px-3.5 text-left md:flex lg:mx-auto"
+                >
+                  <HugeiconsIcon icon={Search01Icon} size={16} strokeWidth={2} className="shrink-0 text-(--nv-text-3)" />
+                  <span className="flex-1 text-[14px] text-(--nv-text-3)">Pesquisar</span>
+                  <kbd className="rounded-[7px] bg-(--nv-fill) px-1.5 py-0.5 font-sans text-[11px] font-medium text-(--nv-text-3)">
+                    ⌘K
+                  </kbd>
+                </button>
 
                 <div className="ml-auto flex items-center gap-2.5 md:ml-0">
                   <Link href="/onboarding" className="nuvi-create-btn">
                     Criar
                   </Link>
                   <IconButton
-                    label={
-                      notifications > 0 ? `Notificações, ${notifications} por ler` : "Notificações"
-                    }
-                    onClick={() => setNotifications(0)}
+                    label="Pesquisar"
+                    onClick={() => setPaletteOpen(true)}
+                    className="md:hidden"
+                  >
+                    <HugeiconsIcon icon={Search01Icon} size={19} strokeWidth={1.8} />
+                  </IconButton>
+                  <IconButton
+                    label={unread > 0 ? `Notificações, ${unread} por ler` : "Notificações"}
+                    onClick={() => setNotifOpen(true)}
                   >
                     <HugeiconsIcon icon={Notification02Icon} size={19} strokeWidth={1.8} />
-                    {notifications > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#FF3B30] px-1 text-[10.5px] font-semibold text-white tabular-nums ring-2 ring-white">
-                        {notifications > 9 ? "9+" : notifications}
+                    {unread > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#FF3B30] px-1 text-[10.5px] font-semibold text-white tabular-nums ring-2 ring-(--nv-solid)">
+                        {unread > 9 ? "9+" : unread}
                       </span>
                     )}
                   </IconButton>
-                  <IconButton label="Conta Moco">
-                    <span className="text-[14px] font-medium text-[#6B7280]">M</span>
-                  </IconButton>
+                  <button
+                    type="button"
+                    onClick={() => setProfileOpen(true)}
+                    aria-label="Editar perfil"
+                    aria-haspopup="dialog"
+                    title="Editar perfil"
+                    className="shrink-0 cursor-pointer rounded-full shadow-[0_0_0_0.5px_var(--nv-line-strong),0_2px_6px_-2px_var(--nv-shadow)] transition-transform duration-300 active:scale-95"
+                  >
+                    <Avatar profile={profile} size={44} />
+                  </button>
                 </div>
               </div>
             </header>
@@ -209,7 +245,7 @@ export default function NuviDashboard() {
                       />
                       <EmptyState
                         icon={
-                          <SquircleTile size={48} colors={["#E8F3FF", "#E8F3FF"]} glass={false}>
+                          <SquircleTile size={48} colors={["var(--nv-accent-soft)", "var(--nv-accent-soft)"]} glass={false}>
                             <HugeiconsIcon
                               icon={Video01Icon}
                               size={22}
@@ -240,12 +276,12 @@ export default function NuviDashboard() {
                       />
                       <EmptyState
                         icon={
-                          <SquircleTile size={48} colors={["#F1F3F6", "#F1F3F6"]} glass={false}>
+                          <SquircleTile size={48} colors={["var(--nv-tile)", "var(--nv-tile)"]} glass={false}>
                             <HugeiconsIcon
                               icon={InboxCheckIcon}
                               size={22}
                               strokeWidth={1.8}
-                              className="text-[#5B6474]"
+                              className="text-(--nv-text-2)"
                             />
                           </SquircleTile>
                         }
@@ -328,7 +364,7 @@ export default function NuviDashboard() {
                     <EmptyState
                       compact
                       icon={
-                        <SquircleTile size={40} colors={["#EAF9EE", "#EAF9EE"]} glass={false}>
+                        <SquircleTile size={40} colors={["var(--nv-success-soft)", "var(--nv-success-soft)"]} glass={false}>
                           <HugeiconsIcon
                             icon={Tick02Icon}
                             size={20}
@@ -346,12 +382,12 @@ export default function NuviDashboard() {
                     <EmptyState
                       compact
                       icon={
-                        <SquircleTile size={40} colors={["#F1F3F6", "#F1F3F6"]} glass={false}>
+                        <SquircleTile size={40} colors={["var(--nv-tile)", "var(--nv-tile)"]} glass={false}>
                           <HugeiconsIcon
                             icon={Notification02Icon}
                             size={19}
                             strokeWidth={1.9}
-                            className="text-[#8A919E]"
+                            className="text-(--nv-text-3)"
                           />
                         </SquircleTile>
                       }
@@ -366,6 +402,27 @@ export default function NuviDashboard() {
       </div>
 
       <MobileTabBar active={activeNav} onChange={setActiveNav} scrolled={scrolled} />
+
+      <CommandPalette open={paletteOpen} onClose={closePalette} onRun={runCommand} />
+      <NotificationsSheet
+        open={notifOpen}
+        items={notifications}
+        onClose={closeNotif}
+        onMarkRead={(id) =>
+          setNotifications((list) => list.map((n) => (n.id === id ? { ...n, read: true } : n)))
+        }
+        onMarkAllRead={() => setNotifications((list) => list.map((n) => ({ ...n, read: true })))}
+      />
+      <AccountMenu
+        open={accountOpen}
+        onClose={closeAccount}
+        avatar={<Avatar profile={profile} size={44} />}
+        onEditProfile={() => {
+          setAccountOpen(false);
+          setProfileOpen(true);
+        }}
+      />
+      <ProfileModal open={profileOpen} profile={profile} onClose={closeProfile} />
 
       <WalletModal
         open={walletOpen}

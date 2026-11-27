@@ -8,7 +8,7 @@ interface SquircleTileProps {
   size: number;
   /** Raio antes do smoothing. Padrão Apple: ~0.42 do lado. */
   radius?: number;
-  /** Cores do gradiente vertical do corpo. */
+  /** Cores do gradiente vertical do corpo (aceita var(--token)). */
   colors: [string, string];
   /** Brilho interno (aresta de vidro). */
   glass?: boolean;
@@ -41,8 +41,8 @@ export default function SquircleTile({
       >
         <defs>
           <linearGradient id={`body-${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor={colors[0]} />
-            <stop offset="1" stopColor={colors[1]} />
+            <stop offset="0" style={{ stopColor: colors[0] }} />
+            <stop offset="1" style={{ stopColor: colors[1] }} />
           </linearGradient>
           <linearGradient id={`rim-${uid}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#fff" stopOpacity="0.75" />

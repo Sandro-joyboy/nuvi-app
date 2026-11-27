@@ -53,7 +53,7 @@ export default function WalletModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="wallet-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A1628]/30 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-(--nv-scrim) p-4 backdrop-blur-md"
       onClick={onClose}
     >
       <div
@@ -62,17 +62,17 @@ export default function WalletModal({
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="sq flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#EFF7FF] text-[#0082F6]">
+            <span className="sq flex h-11 w-11 items-center justify-center rounded-[14px] bg-(--nv-accent-soft) text-[#0082F6]">
               <HugeiconsIcon icon={Wallet02Icon} size={22} strokeWidth={1.8} />
             </span>
             <div>
               <h3
                 id="wallet-modal-title"
-                className="text-[20px] font-bold tracking-[-0.022em] text-[#0A0A0A]"
+                className="text-[20px] font-bold tracking-[-0.022em] text-(--nv-text)"
               >
                 Carregar carteira
               </h3>
-              <p className="text-[13px] text-[#71717A]">Saldo em Kwanzas</p>
+              <p className="text-[13px] text-(--nv-text-3)">Saldo em Kwanzas</p>
             </div>
           </div>
 
@@ -80,7 +80,7 @@ export default function WalletModal({
             type="button"
             onClick={onClose}
             aria-label="Fechar"
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#0A0A0A]"
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-(--nv-text-3) transition-colors hover:bg-(--nv-fill) hover:text-(--nv-text)"
           >
             <HugeiconsIcon icon={Cancel01Icon} size={18} strokeWidth={1.8} />
           </button>
@@ -88,7 +88,7 @@ export default function WalletModal({
 
         {/* Valor em Kwanzas */}
         <div className="mt-6">
-          <p className="text-[12.5px] font-medium text-[#52525B]">
+          <p className="text-[12.5px] font-medium text-(--nv-text-2)">
             Valor
           </p>
           <div className="mt-2.5 grid grid-cols-2 gap-2.5">
@@ -101,8 +101,8 @@ export default function WalletModal({
                   onClick={() => setSelectedAmount(value)}
                   className={`sq cursor-pointer rounded-[18px] border px-4 py-3 text-left transition-all ${
                     active
-                      ? "border-[#4EA7EB] bg-[#EFF7FF] text-[#006FD6]"
-                      : "border-[#E4E4E7] bg-white text-[#0A0A0A] hover:border-[#4EA7EB]/50 hover:bg-[#F8FBFF]"
+                      ? "border-[#4EA7EB] bg-(--nv-accent-soft) text-[#006FD6]"
+                      : "border-(--nv-line) bg-(--nv-solid) text-(--nv-text) hover:border-[#4EA7EB]/50 hover:bg-(--nv-fill)"
                   }`}
                 >
                   <span className="font-title text-[15.5px] font-bold tabular-nums">
@@ -116,7 +116,7 @@ export default function WalletModal({
 
         {/* Método de pagamento local */}
         <div className="mt-5">
-          <p className="text-[12.5px] font-medium text-[#52525B]">
+          <p className="text-[12.5px] font-medium text-(--nv-text-2)">
             Pagamento
           </p>
           <div className="mt-2 grid grid-cols-2 gap-2">
@@ -125,8 +125,8 @@ export default function WalletModal({
               onClick={() => setMethod("mcx")}
               className={`sq cursor-pointer rounded-[14px] border px-3 py-2.5 text-[13px] font-medium transition-all ${
                 method === "mcx"
-                  ? "border-[#4EA7EB] bg-[#EFF7FF] text-[#006FD6]"
-                  : "border-[#E4E4E7] bg-white text-[#52525B] hover:border-[#D4D4D8]"
+                  ? "border-[#4EA7EB] bg-(--nv-accent-soft) text-[#006FD6]"
+                  : "border-(--nv-line) bg-(--nv-solid) text-(--nv-text-2) hover:border-(--nv-line-strong)"
               }`}
             >
               Multicaixa Express
@@ -136,8 +136,8 @@ export default function WalletModal({
               onClick={() => setMethod("referencia")}
               className={`sq cursor-pointer rounded-[14px] border px-3 py-2.5 text-[13px] font-medium transition-all ${
                 method === "referencia"
-                  ? "border-[#4EA7EB] bg-[#EFF7FF] text-[#006FD6]"
-                  : "border-[#E4E4E7] bg-white text-[#52525B] hover:border-[#D4D4D8]"
+                  ? "border-[#4EA7EB] bg-(--nv-accent-soft) text-[#006FD6]"
+                  : "border-(--nv-line) bg-(--nv-solid) text-(--nv-text-2) hover:border-(--nv-line-strong)"
               }`}
             >
               Referência Bancária
@@ -149,7 +149,7 @@ export default function WalletModal({
           <button
             type="button"
             onClick={onClose}
-            className="h-11 cursor-pointer rounded-full border border-[#E4E4E7] bg-white px-5 text-[14px] font-medium text-[#52525B] transition-colors hover:bg-[#F4F4F5]"
+            className="h-11 cursor-pointer rounded-full border border-(--nv-line) bg-(--nv-solid) px-5 text-[14px] font-medium text-(--nv-text-2) transition-colors hover:bg-(--nv-fill)"
           >
             Cancelar
           </button>

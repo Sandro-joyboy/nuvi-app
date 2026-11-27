@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { THEME_BOOT_SCRIPT } from "./components/dashboard/theme-boot";
 
 const gtMechanik = localFont({
   src: [
@@ -60,7 +61,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt" className={`${gtMechanik.variable} ${sfPro.variable}`}>
+    <html
+      lang="pt"
+      className={`${gtMechanik.variable} ${sfPro.variable}`}
+      // data-theme é definido pelo script abaixo antes da hidratação
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body className="antialiased font-sans text-white">
         {children}
       </body>

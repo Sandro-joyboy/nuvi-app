@@ -13,17 +13,16 @@ interface Metric {
   label: string;
   /** Cor da série = cor principal do ícone. */
   color: string;
-  tint: string;
   /** Ícone de vidro em /public, recolorido para a cor da série. */
   icon: string;
 }
 
 const METRICS: Metric[] = [
-  { key: "views", label: "Visualizações", color: "#0082F6", tint: "#E8F3FF", icon: "/Show.svg" },
-  { key: "engagement", label: "Engajamento", color: "#FF9500", tint: "#FFF4E5", icon: "/Chart.svg" },
-  { key: "likes", label: "Curtidas", color: "#FF2D55", tint: "#FFEAEE", icon: "/Heart.svg" },
-  { key: "comments", label: "Comentários", color: "#34C759", tint: "#EAF9EE", icon: "/Chat.svg" },
-  { key: "shares", label: "Partilhas", color: "#AF52DE", tint: "#F6ECFB", icon: "/Send.svg" },
+  { key: "views", label: "Visualizações", color: "#0082F6", icon: "/Show.svg" },
+  { key: "engagement", label: "Engajamento", color: "#FF9500", icon: "/Chart.svg" },
+  { key: "likes", label: "Curtidas", color: "#FF2D55", icon: "/Heart.svg" },
+  { key: "comments", label: "Comentários", color: "#34C759", icon: "/Chat.svg" },
+  { key: "shares", label: "Partilhas", color: "#AF52DE", icon: "/Send.svg" },
 ];
 
 const RANGE_DAYS: Record<RangeKey, number> = { "7d": 7, "30d": 30, "90d": 90 };
@@ -163,7 +162,7 @@ export default function PerformanceCard() {
             <div
               role="radiogroup"
               aria-label="Período"
-              className="sq inline-flex rounded-full bg-[#0F172A]/[0.05] p-[3px]"
+              className="sq inline-flex rounded-full bg-(--nv-fill) p-[3px]"
             >
               {(Object.keys(RANGE_DAYS) as RangeKey[]).map((key) => {
                 const sel = range === key;
@@ -178,7 +177,7 @@ export default function PerformanceCard() {
                       setHover(null);
                     }}
                     className={`h-7 cursor-pointer rounded-full px-3 text-[12px] font-semibold whitespace-nowrap tabular-nums transition-all duration-300 ${
-                      sel ? "lg-control text-[#0A0A0A]" : "text-[#6B7280] hover:text-[#0A0A0A]"
+                      sel ? "lg-control text-(--nv-text)" : "text-(--nv-text-3) hover:text-(--nv-text)"
                     }`}
                   >
                     {RANGE_DAYS[key]} dias
@@ -203,8 +202,8 @@ export default function PerformanceCard() {
               aria-pressed={on}
               className={`sq group flex cursor-pointer flex-col gap-3 rounded-[20px] p-3.5 text-left transition-all duration-300 ${
                 on
-                  ? "bg-white shadow-[0_0_0_0.5px_rgba(15,23,42,0.08),0_4px_14px_-8px_rgba(15,23,42,0.14)]"
-                  : "bg-[#0F172A]/[0.03] opacity-60 hover:opacity-90"
+                  ? "bg-(--nv-solid) shadow-[0_0_0_0.5px_var(--nv-hairline),0_4px_14px_-8px_var(--nv-shadow)]"
+                  : "bg-(--nv-fill-2) opacity-60 hover:opacity-90"
               }`}
             >
               <span className="flex items-center justify-between">
@@ -216,15 +215,15 @@ export default function PerformanceCard() {
                   height={36}
                   className="h-9 w-9 object-contain"
                 />
-                <span className="rounded-full bg-[#0F172A]/[0.05] px-1.5 py-0.5 text-[11px] font-medium text-[#6B7280] tabular-nums">
+                <span className="rounded-full bg-(--nv-fill) px-1.5 py-0.5 text-[11px] font-medium text-(--nv-text-3) tabular-nums">
                   0%
                 </span>
               </span>
               <span className="min-w-0">
-                <span className="font-title block text-[24px] font-bold leading-none tracking-[-0.03em] text-[#0A0A0A] tabular-nums">
+                <span className="font-title block text-[24px] font-bold leading-none tracking-[-0.03em] text-(--nv-text) tabular-nums">
                   {fmtNumber(totals[m.key])}
                 </span>
-                <span className="mt-1.5 block truncate text-[12px] font-medium text-[#6B7280]">
+                <span className="mt-1.5 block truncate text-[12px] font-medium text-(--nv-text-3)">
                   {m.label}
                 </span>
               </span>
@@ -234,7 +233,7 @@ export default function PerformanceCard() {
       </div>
 
       {/* Gráfico */}
-      <div className="sq relative mt-4 rounded-[22px] bg-gradient-to-b from-[#F8FAFD] to-white px-2 pt-3 pb-1 shadow-[inset_0_0_0_0.5px_rgba(15,23,42,0.06)] sm:px-3">
+      <div className="sq relative mt-4 rounded-[22px] bg-gradient-to-b from-(--nv-chart-a) to-(--nv-chart-b) px-2 pt-3 pb-1 shadow-[inset_0_0_0_0.5px_rgba(15,23,42,0.06)] sm:px-3">
         <div ref={plotRef} className="relative" style={{ height: CHART_H }}>
           {width > 0 && (
             <svg
@@ -262,14 +261,14 @@ export default function PerformanceCard() {
                     x2={width - PAD.right}
                     y1={y(t)}
                     y2={y(t)}
-                    stroke={t === 0 ? "#E2E8F0" : "#EEF2F6"}
+                    style={{ stroke: t === 0 ? "var(--nv-grid-strong)" : "var(--nv-grid)" }}
                     strokeDasharray={t === 0 ? undefined : "2 4"}
                   />
                   <text
                     x={PAD.left - 12}
                     y={y(t) + 4}
                     textAnchor="end"
-                    className="fill-[#9CA3AF] text-[11px] tabular-nums"
+                    className="fill-(--nv-text-3) text-[11px] tabular-nums"
                   >
                     {fmtNumber(t)}
                   </text>
@@ -282,7 +281,7 @@ export default function PerformanceCard() {
                   x={x(i)}
                   y={CHART_H - 8}
                   textAnchor={n === 0 ? "start" : n === xLabelIdx.length - 1 ? "end" : "middle"}
-                  className="fill-[#9CA3AF] text-[11px]"
+                  className="fill-(--nv-text-3) text-[11px]"
                 >
                   {fmtDay(days[i])}
                 </text>
@@ -314,7 +313,7 @@ export default function PerformanceCard() {
                     x2={x(hover)}
                     y1={PAD.top}
                     y2={PAD.top + plotH}
-                    stroke="#0F172A"
+                    style={{ stroke: "var(--nv-text)" }}
                     strokeOpacity="0.12"
                   />
                   {drawOrder.map((m) => (
@@ -323,7 +322,7 @@ export default function PerformanceCard() {
                       cx={x(hover)}
                       cy={y(series[m.key][hover])}
                       r={4.5}
-                      fill="#fff"
+                      style={{ fill: "var(--nv-solid)" }}
                       stroke={m.color}
                       strokeWidth={2}
                     />
@@ -353,15 +352,15 @@ export default function PerformanceCard() {
                 left: x(hover) + 176 > width ? x(hover) - 164 : x(hover) + 12,
               }}
             >
-              <p className="text-[11px] font-semibold text-[#6B7280]">{fmtDay(days[hover])}</p>
+              <p className="text-[11px] font-semibold text-(--nv-text-3)">{fmtDay(days[hover])}</p>
               <ul className="mt-1.5 space-y-1">
                 {shown.map((m) => (
                   <li key={m.key} className="flex items-center justify-between gap-4 text-[12px]">
-                    <span className="flex items-center gap-1.5 text-[#374151]">
+                    <span className="flex items-center gap-1.5 text-(--nv-text-2)">
                       <span className="h-2 w-2 rounded-full" style={{ background: m.color }} />
                       {m.label}
                     </span>
-                    <span className="font-semibold text-[#0A0A0A] tabular-nums">
+                    <span className="font-semibold text-(--nv-text) tabular-nums">
                       {fmtNumber(series[m.key][hover])}
                     </span>
                   </li>
@@ -371,7 +370,7 @@ export default function PerformanceCard() {
           )}
 
           {isEmpty && hover === null && (
-            <p className="lg-surface pointer-events-none absolute top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full px-3.5 py-1.5 text-[12px] font-medium whitespace-nowrap text-[#6B7280]">
+            <p className="lg-surface pointer-events-none absolute top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full px-3.5 py-1.5 text-[12px] font-medium whitespace-nowrap text-(--nv-text-3)">
               Sem dados ainda
             </p>
           )}
@@ -384,7 +383,7 @@ export default function PerformanceCard() {
           <span
             key={m.key}
             className="sq inline-flex h-8 items-center gap-1.5 rounded-full pr-1 pl-3 text-[12.5px] font-semibold"
-            style={{ background: m.tint, color: m.color }}
+            style={{ background: `color-mix(in srgb, ${m.color} 13%, transparent)`, color: m.color }}
           >
             <span className="h-2 w-2 rounded-full" style={{ background: m.color }} />
             {m.label}
@@ -393,7 +392,7 @@ export default function PerformanceCard() {
               onClick={() => toggle(m.key)}
               disabled={shown.length === 1}
               aria-label={`Ocultar ${m.label}`}
-              className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-black/[0.06] disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-(--nv-fill) disabled:cursor-not-allowed disabled:opacity-40"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={12} strokeWidth={2.4} />
             </button>
@@ -408,7 +407,7 @@ export default function PerformanceCard() {
             aria-label="Adicionar métrica"
             aria-expanded={addOpen}
             aria-haspopup="menu"
-            className="lg-control flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[#374151]"
+            className="lg-control flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-(--nv-text-2)"
           >
             <HugeiconsIcon icon={Add01Icon} size={15} strokeWidth={2.2} />
           </button>
@@ -426,7 +425,7 @@ export default function PerformanceCard() {
                     toggle(m.key);
                     setAddOpen(false);
                   }}
-                  className="flex w-full cursor-pointer items-center gap-2 rounded-[12px] px-2.5 py-2 text-left text-[13px] font-medium text-[#0A0A0A] hover:bg-[#0F172A]/[0.05]"
+                  className="flex w-full cursor-pointer items-center gap-2 rounded-[12px] px-2.5 py-2 text-left text-[13px] font-medium text-(--nv-text) hover:bg-(--nv-fill)"
                 >
                   <span className="h-2 w-2 rounded-full" style={{ background: m.color }} />
                   {m.label}

@@ -45,7 +45,13 @@ interface SidebarProps {
   onChange: (key: NavKey) => void;
 }
 
-export function Sidebar({ active, onChange }: SidebarProps) {
+export function Sidebar({
+  active,
+  onChange,
+  avatar,
+  accountOpen,
+  onAccount,
+}: SidebarProps & { avatar: React.ReactNode; accountOpen: boolean; onAccount: () => void }) {
   return (
     <aside
       aria-label="Navegação principal"
@@ -84,7 +90,7 @@ export function Sidebar({ active, onChange }: SidebarProps) {
                   className={`sq relative flex h-9 w-11 items-center justify-center rounded-[13px] transition-all duration-300 ${
                     isActive
                       ? "lg-control text-[#0076E8]"
-                      : "text-[#5B6474] group-hover:bg-[#0F172A]/[0.05] group-hover:text-[#0A0A0A]"
+                      : "text-(--nv-text-2) group-hover:bg-(--nv-fill) group-hover:text-(--nv-text)"
                   }`}
                 >
                   <HugeiconsIcon
@@ -93,7 +99,7 @@ export function Sidebar({ active, onChange }: SidebarProps) {
                     strokeWidth={isActive ? 1.9 : 1.6}
                   />
                   {item.badge && (
-                    <span className="absolute -top-1.5 -right-2 rounded-full bg-[#0082F6] px-1.5 py-px text-[9px] font-semibold leading-[14px] text-white ring-2 ring-[#EEF1F5]">
+                    <span className="absolute -top-1.5 -right-2 rounded-full bg-[#0082F6] px-1.5 py-px text-[9px] font-semibold leading-[14px] text-white ring-2 ring-(--nv-bg)">
                       {item.badge}
                     </span>
                   )}
@@ -101,8 +107,8 @@ export function Sidebar({ active, onChange }: SidebarProps) {
                 <span
                   className={`text-[10.5px] leading-none tracking-[-0.01em] ${
                     isActive
-                      ? "font-semibold text-[#0A0A0A]"
-                      : "font-medium text-[#6B7280] group-hover:text-[#0A0A0A]"
+                      ? "font-semibold text-(--nv-text)"
+                      : "font-medium text-(--nv-text-3) group-hover:text-(--nv-text)"
                   }`}
                 >
                   {item.label}
@@ -116,11 +122,14 @@ export function Sidebar({ active, onChange }: SidebarProps) {
       <div className="flex flex-col items-center gap-3">
         <button
           type="button"
+          onClick={onAccount}
           aria-label="Conta Moco"
+          aria-haspopup="dialog"
+          aria-expanded={accountOpen}
           title="Moco"
-          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#0A0A0A] text-[14px] font-semibold text-white ring-2 ring-white shadow-[0_4px_12px_-4px_rgba(15,23,42,0.4)] transition-transform duration-300 hover:scale-105 active:scale-95"
+          className="cursor-pointer rounded-full ring-2 ring-(--nv-solid) shadow-[0_4px_12px_-4px_var(--nv-shadow)] transition-transform duration-300 hover:scale-105 active:scale-95"
         >
-          M
+          {avatar}
         </button>
       </div>
     </aside>
@@ -156,7 +165,7 @@ export function MobileTabBar({
 
   const tab = (isActive: boolean) =>
     `relative flex h-12 flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-full text-[10px] font-medium transition-colors ${
-      isActive ? "bg-[#0082F6]/10 text-[#0076E8]" : "text-[#5B6474]"
+      isActive ? "bg-[#0082F6]/10 text-[#0076E8]" : "text-(--nv-text-2)"
     }`;
 
   return (
@@ -177,7 +186,7 @@ export function MobileTabBar({
                 setMoreOpen(false);
               }}
               className={`flex w-full cursor-pointer items-center gap-3 rounded-[16px] px-3 py-2.5 text-[14px] font-medium ${
-                active === item.key ? "bg-[#0082F6]/10 text-[#0076E8]" : "text-[#0A0A0A] hover:bg-[#0F172A]/[0.05]"
+                active === item.key ? "bg-[#0082F6]/10 text-[#0076E8]" : "text-(--nv-text) hover:bg-(--nv-fill)"
               }`}
             >
               <HugeiconsIcon icon={item.icon} size={20} strokeWidth={1.7} />
@@ -199,13 +208,13 @@ export function MobileTabBar({
           // Em repouso: vidro claro. Ao rolar: liquid glass mais transparente,
           // com mais desfoque e saturação, deixando ver o conteúdo por baixo.
           background: scrolled
-            ? "linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.28))"
-            : "rgba(255,255,255,0.86)",
+            ? "linear-gradient(180deg, var(--nv-tab-a), var(--nv-tab-b))"
+            : "var(--nv-tab-rest)",
           backdropFilter: scrolled ? "blur(22px) saturate(200%)" : "blur(16px) saturate(160%)",
           WebkitBackdropFilter: scrolled ? "blur(22px) saturate(200%)" : "blur(16px) saturate(160%)",
           boxShadow: scrolled
-            ? "inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(255,255,255,0.35), 0 0 0 0.5px rgba(15,23,42,0.1), 0 12px 30px -10px rgba(15,23,42,0.28)"
-            : "inset 0 1px 0 rgba(255,255,255,0.95), 0 0 0 0.5px rgba(15,23,42,0.08), 0 8px 24px -12px rgba(15,23,42,0.18)",
+            ? "inset 0 1px 0 var(--nv-glass-edge), 0 0 0 0.5px var(--nv-line), 0 12px 30px -10px var(--nv-shadow)"
+            : "inset 0 1px 0 var(--nv-glass-edge), 0 0 0 0.5px var(--nv-hairline), 0 8px 24px -12px var(--nv-shadow)",
           transition: "background 300ms ease, box-shadow 300ms ease",
         }}
       >
@@ -235,7 +244,7 @@ export function MobileTabBar({
           <HugeiconsIcon icon={MoreHorizontalIcon} size={21} strokeWidth={1.9} />
           Mais
           {moreBadge && (
-            <span className="absolute top-1.5 right-[calc(50%-14px)] h-2 w-2 rounded-full bg-[#0082F6] ring-2 ring-white" />
+            <span className="absolute top-1.5 right-[calc(50%-14px)] h-2 w-2 rounded-full bg-[#0082F6] ring-2 ring-(--nv-solid)" />
           )}
         </button>
       </nav>

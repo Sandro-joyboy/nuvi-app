@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
+import { initialOf, type Profile } from "./prefs";
 
 /** Raio do cartão = 28; conteúdo interno usa 20–22 (cantos concêntricos). */
 export function Card({ className = "", children, ...props }: ComponentProps<"section">) {
@@ -30,14 +31,14 @@ export function SectionHeader({ id, title, subtitle, actions, size = "md" }: Sec
       <div className="min-w-0">
         <h2
           id={id}
-          className={`font-bold tracking-[-0.022em] text-[#0A0A0A] ${
+          className={`font-bold tracking-[-0.022em] text-(--nv-text) ${
             size === "lg" ? "text-[22px] leading-7" : "text-[17px] leading-6"
           }`}
         >
           {title}
         </h2>
         {subtitle && (
-          <p className="mt-0.5 text-[12.5px] font-medium text-[#8A919E]">{subtitle}</p>
+          <p className="mt-0.5 text-[12.5px] font-medium text-(--nv-text-3)">{subtitle}</p>
         )}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
@@ -48,7 +49,7 @@ export function SectionHeader({ id, title, subtitle, actions, size = "md" }: Sec
 /** "Ver tudo" em vidro. `label` dá contexto a leitores de ecrã. */
 export function ViewAllButton({ label, href }: { label: string; href?: string }) {
   const cls =
-    "lg-control sq inline-flex h-8 cursor-pointer items-center gap-1 rounded-full pr-2.5 pl-3.5 text-[12.5px] font-semibold text-[#0A0A0A]";
+    "lg-control sq inline-flex h-8 cursor-pointer items-center gap-1 rounded-full pr-2.5 pl-3.5 text-[12.5px] font-semibold text-(--nv-text)";
   const inner = (
     <>
       Ver tudo
@@ -81,8 +82,34 @@ export function EmptyState({ icon, title, action, compact }: EmptyStateProps) {
       }`}
     >
       {icon}
-      <p className="mt-3 text-[13.5px] font-semibold text-[#374151]">{title}</p>
+      <p className="mt-3 text-[13.5px] font-semibold text-(--nv-text-2)">{title}</p>
       {action && <div className="mt-3.5">{action}</div>}
     </div>
+  );
+}
+
+/** Avatar: foto do perfil, ou inicial sobre o azul da Nuvi. */
+export function Avatar({ profile, size = 40 }: { profile: Profile; size?: number }) {
+  if (profile.photo) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- data URL local
+      <img
+        src={profile.photo}
+        alt=""
+        width={size}
+        height={size}
+        className="block rounded-full object-cover"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+  return (
+    <span
+      aria-hidden
+      className="flex items-center justify-center rounded-full bg-gradient-to-b from-[#5DB6F5] to-[#0076E8] font-semibold text-white"
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.38) }}
+    >
+      {initialOf(profile.name)}
+    </span>
   );
 }

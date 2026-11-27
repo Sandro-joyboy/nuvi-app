@@ -7,6 +7,80 @@
   --color-nuvi-dark: #0082F6;
 }
 
+
+/* ============================================================
+   0. Tokens do painel (claro / escuro)
+   O tema vem de <html data-theme="light|dark">, definido antes da
+   página pintar (script em layout.tsx) para não piscar.
+   ============================================================ */
+.nuvi-dash {
+  color-scheme: light;
+  --nv-bg: #eef1f5;
+  --nv-panel: #f7f8fa;
+  --nv-solid: #ffffff;
+  --nv-text: #0a0a0a;
+  --nv-text-2: #4b5563;
+  --nv-text-3: #7b8391;
+  --nv-fill: rgba(15, 23, 42, 0.05);
+  --nv-fill-2: rgba(15, 23, 42, 0.03);
+  --nv-line: rgba(15, 23, 42, 0.08);
+  --nv-line-strong: rgba(15, 23, 42, 0.16);
+  --nv-accent-soft: #eaf4ff;
+  --nv-success-soft: #eaf9ee;
+  --nv-tile: #f1f3f6;
+  --nv-chart-a: #f8fafd;
+  --nv-chart-b: #ffffff;
+  --nv-grid: #eef2f6;
+  --nv-grid-strong: #e2e8f0;
+  --nv-glass: rgba(255, 255, 255, 0.74);
+  --nv-glass-strong: rgba(255, 255, 255, 0.95);
+  --nv-glass-edge: rgba(255, 255, 255, 0.95);
+  --nv-hairline: rgba(15, 23, 42, 0.07);
+  --nv-ctl-a: rgba(255, 255, 255, 0.92);
+  --nv-ctl-b: rgba(255, 255, 255, 0.66);
+  --nv-ctl-edge: rgba(255, 255, 255, 1);
+  --nv-scrim: rgba(10, 22, 40, 0.28);
+  --nv-shadow: rgba(15, 23, 42, 0.12);
+  --nv-ambient: 1;
+  --nv-tab-rest: rgba(255, 255, 255, 0.86);
+  --nv-tab-a: rgba(255, 255, 255, 0.55);
+  --nv-tab-b: rgba(255, 255, 255, 0.28);
+}
+
+html[data-theme="dark"] .nuvi-dash {
+  color-scheme: dark;
+  --nv-bg: #07090d;
+  --nv-panel: #0f1217;
+  --nv-solid: #171a21;
+  --nv-text: #f3f5f8;
+  --nv-text-2: #c3c9d2;
+  --nv-text-3: #8a93a2;
+  --nv-fill: rgba(255, 255, 255, 0.07);
+  --nv-fill-2: rgba(255, 255, 255, 0.04);
+  --nv-line: rgba(255, 255, 255, 0.09);
+  --nv-line-strong: rgba(255, 255, 255, 0.18);
+  --nv-accent-soft: rgba(0, 130, 246, 0.18);
+  --nv-success-soft: rgba(52, 199, 89, 0.16);
+  --nv-tile: rgba(255, 255, 255, 0.07);
+  --nv-chart-a: #13161c;
+  --nv-chart-b: #171a21;
+  --nv-grid: rgba(255, 255, 255, 0.06);
+  --nv-grid-strong: rgba(255, 255, 255, 0.12);
+  --nv-glass: rgba(26, 29, 36, 0.72);
+  --nv-glass-strong: rgba(30, 33, 41, 0.97);
+  --nv-glass-edge: rgba(255, 255, 255, 0.1);
+  --nv-hairline: rgba(255, 255, 255, 0.08);
+  --nv-ctl-a: rgba(255, 255, 255, 0.12);
+  --nv-ctl-b: rgba(255, 255, 255, 0.05);
+  --nv-ctl-edge: rgba(255, 255, 255, 0.16);
+  --nv-scrim: rgba(0, 0, 0, 0.55);
+  --nv-shadow: rgba(0, 0, 0, 0.5);
+  --nv-ambient: 0.55;
+  --nv-tab-rest: rgba(23, 26, 33, 0.88);
+  --nv-tab-a: rgba(44, 48, 58, 0.55);
+  --nv-tab-b: rgba(30, 33, 41, 0.35);
+}
+
 /* 1. Botões Principais (Glossy Blue Pill) */
 .nuvi-btn,
 .nuvi-btn-sm,
@@ -302,30 +376,26 @@
    7. Liquid Glass (tema claro) — superfícies do painel
    ============================================================ */
 .lg-surface {
-  background: rgba(255, 255, 255, 0.74);
+  background: var(--nv-glass, rgba(255, 255, 255, 0.74));
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 0 0 0.5px rgba(15, 23, 42, 0.07),
+    inset 0 1px 0 var(--nv-glass-edge, rgba(255, 255, 255, 0.95)),
+    0 0 0 0.5px var(--nv-hairline, rgba(15, 23, 42, 0.07)),
     0 1px 2px rgba(15, 23, 42, 0.03),
-    0 12px 32px -18px rgba(15, 23, 42, 0.12);
+    0 12px 32px -18px var(--nv-shadow, rgba(15, 23, 42, 0.12));
 }
 
 .lg-control {
   position: relative;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.92) 0%,
-    rgba(255, 255, 255, 0.66) 100%
-  );
+  background: linear-gradient(180deg, var(--nv-ctl-a, rgba(255, 255, 255, 0.92)) 0%, var(--nv-ctl-b, rgba(255, 255, 255, 0.66)) 100%);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 1px 0 var(--nv-ctl-edge, #fff),
     inset 0 -1px 0 rgba(15, 23, 42, 0.04),
-    0 0 0 0.5px rgba(15, 23, 42, 0.12),
-    0 2px 6px -2px rgba(15, 23, 42, 0.1);
+    0 0 0 0.5px var(--nv-line-strong, rgba(15, 23, 42, 0.12)),
+    0 2px 6px -2px var(--nv-shadow, rgba(15, 23, 42, 0.1));
   transition:
     transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.2s ease,
@@ -334,16 +404,12 @@
 }
 
 .lg-control:hover:not(:disabled) {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0.8) 100%
-  );
+  background: linear-gradient(180deg, var(--nv-ctl-a, #fff) 0%, var(--nv-ctl-a, rgba(255, 255, 255, 0.8)) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 1px 0 var(--nv-ctl-edge, #fff),
     inset 0 -1px 0 rgba(15, 23, 42, 0.04),
-    0 0 0 0.5px rgba(15, 23, 42, 0.14),
-    0 6px 16px -6px rgba(15, 23, 42, 0.16);
+    0 0 0 0.5px var(--nv-line-strong, rgba(15, 23, 42, 0.14)),
+    0 6px 16px -6px var(--nv-shadow, rgba(15, 23, 42, 0.16));
 }
 
 .lg-control:active:not(:disabled) {
@@ -386,6 +452,11 @@
 .nuvi-dash :focus-visible {
   outline: 2px solid #0082f6;
   outline-offset: 2px;
+}
+/* Campos de texto mostram o foco no próprio contentor, sem contorno extra */
+.nuvi-dash input:focus-visible,
+.nuvi-dash textarea:focus-visible {
+  outline: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -470,4 +541,36 @@
 }
 .nuvi-scroll::-webkit-scrollbar-thumb:hover {
   background-color: rgba(15, 23, 42, 0.32);
+}
+
+/* Modal da carteira e thumb de scroll no modo escuro */
+html[data-theme="dark"] .nuvi-dash .nuvi-modal-card {
+  background: rgba(23, 26, 33, 0.92);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--nv-text);
+}
+html[data-theme="dark"] .nuvi-dash .nuvi-scroll {
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+html[data-theme="dark"] .nuvi-dash .nuvi-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ============================================================
+   10. Entradas de modais e painéis (respeitam "reduzir movimento")
+   ============================================================ */
+@keyframes nuvi-sheet-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes nuvi-pop-in {
+  from { transform: scale(0.96) translateY(6px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.nuvi-sheet { animation: nuvi-sheet-in 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
+.nuvi-pop { animation: nuvi-pop-in 0.24s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: bottom left; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nuvi-sheet,
+  .nuvi-pop { animation: none; }
 }
