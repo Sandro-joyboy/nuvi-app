@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import UnderConstruction from "@/app/components/dashboard/UnderConstruction";
+import CampaignsView from "@/app/components/dashboard/CampaignsView";
 
 export const metadata: Metadata = { title: "Campanhas" };
 
 export default function CampanhasPage() {
-  return <UnderConstruction section="Campanhas" />;
+  return <CampaignsView />;
 }

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import UnderConstruction from "@/app/components/dashboard/UnderConstruction";
+import PayoutsView from "@/app/components/dashboard/PayoutsView";
 
 export const metadata: Metadata = { title: "Pagamentos" };
 
 export default function PagamentosPage() {
-  return <UnderConstruction section="Pagamentos" />;
+  return <PayoutsView />;
 }
