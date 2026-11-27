@@ -129,7 +129,7 @@ function DialogBody({ onClose, onSent }: Omit<NewMessageDialogProps, "open">) {
               <button
                 type="submit"
                 disabled={!canSend}
-                className="nuvi-create-btn gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="nuvi-btn-sm sq !h-11 !px-6"
               >
                 <HugeiconsIcon icon={SentIcon} size={16} strokeWidth={2.1} />
                 Enviar

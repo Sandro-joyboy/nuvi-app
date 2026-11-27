@@ -127,7 +127,7 @@ export default function MessagesView({ onCompose, openId, onOpenIdChange }: Mess
             onClick={onCompose}
             aria-label="Nova mensagem"
             title="Nova mensagem"
-            className="sq flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-b from-[#4EA7EB] to-[#0076E8] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.55),inset_0_0_0_0.5px_rgba(255,255,255,0.3),0_6px_14px_-6px_rgba(0,118,232,0.6)] transition-transform duration-300 hover:scale-[1.04] active:scale-95"
+            className="nuvi-btn-sm sq !h-10 !w-10 shrink-0 !p-0"
           >
             <HugeiconsIcon icon={PencilEdit02Icon} size={18} strokeWidth={2} />
           </button>
@@ -177,7 +177,7 @@ export default function MessagesView({ onCompose, openId, onOpenIdChange }: Mess
               <button
                 type="button"
                 onClick={onCompose}
-                className="lg-control sq mt-4 inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold text-(--nv-text)"
+                className="nuvi-btn-sm sq mt-4 !h-10 !gap-1.5 !px-5 !text-[13.5px]"
               >
                 <HugeiconsIcon icon={PencilEdit02Icon} size={15} strokeWidth={2} />
                 Nova mensagem
@@ -229,7 +229,7 @@ export default function MessagesView({ onCompose, openId, onOpenIdChange }: Mess
             <p className="mt-1.5 max-w-[300px] text-[13.5px] leading-snug text-(--nv-text-3)">
               Escolhe um criador à esquerda ou começa uma nova mensagem.
             </p>
-            <button type="button" onClick={onCompose} className="nuvi-create-btn mt-5 gap-2">
+            <button type="button" onClick={onCompose} className="nuvi-btn-sm sq mt-5 !h-11 !px-6">
               <HugeiconsIcon icon={PencilEdit02Icon} size={17} strokeWidth={2} />
               Nova mensagem
             </button>
@@ -479,7 +479,7 @@ function Thread({
             type="submit"
             disabled={!draft.trim()}
             aria-label="Enviar"
-            className="sq flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-b from-[#4EA7EB] to-[#0076E8] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.55),inset_0_0_0_0.5px_rgba(255,255,255,0.3),0_6px_14px_-6px_rgba(0,118,232,0.6)] transition-all duration-300 hover:scale-[1.04] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+            className="nuvi-btn-sm sq !h-11 !w-11 shrink-0 !p-0"
           >
             <HugeiconsIcon icon={SentIcon} size={18} strokeWidth={2} />
           </button>
