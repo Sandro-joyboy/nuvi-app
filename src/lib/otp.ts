@@ -1,7 +1,30 @@
 import crypto from "crypto";
 
-const OTP_SECRET =
-  process.env.OTP_SECRET || "nuvi-dev-otp-secret-change-in-production";
+// Chave só para desenvolvimento local. Nunca é usada em produção.
+const DEV_FALLBACK_SECRET = "nuvi-dev-otp-secret-change-in-production";
+const PLACEHOLDER_SECRETS = new Set([
+  DEV_FALLBACK_SECRET,
+  "troque-por-uma-chave-secreta-segura", // valor do .env.example
+]);
+const MIN_SECRET_LENGTH = 32;
+
+/**
+ * Lida no momento do uso (não no import) para não partir o `next build`.
+ * Em produção exige OTP_SECRET real: sem ela, qualquer pessoa com a chave
+ * pública do repositório poderia forjar códigos válidos.
+ */
+function getOtpSecret(): string {
+  const secret = process.env.OTP_SECRET?.trim();
+  if (process.env.NODE_ENV !== "production") {
+    return secret || DEV_FALLBACK_SECRET;
+  }
+  if (!secret || PLACEHOLDER_SECRETS.has(secret) || secret.length < MIN_SECRET_LENGTH) {
+    throw new Error(
+      `OTP_SECRET em falta ou inválida. Define uma chave aleatória com pelo menos ${MIN_SECRET_LENGTH} caracteres (ex.: openssl rand -base64 48).`
+    );
+  }
+  return secret;
+}
 
 export const OTP_COOKIE_NAME = "nuvi_otp_token";
 export const OTP_TTL_MS = 10 * 60 * 1000; // 10 minutos
@@ -18,14 +41,14 @@ export function generateSixDigitCode(): string {
 
 function hashCode(email: string, code: string): string {
   return crypto
-    .createHmac("sha256", OTP_SECRET)
+    .createHmac("sha256", getOtpSecret())
     .update(`${email.toLowerCase().trim()}:${code}`)
     .digest("hex");
 }
 
 function signData(encodedPayload: string): string {
   return crypto
-    .createHmac("sha256", OTP_SECRET)
+    .createHmac("sha256", getOtpSecret())
     .update(encodedPayload)
     .digest("base64url");
 }
