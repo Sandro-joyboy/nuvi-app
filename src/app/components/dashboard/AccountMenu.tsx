@@ -13,7 +13,7 @@ import {
   Sun03Icon,
 } from "@hugeicons/core-free-icons";
 import { useDialog } from "./useDialog";
-import { setThemePref, useThemePref, type ThemePref } from "./prefs";
+import { setThemePref, useProfile, useThemePref, type ThemePref } from "./prefs";
 
 const THEMES: { key: ThemePref; label: string; icon: typeof Sun03Icon }[] = [
   { key: "light", label: "Claro", icon: Sun03Icon },
@@ -40,6 +40,7 @@ const itemCls = `${itemBase} text-(--nv-text)`;
 function MenuBody({ onClose, onEditProfile, avatar }: AccountMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
   const theme = useThemePref();
+  const profile = useProfile();
   useDialog(true, onClose, ref);
 
   return (
@@ -55,8 +56,10 @@ function MenuBody({ onClose, onEditProfile, avatar }: AccountMenuProps) {
         <button type="button" onClick={onEditProfile} className="flex w-full cursor-pointer items-center gap-3 rounded-[16px] p-2.5 text-left hover:bg-(--nv-fill)">
           {avatar}
           <span className="min-w-0">
-            <span className="block truncate text-[16px] font-bold tracking-[-0.02em] text-(--nv-text)">Moco</span>
-            <span className="block text-[11px] font-semibold tracking-[0.08em] text-(--nv-text-3) uppercase">Sem plano</span>
+            <span className="block truncate text-[16px] font-bold tracking-[-0.02em] text-(--nv-text)">
+              {profile.name || "A tua marca"}
+            </span>
+            <span className="block text-[11px] font-semibold tracking-[0.08em] text-(--nv-text-3) uppercase">Gratuito</span>
           </span>
         </button>
 
@@ -66,10 +69,10 @@ function MenuBody({ onClose, onEditProfile, avatar }: AccountMenuProps) {
           <HugeiconsIcon icon={ArrowDataTransferHorizontalIcon} size={18} strokeWidth={1.8} />
           Mudar empresa
         </button>
-        <button type="button" className={itemCls} onClick={onClose}>
+        <Link href="/painel/definicoes" className={itemCls} onClick={onClose}>
           <HugeiconsIcon icon={Settings01Icon} size={18} strokeWidth={1.8} />
           Definições
-        </button>
+        </Link>
 
         {/* Aparência */}
         <div className="px-3 pt-2.5 pb-2">

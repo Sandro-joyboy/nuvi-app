@@ -9,10 +9,8 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Building03Icon,
-  CameraVideoIcon,
   Cancel01Icon,
   Edit02Icon,
-  EyeIcon,
   InstagramIcon,
   Link01Icon,
   Location01Icon,
@@ -20,17 +18,12 @@ import {
   Tick02Icon,
   TiktokIcon,
   UserGroupIcon,
-  Wallet01Icon,
 } from "@hugeicons/core-free-icons";
 import { Field, PrimaryButton, secondaryBtn } from "@/app/components/auth/ui";
 import {
-  BUDGET_META,
   computePlanProjection,
   createCampaign,
-  formatCompactNumber,
-  formatKwanzas,
   getPresetPostsForBudget,
-  getSliderBounds,
   loadDraft,
   saveCampaignLaunch,
   saveDraft,
@@ -52,7 +45,6 @@ const STEPS = [
   "Marca",
   "Origem",
   "Orçamento",
-  "Plano",
   "Rever",
 ] as const;
 
@@ -129,19 +121,7 @@ function Wizard() {
       return { ...p, [k]: list };
     });
 
-  // Projeção do plano baseada no orçamento escolhido
-  const budgetKey: Budget = d.budget ?? "nao-sei";
-  const budgetMeta = BUDGET_META[budgetKey];
-  const presetPosts = getPresetPostsForBudget(budgetKey);
-  const sliderBounds = getSliderBounds(presetPosts);
-  const activePosts = d.plannedPosts ?? presetPosts;
-  const plan = computePlanProjection(activePosts);
-  const withinBudget = budgetMeta.maxKz === null || plan.spendKz <= budgetMeta.maxKz;
-  const isPreset = activePosts === presetPosts;
-
-  const selectBudget = (b: Budget) => {
-    setD((p) => ({ ...p, budget: b, plannedPosts: null }));
-  };
+  const plan = computePlanProjection(getPresetPostsForBudget(d.budget));
 
   const websiteError = d.website.trim() && !URL_RE.test(d.website.trim()) ? "Escreve um endereço válido, ex.: minhamarca.ao" : null;
   const valid = [
@@ -151,7 +131,6 @@ function Wizard() {
     d.brandName.trim().length > 1 && !websiteError,
     !!d.source,
     !!d.budget,
-    true,
     true,
   ][step];
 
@@ -167,7 +146,7 @@ function Wizard() {
       return;
     }
     if (step === STEPS.length - 1) {
-      createCampaign({ ...d, plannedPosts: activePosts });
+      createCampaign({ ...d, plannedPosts: plan.posts });
       setPhase("creators");
       return;
     }
@@ -208,9 +187,6 @@ function Wizard() {
     );
   }
 
-  const wideStep = step === 6;
-  const containerWidth = wideStep ? "max-w-[720px]" : "max-w-[560px]";
-
   return (
     <div className="nuvi-ui relative flex min-h-dvh flex-col bg-(--nv-panel) font-sans text-(--nv-text)">
       <div
@@ -220,7 +196,7 @@ function Wizard() {
       />
 
       {/* Topo: progresso · guardar e sair */}
-      <header className={`relative z-10 mx-auto flex w-full ${containerWidth} items-center gap-4 px-4 py-4 transition-[max-width] duration-300 sm:gap-6 sm:py-6`}>
+      <header className="relative z-10 mx-auto flex w-full max-w-[560px] items-center gap-4 px-4 py-4 sm:gap-6 sm:py-6">
         {/* Progresso: passo e contador por cima da barra, que ocupa toda a largura até ao botão */}
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2 text-[12.5px]">
@@ -264,7 +240,7 @@ function Wizard() {
       <form
         onSubmit={next}
         noValidate
-        className={`relative z-10 mx-auto flex w-full ${containerWidth} flex-1 flex-col px-4 pt-10 pb-16 transition-[max-width] duration-300 sm:pt-14`}
+        className="relative z-10 mx-auto flex w-full max-w-[560px] flex-1 flex-col px-4 pt-10 pb-16 sm:pt-14"
       >
         <p className="mb-2 text-[12.5px] font-semibold text-[#4EA7EB]">A tua primeira campanha</p>
 
@@ -352,35 +328,12 @@ function Wizard() {
 
         {step === 5 && (
           <Step headingRef={headingRef} title="Quanto queres investir por mês?" subtitle="Uma estimativa. Podes mudar quando quiseres.">
-            <OptionList label="Orçamento" items={BUDGETS} value={d.budget} onChange={selectBudget} />
+            <OptionList label="Orçamento" items={BUDGETS} value={d.budget} onChange={(v) => set("budget", v)} />
           </Step>
         )}
 
         {step === 6 && (
-          <Step
-            headingRef={headingRef}
-            title={withinBudget ? "O teu plano está pronto. Cabe no teu orçamento." : "Ajusta o plano ao teu ritmo."}
-            subtitle="Criado a partir das tuas respostas. Mantém assim ou desliza o que mais importa."
-          >
-            <PlanCard
-              budgetLabel={budgetMeta.shortLabel}
-              budgetUnit={budgetMeta.unitLabel}
-              projectedViewsLabel={formatCompactNumber(plan.views)}
-              withinBudget={withinBudget}
-              creators={plan.creators}
-              posts={plan.posts}
-              viewsLabel={formatCompactNumber(plan.views)}
-              spendLabel={formatKwanzas(plan.spendKz)}
-              bounds={sliderBounds}
-              isPreset={isPreset}
-              onChangePosts={(v) => set("plannedPosts", v)}
-              onResetPreset={() => set("plannedPosts", null)}
-            />
-          </Step>
-        )}
-
-        {step === 7 && (
-          <Step headingRef={headingRef} title="Tudo pronto. Confirma a tua campanha" subtitle="Podes editar qualquer parte antes de escolher os criadores.">
+          <Step headingRef={headingRef} title="Tudo pronto. Confirma a tua campanha" subtitle="Podes editar qualquer parte antes de continuar.">
             <dl className="lg-surface sq divide-y divide-(--nv-line) rounded-[24px] px-5">
               <Review label="Objetivo" value={GOALS.find((g) => g.id === d.goal)?.title} onEdit={() => goStep(0)} />
               <Review label="Experiência" value={EXPERIENCE.find((x) => x.id === d.experience)?.title} onEdit={() => goStep(1)} />
@@ -391,11 +344,6 @@ function Wizard() {
               />
               <Review label="Marca" value={[d.brandName, d.website, d.instagram].filter(Boolean).join(" · ")} onEdit={() => goStep(3)} />
               <Review label="Orçamento" value={BUDGETS.find((b) => b.id === d.budget)?.title} onEdit={() => goStep(5)} />
-              <Review
-                label="Plano projetado"
-                value={`${plan.creators} ${plan.creators === 1 ? "criador" : "criadores"} · ${plan.posts} posts/mês · ${formatKwanzas(plan.spendKz)}/mês`}
-                onEdit={() => goStep(6)}
-              />
             </dl>
           </Step>
         )}
@@ -415,14 +363,9 @@ function Wizard() {
             </button>
           ) : null}
           <PrimaryButton type="submit" aria-disabled={!valid} className={`ml-auto sm:!w-auto sm:!px-8 ${valid ? "" : "!opacity-60"}`}>
-            {step === 6 ? (
+            {step === STEPS.length - 1 ? (
               <>
-                Criar e rever campanha
-                <HugeiconsIcon icon={ArrowRight01Icon} size={17} strokeWidth={2.2} />
-              </>
-            ) : step === STEPS.length - 1 ? (
-              <>
-                Ver criadores sugeridos
+                Continuar
                 <HugeiconsIcon icon={ArrowRight01Icon} size={17} strokeWidth={2.2} />
               </>
             ) : (
@@ -461,171 +404,6 @@ function Step({
       <p className="mt-2 text-[15px] text-(--nv-text-2)">{subtitle}</p>
       <div className="mt-8 flex flex-col gap-6">{children}</div>
     </section>
-  );
-}
-
-function PlanCard({
-  budgetLabel,
-  budgetUnit,
-  projectedViewsLabel,
-  withinBudget,
-  creators,
-  posts,
-  viewsLabel,
-  spendLabel,
-  bounds,
-  isPreset,
-  onChangePosts,
-  onResetPreset,
-}: {
-  budgetLabel: string;
-  budgetUnit: string;
-  projectedViewsLabel: string;
-  withinBudget: boolean;
-  creators: number;
-  posts: number;
-  viewsLabel: string;
-  spendLabel: string;
-  bounds: { min: number; max: number; step: number };
-  isPreset: boolean;
-  onChangePosts: (v: number) => void;
-  onResetPreset: () => void;
-}) {
-  const pct = Math.min(100, Math.max(0, ((posts - bounds.min) / Math.max(1, bounds.max - bounds.min)) * 100));
-
-  return (
-    <div className="lg-surface sq overflow-hidden rounded-[24px]">
-      {/* Topo: Orçamento vs Projeção */}
-      <div className="grid grid-cols-1 gap-5 border-b border-(--nv-line) p-5 sm:grid-cols-2 sm:gap-6 sm:p-6">
-        <div>
-          <p className="text-[11px] font-semibold tracking-[0.06em] text-(--nv-text-3) uppercase">O teu orçamento</p>
-          <p className="mt-1.5 flex flex-wrap items-baseline gap-2">
-            <span className="font-title text-[26px] leading-none font-bold tracking-[-0.03em] text-(--nv-text) tabular-nums sm:text-[30px]">
-              {budgetLabel}
-            </span>
-            <span className="text-[14px] font-medium text-(--nv-text-3)">{budgetUnit}</span>
-          </p>
-          <p className="mt-2.5 text-[12px] text-(--nv-text-3)">Projeção, não é garantia.</p>
-        </div>
-
-        <div className="sm:border-l sm:border-(--nv-line) sm:pl-6">
-          <p className="text-[11px] font-semibold tracking-[0.06em] text-(--nv-text-3) uppercase">Este plano projeta</p>
-          <p className="mt-1.5 flex flex-wrap items-baseline gap-2">
-            <span
-              className={`font-title text-[26px] leading-none font-bold tracking-[-0.03em] tabular-nums transition-colors sm:text-[30px] ${
-                withinBudget ? "text-[#4EA7EB]" : "text-[#FF9500]"
-              }`}
-            >
-              {projectedViewsLabel}
-            </span>
-            <span className="text-[14px] font-medium text-(--nv-text-3)">visualizações / mês</span>
-          </p>
-          {!withinBudget && (
-            <p className="mt-2.5 text-[12px] font-medium text-[#FF9500]">Acima da faixa de orçamento escolhida.</p>
-          )}
-        </div>
-      </div>
-
-      {/* Meio: 4 indicadores */}
-      <div className="grid grid-cols-2 border-b border-(--nv-line) sm:grid-cols-4">
-        <PlanMetric
-          icon={UserGroupIcon}
-          value={String(creators)}
-          label={creators === 1 ? "Criador" : "Criadores"}
-          className="border-r border-b border-(--nv-line) sm:border-b-0"
-        />
-        <PlanMetric
-          icon={CameraVideoIcon}
-          value={String(posts)}
-          label="Posts / mês"
-          className="border-b border-(--nv-line) sm:border-r sm:border-b-0"
-        />
-        <PlanMetric
-          icon={EyeIcon}
-          value={viewsLabel}
-          label="Views / mês"
-          className="border-r border-(--nv-line)"
-        />
-        <PlanMetric
-          icon={Wallet01Icon}
-          value={spendLabel}
-          sub="+ bónus por views"
-          label="Investimento / mês"
-        />
-      </div>
-
-      {/* Base: Slider interativo */}
-      <div className="bg-(--nv-fill-2) p-5 sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <label htmlFor="plan-posts-slider" className="text-[14px] font-semibold text-(--nv-text)">
-            Publicações este mês · <span className="tabular-nums">{posts}</span>
-          </label>
-          {isPreset ? (
-            <span className="text-[12.5px] font-medium text-(--nv-text-3)">Ajustado ao teu orçamento</span>
-          ) : (
-            <button
-              type="button"
-              onClick={onResetPreset}
-              className="cursor-pointer text-[12.5px] font-semibold text-[#4EA7EB] hover:underline"
-            >
-              Repor plano sugerido
-            </button>
-          )}
-        </div>
-
-        <div className="mt-4 flex items-center">
-          <input
-            id="plan-posts-slider"
-            type="range"
-            min={bounds.min}
-            max={bounds.max}
-            step={bounds.step}
-            value={posts}
-            onChange={(e) => onChangePosts(Number(e.target.value))}
-            aria-label="Publicações este mês"
-            className="nuvi-range"
-            style={{
-              background: `linear-gradient(to right, #4EA7EB 0%, #4EA7EB ${pct}%, var(--nv-line-strong) ${pct}%, var(--nv-line-strong) 100%)`,
-            }}
-          />
-        </div>
-
-        <p className="mt-3.5 text-[12.5px] text-(--nv-text-3)">
-          Aprovas cada publicação <strong className="font-semibold text-(--nv-text-2)">antes</strong> de qualquer pagamento.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function PlanMetric({
-  icon,
-  value,
-  sub,
-  label,
-  className = "",
-}: {
-  icon: Icon;
-  value: string;
-  sub?: string;
-  label: string;
-  className?: string;
-}) {
-  return (
-    <div className={`flex items-start gap-2.5 p-4 sm:px-4 sm:py-5 ${className}`}>
-      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-[10px] bg-(--nv-accent-soft) text-[#4EA7EB]">
-        <HugeiconsIcon icon={icon} size={15} strokeWidth={1.9} />
-      </span>
-      <div className="min-w-0">
-        <p className="font-title truncate text-[18px] leading-tight font-bold tracking-[-0.025em] text-(--nv-text) tabular-nums sm:text-[19px]">
-          {value}
-        </p>
-        {sub && <p className="mt-0.5 truncate text-[11px] text-(--nv-text-3)">{sub}</p>}
-        <p className="mt-1 truncate text-[10.5px] font-semibold tracking-[0.05em] text-(--nv-text-3) uppercase">
-          {label}
-        </p>
-      </div>
-    </div>
   );
 }
 

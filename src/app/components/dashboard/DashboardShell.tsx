@@ -150,7 +150,12 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   const closeProfile = useCallback(() => setProfileOpen(false), []);
   const closeCompose = useCallback(() => setComposeOpen(false), []);
   const isMessages = active === "mensagens";
-  const title = active === "inicio" ? "Início" : NAV_ITEMS.find((i) => i.key === active)?.label ?? "Início";
+  const title =
+    active === "inicio"
+      ? "Início"
+      : active === "definicoes"
+        ? "Definições"
+        : NAV_ITEMS.find((i) => i.key === active)?.label ?? "Início";
 
   const ctx = useMemo(
     () => ({

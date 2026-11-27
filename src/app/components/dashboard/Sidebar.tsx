@@ -10,6 +10,7 @@ import {
   Globe02Icon,
   Megaphone01Icon,
   MoreHorizontalIcon,
+  Settings01Icon,
 } from "@hugeicons/core-free-icons";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,7 +22,8 @@ export type NavKey =
   | "mensagens"
   | "anuncios"
   | "analises"
-  | "pagamentos";
+  | "pagamentos"
+  | "definicoes";
 
 interface NavItem {
   key: Exclude<NavKey, "inicio">;
@@ -46,6 +48,7 @@ export const hrefOf = (key: NavKey) => (key === "inicio" ? "/painel" : `/painel/
 
 export function navKeyFromPath(pathname: string | null): NavKey {
   const seg = pathname?.split("/")[2];
+  if (seg === "definicoes") return "definicoes";
   return NAV_ITEMS.find((i) => i.key === seg)?.key ?? "inicio";
 }
 
@@ -128,10 +131,10 @@ export function Sidebar({
         <button
           type="button"
           onClick={onAccount}
-          aria-label="Conta Moco"
+          aria-label="Conta"
           aria-haspopup="dialog"
           aria-expanded={accountOpen}
-          title="Moco"
+          title="Conta"
           className="cursor-pointer rounded-full ring-2 ring-(--nv-solid) shadow-[0_4px_12px_-4px_var(--nv-shadow)] transition-transform duration-300 hover:scale-105 active:scale-95"
         >
           {avatar}
@@ -150,7 +153,7 @@ export function MobileTabBar({
   const ref = useRef<HTMLDivElement>(null);
   const primary = NAV_ITEMS.filter((i) => i.primary);
   const secondary = NAV_ITEMS.filter((i) => !i.primary);
-  const moreActive = secondary.some((i) => i.key === active);
+  const moreActive = secondary.some((i) => i.key === active) || active === "definicoes";
   const moreBadge = secondary.some((i) => i.badge);
 
   useEffect(() => {
@@ -200,6 +203,19 @@ export function MobileTabBar({
               )}
             </Link>
           ))}
+          <div className="my-1 h-px bg-(--nv-line)" />
+          <Link
+            href="/painel/definicoes"
+            role="menuitem"
+            aria-current={active === "definicoes" ? "page" : undefined}
+            onClick={() => setMoreOpen(false)}
+            className={`flex w-full cursor-pointer items-center gap-3 rounded-[16px] px-3 py-2.5 text-[14px] font-medium ${
+              active === "definicoes" ? "bg-[#4EA7EB]/10 text-[#0076E8]" : "text-(--nv-text) hover:bg-(--nv-fill)"
+            }`}
+          >
+            <HugeiconsIcon icon={Settings01Icon} size={20} strokeWidth={1.7} />
+            Definições
+          </Link>
         </div>
       )}
 
