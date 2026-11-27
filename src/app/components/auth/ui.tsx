@@ -33,7 +33,7 @@ export function AuthShell({ children, back, aside, width = "sm", footer = true, 
         className="pointer-events-none fixed inset-x-0 top-0 h-[560px] bg-[radial-gradient(55%_60%_at_20%_0%,rgba(78,167,235,0.2),transparent_70%),radial-gradient(40%_50%_at_85%_5%,rgba(175,82,222,0.1),transparent_70%)]"
       />
 
-      <main className="relative z-10 flex flex-1 flex-col items-center px-4 pt-10 pb-12 sm:pt-24">
+      <main className="relative z-10 flex flex-1 flex-col items-center px-4 pt-16 pb-12 sm:pt-32">
         <div className={`w-full ${WIDTHS[width]}`}>
           {/* Marca por cima do título, na mesma coluna */}
           <div className="mb-6 flex items-center gap-3 sm:mb-8">

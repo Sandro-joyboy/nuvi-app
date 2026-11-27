@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -33,16 +34,16 @@ type Icon = typeof InstagramIcon;
 
 const STEPS = ["Objetivo", "Experiência", "Público", "Marca", "Origem", "Orçamento", "Rever"] as const;
 
-const GOALS: { id: Goal; title: string; body: string }[] = [
-  { id: "anuncios", title: "Criativos para anúncios", body: "Vídeos feitos para correr como anúncios pagos." },
-  { id: "organico", title: "Conteúdo orgânico", body: "Publicações que geram alcance no TikTok e no Instagram." },
-  { id: "influenciadores", title: "Publicações de influenciadores", body: "Criadores publicam nas próprias contas." },
+const GOALS: { id: Goal; title: string; body: string; image: string }[] = [
+  { id: "anuncios", title: "Criativos para anúncios", body: "Vídeos feitos para correr como anúncios pagos.", image: "/icons/video.svg" },
+  { id: "organico", title: "Conteúdo orgânico", body: "Publicações que geram alcance no TikTok e no Instagram.", image: "/icons/graph.svg" },
+  { id: "influenciadores", title: "Publicações de influenciadores", body: "Criadores publicam nas próprias contas.", image: "/icons/profile.svg" },
 ];
 
-const EXPERIENCE: { id: Experience; title: string; body: string }[] = [
-  { id: "primeira", title: "É a primeira vez", body: "Guiamos-te em cada passo." },
-  { id: "algumas", title: "Já fiz algumas campanhas", body: "Conheço o básico." },
-  { id: "regular", title: "Trabalho com criadores regularmente", body: "Quero escalar e poupar tempo." },
+const EXPERIENCE: { id: Experience; title: string; body: string; image: string }[] = [
+  { id: "primeira", title: "É a primeira vez", body: "Guiamos-te em cada passo.", image: "/icons/discovery.svg" },
+  { id: "algumas", title: "Já fiz algumas campanhas", body: "Conheço o básico.", image: "/icons/tick.svg" },
+  { id: "regular", title: "Trabalho com criadores regularmente", body: "Quero escalar e poupar tempo.", image: "/icons/clock.svg" },
 ];
 
 const AGES = ["18–24", "25–34", "35–44", "45+"];
@@ -62,11 +63,11 @@ const SOURCES: { id: string; label: string; icon: Icon }[] = [
   { id: "outro", label: "Outro", icon: Edit02Icon },
 ];
 
-const BUDGETS: { id: Budget; title: string; body: string }[] = [
-  { id: "ate-100", title: "Até 100 000 Kz", body: "Ideal para testar com poucos criadores." },
-  { id: "100-500", title: "100 000 – 500 000 Kz", body: "Várias peças e criadores por mês." },
-  { id: "500-mais", title: "Mais de 500 000 Kz", body: "Campanhas contínuas e em escala." },
-  { id: "nao-sei", title: "Ainda não sei", body: "Ajudamos-te a definir." },
+const BUDGETS: { id: Budget; title: string; body: string; image: string }[] = [
+  { id: "ate-100", title: "Até 100 000 Kz", body: "Ideal para testar com poucos criadores.", image: "/icons/wallet.svg" },
+  { id: "100-500", title: "100 000 – 500 000 Kz", body: "Várias peças e criadores por mês.", image: "/icons/buy.svg" },
+  { id: "500-mais", title: "Mais de 500 000 Kz", body: "Campanhas contínuas e em escala.", image: "/icons/bag.svg" },
+  { id: "nao-sei", title: "Ainda não sei", body: "Ajudamos-te a definir.", image: "/icons/info.svg" },
 ];
 
 const URL_RE = /^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/\S*)?$/i;
@@ -349,7 +350,8 @@ function OptionList<T extends string>({
   onChange,
 }: {
   label: string;
-  items: { id: T; title: string; body: string }[];
+  /** Ícone de vidro opcional (mesma família dos da escolha marca/criador). */
+  items: { id: T; title: string; body: string; image?: string }[];
   value: T | null;
   onChange: (v: T) => void;
 }) {
@@ -366,6 +368,9 @@ function OptionList<T extends string>({
             onClick={() => onChange(it.id)}
             className={`sq flex w-full cursor-pointer items-center gap-4 rounded-[22px] px-5 py-4 text-left transition-all duration-200 ${selCls(sel)}`}
           >
+            {it.image && (
+              <Image src={it.image} alt="" width={44} height={40} className="h-10 w-11 shrink-0 object-contain" />
+            )}
             <span className="min-w-0 flex-1">
               <span className="block text-[15.5px] font-semibold tracking-[-0.01em]">{it.title}</span>
               <span className="mt-0.5 block text-[13.5px] leading-snug text-(--nv-text-3)">{it.body}</span>
