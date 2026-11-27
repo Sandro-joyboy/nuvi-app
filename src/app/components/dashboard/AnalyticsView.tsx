@@ -259,7 +259,7 @@ export default function AnalyticsView() {
                   { label: "Total gasto", value: "0 Kz", icon: Money01Icon },
                   { label: "Views totais", value: "0", icon: EyeIcon },
                   { label: "CPM atual", value: "—", icon: AnalyticsUpIcon },
-                  { label: "CPM estimado", value: "1 150 Kz", icon: TrendingUpIcon },
+                  { label: "CPM estimado", value: "—", icon: TrendingUpIcon },
                 ].map((m) => (
                   <div
                     key={m.label}

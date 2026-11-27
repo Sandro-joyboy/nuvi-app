@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AiCameraIcon,
@@ -51,6 +52,36 @@ export default function CreatorPickerStep({
   const [skippedIds, setSkippedIds] = useState<string[]>([]);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [completedDeck, setCompletedDeck] = useState(false);
+
+  if (TOP_CREATORS.length === 0) {
+    return (
+      <div className="nuvi-ui relative flex min-h-dvh flex-col bg-(--nv-panel) font-sans text-(--nv-text)">
+        <div
+          aria-hidden
+          style={{ opacity: "var(--nv-ambient)" }}
+          className="pointer-events-none fixed inset-x-0 top-0 h-[560px] bg-[radial-gradient(55%_60%_at_20%_0%,rgba(78,167,235,0.2),transparent_70%),radial-gradient(40%_50%_at_85%_5%,rgba(175,82,222,0.1),transparent_70%)]"
+        />
+        <main className="relative z-10 mx-auto flex w-full max-w-[540px] flex-1 flex-col items-center justify-center px-4 py-16 text-center">
+          <section className="nuvi-step lg-surface sq flex w-full flex-col items-center rounded-[28px] p-8 sm:p-10">
+            <Image src="/icons/discovery.svg" alt="" width={84} height={74} className="select-none" draggable={false} />
+            <h1 className="mt-5 text-[24px] leading-[1.15] font-bold tracking-[-0.03em] text-balance sm:text-[28px]">
+              Ainda sem criadores disponíveis
+            </h1>
+            <p className="mt-2 max-w-[380px] text-[14.5px] leading-relaxed text-(--nv-text-2)">
+              Os primeiros criadores estão a entrar na Nuvi. Podes avançar já para rever e lançar a campanha da{" "}
+              <strong className="font-semibold text-(--nv-text)">{brandName || "tua marca"}</strong>.
+            </p>
+            <div className="mt-7 w-full sm:w-auto">
+              <PrimaryButton type="button" onClick={() => onContinue([])} className="sm:!w-auto sm:!px-8">
+                Continuar para lançar
+                <HugeiconsIcon icon={ArrowRight01Icon} size={17} strokeWidth={2.2} />
+              </PrimaryButton>
+            </div>
+          </section>
+        </main>
+      </div>
+    );
+  }
 
   const creator = TOP_CREATORS[activeIndex];
   const isInvited = invitedIds.includes(creator.id);

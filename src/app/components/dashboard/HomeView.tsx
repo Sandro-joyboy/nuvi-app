@@ -11,10 +11,10 @@ import {
   Video01Icon,
 } from "@hugeicons/core-free-icons";
 import SquircleTile from "@/app/components/squircle/SquircleTile";
-import { useCampaign } from "@/app/components/onboarding/campaign";
 import PerformanceCard from "./PerformanceCard";
 import { Card, EmptyState, SectionHeader, ViewAllButton } from "./ui";
 import { useDashboard } from "./dashboard-context";
+import { useProfile } from "./prefs";
 
 const fmtKz = (n: number) => `${n.toLocaleString("pt-PT")} Kz`;
 
@@ -24,7 +24,7 @@ const ghostCta =
 /** Conteúdo do Início (/painel). */
 export default function HomeView() {
   const { balance, openWallet } = useDashboard();
-  const campaign = useCampaign();
+  const profile = useProfile();
 
   return (
     <div className="mx-auto grid w-full max-w-[1360px] grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
@@ -77,14 +77,12 @@ export default function HomeView() {
                   />
                 </SquircleTile>
               }
-              title={campaign ? `${campaign.brandName}: à espera de criadores` : "Nada por rever"}
+              title="Nada por rever"
               action={
-                campaign ? undefined : (
-                  <Link href="/onboarding" className={ghostCta}>
-                    <HugeiconsIcon icon={Add01Icon} size={15} strokeWidth={2.2} />
-                    Criar campanha
-                  </Link>
-                )
+                <Link href="/onboarding" className={ghostCta}>
+                  <HugeiconsIcon icon={Add01Icon} size={15} strokeWidth={2.2} />
+                  Criar campanha
+                </Link>
               }
             />
           </Card>
@@ -108,7 +106,7 @@ export default function HomeView() {
               <h2 id="wallet-title" className="text-[17px] font-bold tracking-[-0.022em]">
                 Carteira
               </h2>
-              <p className="text-[12.5px] font-medium text-white/70">Moco · AOA</p>
+              <p className="text-[12.5px] font-medium text-white/70">{profile.name || "Nuvi"} · AOA</p>
             </div>
             <Link href="/painel/pagamentos" aria-label="Abrir pagamentos" className="lg-tint flex h-9 w-9 cursor-pointer items-center justify-center rounded-full">
               <HugeiconsIcon icon={ArrowUpRight01Icon} size={16} strokeWidth={2.2} />

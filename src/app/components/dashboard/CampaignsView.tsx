@@ -6,28 +6,14 @@ import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Add01Icon,
-  Archive01Icon,
   ArrowRight01Icon,
   Bookmark01Icon,
   Cancel01Icon,
   GridViewIcon,
-  InstagramIcon,
   LayoutListIcon,
   Search01Icon,
   SparklesIcon,
-  TiktokIcon,
 } from "@hugeicons/core-free-icons";
-import {
-  computePlanProjection,
-  formatKwanzas,
-  getPresetPostsForBudget,
-  loadDraft,
-  useCampaign,
-  useHydrated,
-  type CampaignDraft,
-  type Goal,
-} from "@/app/components/onboarding/campaign";
-import { ALL_CREATORS } from "@/app/components/onboarding/creators";
 import { Card } from "./ui";
 
 type CampaignTab = "campanhas" | "entregas" | "candidatos" | "pedidos";
@@ -40,12 +26,6 @@ const TABS: { id: CampaignTab; label: string }[] = [
   { id: "candidatos", label: "Candidatos" },
   { id: "pedidos", label: "Pedidos" },
 ];
-
-const GOAL_LABEL: Record<Goal, string> = {
-  anuncios: "UGC para Anúncios",
-  organico: "Conteúdo Orgânico",
-  influenciadores: "Influenciadores",
-};
 
 const TEMPLATES = [
   {
@@ -66,39 +46,11 @@ const TEMPLATES = [
 ];
 
 export default function CampaignsView() {
-  const hydrated = useHydrated();
-  const campaign = useCampaign();
-
   const [tab, setTab] = useState<CampaignTab>("campanhas");
   const [status, setStatus] = useState<StatusFilter>("ativas");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [query, setQuery] = useState("");
-  const [archived, setArchived] = useState(false);
   const [templatesOpen, setTemplatesOpen] = useState(false);
-
-  const draft: CampaignDraft | null = hydrated ? loadDraft() : null;
-  const hasDraft = !!draft && (!!draft.goal || !!draft.brandName.trim() || draft.step > 0);
-
-  const activeCount = campaign && !archived ? 1 : 0;
-  const archivedCount = campaign && archived ? 1 : 0;
-  const draftsCount = hasDraft ? 1 : 0;
-
-  const campaignTitle = campaign?.campaignTitle || "Campanha de Criadores";
-  const campaignBrand = campaign?.brandName || "A tua marca";
-  const campaignMatchesQuery =
-    !query.trim() ||
-    `${campaignTitle} ${campaignBrand} ${campaign?.campaignBrief ?? ""}`
-      .toLowerCase()
-      .includes(query.trim().toLowerCase());
-
-  const showLiveCampaign =
-    !!campaign &&
-    campaignMatchesQuery &&
-    ((status === "ativas" && !archived) || (status === "arquivadas" && archived));
-
-  const invitedCreators = ALL_CREATORS.filter((c) => campaign?.invitedCreators?.includes(c.id));
-  const posts = campaign?.plannedPosts ?? getPresetPostsForBudget(campaign?.budget ?? null);
-  const plan = computePlanProjection(posts);
 
   useEffect(() => {
     if (!templatesOpen) return;
@@ -159,9 +111,9 @@ export default function CampaignsView() {
             <div className="flex flex-wrap items-center gap-1.5" role="radiogroup" aria-label="Estado das campanhas">
               {(
                 [
-                  { id: "ativas", label: "Ativas", count: activeCount },
-                  { id: "arquivadas", label: "Arquivadas", count: archivedCount },
-                  { id: "rascunhos", label: "Rascunhos", count: draftsCount },
+                  { id: "ativas", label: "Ativas" },
+                  { id: "arquivadas", label: "Arquivadas" },
+                  { id: "rascunhos", label: "Rascunhos" },
                 ] as const
               ).map((s) => {
                 const sel = status === s.id;
@@ -179,9 +131,6 @@ export default function CampaignsView() {
                     }`}
                   >
                     {s.label}
-                    {s.count > 0 && (
-                      <span className="text-[11.5px] opacity-75 tabular-nums">{s.count}</span>
-                    )}
                   </button>
                 );
               })}
@@ -227,160 +176,37 @@ export default function CampaignsView() {
             </div>
           </div>
 
-          {/* Campanha ativa / arquivada */}
-          {status !== "rascunhos" && showLiveCampaign && campaign && (
-            <div className={viewMode === "grid" ? "grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-3"}>
-              <Card className={`flex flex-col gap-5 ${viewMode === "list" ? "sm:flex-row sm:items-center sm:justify-between" : ""}`}>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`sq inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11.5px] font-semibold ${
-                        archived
-                          ? "bg-(--nv-fill) text-(--nv-text-3)"
-                          : "bg-(--nv-success-soft) text-[#188038] dark:text-[#34C759]"
-                      }`}
-                    >
-                      <span className={`h-1.5 w-1.5 rounded-full ${archived ? "bg-(--nv-text-3)" : "bg-[#34C759]"}`} />
-                      {archived ? "Arquivada" : "Ativa"}
-                    </span>
-                    <span className="text-[12px] font-medium text-(--nv-text-3)">
-                      {GOAL_LABEL[campaign.goal ?? "organico"]}
-                    </span>
-                  </div>
-
-                  <h2 className="mt-3 truncate text-[19px] font-bold tracking-[-0.025em] text-(--nv-text)">
-                    {campaignTitle}
-                  </h2>
-                  <p className="text-[13px] text-(--nv-text-3)">{campaignBrand}</p>
-
-                  {viewMode === "grid" && campaign.campaignBrief && (
-                    <p className="mt-2.5 line-clamp-2 text-[13px] leading-relaxed text-(--nv-text-2)">
-                      {campaign.campaignBrief}
-                    </p>
-                  )}
-                </div>
-
-                <div className={`flex flex-wrap items-center gap-5 ${viewMode === "grid" ? "border-t border-(--nv-line) pt-4" : ""}`}>
-                  <div>
-                    <p className="text-[11px] font-medium text-(--nv-text-3)">Orçamento</p>
-                    <p className="font-title text-[17px] font-bold text-(--nv-text) tabular-nums">
-                      {formatKwanzas(plan.spendKz)}/mês
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-medium text-(--nv-text-3)">Volume</p>
-                    <p className="font-title text-[17px] font-bold text-(--nv-text) tabular-nums">
-                      {plan.posts} posts
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    {(campaign.platforms ?? ["tiktok", "instagram"]).map((p) => (
-                      <span
-                        key={p}
-                        title={p === "instagram" ? "Instagram" : "TikTok"}
-                        className={`flex h-7 w-7 items-center justify-center rounded-full text-white ${
-                          p === "instagram"
-                            ? "bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF]"
-                            : "bg-[#111827] dark:bg-white/15"
-                        }`}
-                      >
-                        <HugeiconsIcon icon={p === "instagram" ? InstagramIcon : TiktokIcon} size={13} strokeWidth={2.2} />
-                      </span>
-                    ))}
-                  </div>
-                  {invitedCreators.length > 0 && (
-                    <div className="flex -space-x-2">
-                      {invitedCreators.slice(0, 3).map((c) => (
-                        <span
-                          key={c.id}
-                          title={c.name}
-                          className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-(--nv-solid) text-[10px] font-bold text-white"
-                          style={{ background: c.avatarBg }}
-                        >
-                          {c.initials}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/painel/descobrir"
-                    className="lg-control sq inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-[13.5px] font-semibold text-(--nv-text)"
-                  >
-                    Convidar criadores
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => setArchived((v) => !v)}
-                    aria-label={archived ? "Reativar campanha" : "Arquivar campanha"}
-                    title={archived ? "Reativar campanha" : "Arquivar campanha"}
-                    className="lg-control sq flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-(--nv-text-2) hover:text-(--nv-text)"
-                  >
-                    <HugeiconsIcon icon={Archive01Icon} size={16} strokeWidth={2} />
-                  </button>
-                </div>
-              </Card>
-            </div>
-          )}
-
-          {/* Rascunho guardado */}
-          {status === "rascunhos" && hasDraft && draft && (
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-              <Card className="flex flex-col justify-between gap-5">
-                <div>
-                  <span className="sq inline-flex items-center rounded-full bg-(--nv-accent-soft) px-2.5 py-0.5 text-[11.5px] font-semibold text-[#0076E8] dark:text-[#60B5FF]">
-                    Rascunho · Passo {Math.min(draft.step + 1, 8)}/8
-                  </span>
-                  <h2 className="mt-3 text-[19px] font-bold tracking-[-0.025em] text-(--nv-text)">
-                    {draft.brandName.trim() || "Campanha em progresso"}
-                  </h2>
-                  <p className="mt-1 text-[13px] text-(--nv-text-3)">
-                    {draft.goal ? GOAL_LABEL[draft.goal] : "Retoma exatamente onde paraste."}
-                  </p>
-                </div>
-                <Link href="/onboarding" className="nuvi-btn-sm sq !h-10 w-full">
-                  Continuar rascunho
-                  <HugeiconsIcon icon={ArrowRight01Icon} size={15} strokeWidth={2.2} />
-                </Link>
-              </Card>
-            </div>
-          )}
-
-          {/* Estado vazio 100% Nuvi */}
-          {((status !== "rascunhos" && !showLiveCampaign) || (status === "rascunhos" && !hasDraft)) && (
-            <Card className="flex min-h-[420px] flex-col items-center justify-center text-center">
-              <Image
-                src={status === "ativas" ? "/icons/video.svg" : status === "arquivadas" ? "/icons/bag.svg" : "/icons/clock.svg"}
-                alt=""
-                width={80}
-                height={70}
-                className="select-none"
-                draggable={false}
-              />
-              <h2 className="mt-5 text-[20px] font-bold tracking-[-0.025em] text-(--nv-text)">
-                {status === "ativas"
-                  ? "Sem campanhas ativas"
-                  : status === "arquivadas"
-                    ? "Sem campanhas arquivadas"
-                    : "Sem rascunhos guardados"}
-              </h2>
-              <p className="mt-1.5 max-w-[340px] text-[13.5px] leading-relaxed text-(--nv-text-3)">
-                {status === "ativas"
-                  ? "Lança a tua primeira campanha para começar a receber vídeos de criadores."
-                  : status === "arquivadas"
-                    ? "Campanhas concluídas ou pausadas ficam guardadas aqui."
-                    : "Se saíres a meio da criação de uma campanha, ela fica guardada aqui."}
-              </p>
-              {status === "ativas" && (
-                <Link href="/onboarding" className="nuvi-btn-sm sq mt-6 !h-11 !px-6">
-                  <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2.4} />
-                  Criar campanha
-                </Link>
-              )}
-            </Card>
-          )}
+          {/* Estado vazio limpo (sem campanhas mockadas) */}
+          <Card className="flex min-h-[420px] flex-col items-center justify-center text-center">
+            <Image
+              src={status === "ativas" ? "/icons/video.svg" : status === "arquivadas" ? "/icons/bag.svg" : "/icons/clock.svg"}
+              alt=""
+              width={80}
+              height={70}
+              className="select-none"
+              draggable={false}
+            />
+            <h2 className="mt-5 text-[20px] font-bold tracking-[-0.025em] text-(--nv-text)">
+              {status === "ativas"
+                ? "Sem campanhas ativas"
+                : status === "arquivadas"
+                  ? "Sem campanhas arquivadas"
+                  : "Sem rascunhos guardados"}
+            </h2>
+            <p className="mt-1.5 max-w-[340px] text-[13.5px] leading-relaxed text-(--nv-text-3)">
+              {status === "ativas"
+                ? "Lança a tua primeira campanha para começar a receber vídeos de criadores."
+                : status === "arquivadas"
+                  ? "Campanhas concluídas ou pausadas ficam guardadas aqui."
+                  : "Se saíres a meio da criação de uma campanha, ela fica guardada aqui."}
+            </p>
+            {status === "ativas" && (
+              <Link href="/onboarding" className="nuvi-btn-sm sq mt-6 !h-11 !px-6">
+                <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2.4} />
+                Criar campanha
+              </Link>
+            )}
+          </Card>
         </>
       ) : (
         /* Entregas, Candidatos, Pedidos */

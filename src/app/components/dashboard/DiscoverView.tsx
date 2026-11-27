@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Bookmark01Icon,
-  Briefcase01Icon,
-  Building03Icon,
   Cancel01Icon,
   CheckmarkBadge01Icon,
   CrownIcon,
@@ -16,7 +15,6 @@ import {
   Megaphone01Icon,
   Message01Icon,
   MoreHorizontalIcon,
-  ScissorIcon,
   Search01Icon,
   SparklesIcon,
   StarIcon,
@@ -32,49 +30,25 @@ import {
 } from "@/app/components/onboarding/creators";
 import { useCampaign } from "@/app/components/onboarding/campaign";
 import { useDashboard } from "./dashboard-context";
-
-type PlatformFilter = "todos" | "tiktok" | "instagram" | "youtube";
-type SortKey = "recomendados" | "views" | "engajamento" | "cpm";
+import DiscoverFilterSheet, {
+  DEFAULT_FILTERS,
+  FILTER_NICHES,
+  MAX_CPM_LIMIT,
+  MIN_VIEWS_OPTIONS,
+  SORT_OPTIONS,
+  countActiveFilters,
+  type DiscoverFilters,
+} from "./DiscoverFilterSheet";
 
 const CATEGORIES: {
   id: DiscoverCategory;
   label: string;
-  subtitle: string;
   icon: typeof UserGroupIcon;
 }[] = [
-  {
-    id: "criadores",
-    label: "Criadores",
-    subtitle: "Criadores de UGC produzem vídeos para os teus anúncios, pagos por vídeo.",
-    icon: UserGroupIcon,
-  },
-  {
-    id: "influenciadores",
-    label: "Influenciadores",
-    subtitle: "Influenciadores publicam nas próprias contas para gerar alcance orgânico.",
-    icon: Megaphone01Icon,
-  },
-  {
-    id: "gestores",
-    label: "Gestores de Campanha",
-    subtitle: "Especialistas que coordenam briefings, entregas e criadores por ti.",
-    icon: Briefcase01Icon,
-  },
-  {
-    id: "agencias",
-    label: "Agências UGC",
-    subtitle: "Equipas prontas para produzir conteúdo em escala todos os meses.",
-    icon: Building03Icon,
-  },
-  {
-    id: "clipping",
-    label: "Clipping",
-    subtitle: "Editores transformam vídeos longos e podcasts em clips curtos virais.",
-    icon: ScissorIcon,
-  },
+  { id: "criadores", label: "Criadores", icon: UserGroupIcon },
+  { id: "influenciadores", label: "Influenciadores", icon: Megaphone01Icon },
 ];
 
-const REGIONS = ["Todas", "Luanda", "Benguela", "Huíla", "Huambo", "Lisboa"] as const;
 const DAILY_INVITE_LIMIT = 30;
 
 export default function DiscoverView() {
@@ -85,10 +59,7 @@ export default function DiscoverView() {
   const [category, setCategory] = useState<DiscoverCategory>("criadores");
   const [query, setQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [platform, setPlatform] = useState<PlatformFilter>("todos");
-  const [region, setRegion] = useState<string>("Todas");
-  const [onlyTop, setOnlyTop] = useState(false);
-  const [sortBy, setSortBy] = useState<SortKey>("recomendados");
+  const [filters, setFilters] = useState<DiscoverFilters>(DEFAULT_FILTERS);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [extraInvitedIds, setExtraInvitedIds] = useState<string[]>([]);
@@ -103,20 +74,27 @@ export default function DiscoverView() {
   }, [campaign?.invitedCreators, extraInvitedIds]);
 
   const invitesLeft = Math.max(0, DAILY_INVITE_LIMIT - extraInvitedIds.length);
-
-  const activeFilterCount =
-    (platform !== "todos" ? 1 : 0) +
-    (region !== "Todas" ? 1 : 0) +
-    (onlyTop ? 1 : 0) +
-    (sortBy !== "recomendados" ? 1 : 0);
+  const activeFilterCount = countActiveFilters(filters);
 
   const filteredCreators = useMemo(() => {
     const q = query.trim().toLowerCase();
     const list = ALL_CREATORS.filter((c) => {
       if (!c.categories.includes(category)) return false;
-      if (platform !== "todos" && !c.platforms.includes(platform)) return false;
-      if (region !== "Todas" && c.regionKey !== region) return false;
-      if (onlyTop && !c.topCreator) return false;
+      if (filters.platform !== "todos" && !c.platforms.includes(filters.platform)) return false;
+      if (filters.regions.length > 0 && !filters.regions.includes(c.regionKey)) return false;
+      if (filters.niches.length > 0) {
+        const nicheText = c.niches.map((n) => n.label.toLowerCase()).join(" ");
+        const matchesNiche = filters.niches.some((id) => {
+          const def = FILTER_NICHES.find((n) => n.id === id);
+          return def?.keywords.some((kw) => nicheText.includes(kw));
+        });
+        if (!matchesNiche) return false;
+      }
+      if (filters.minViews > 0 && c.viewsNum < filters.minViews) return false;
+      if (filters.maxCpm < MAX_CPM_LIMIT && c.cpmNum > filters.maxCpm) return false;
+      if (filters.onlyTop && !c.topCreator) return false;
+      if (filters.onlyRated && !c.rating) return false;
+      if (filters.onlySaved && !savedIds.includes(c.id)) return false;
       if (q) {
         const hay = `${c.name} ${c.handle} ${c.location} ${c.niches.map((n) => n.label).join(" ")}`.toLowerCase();
         if (!hay.includes(q)) return false;
@@ -124,11 +102,47 @@ export default function DiscoverView() {
       return true;
     });
 
-    if (sortBy === "views") return [...list].sort((a, b) => b.viewsNum - a.viewsNum);
-    if (sortBy === "engajamento") return [...list].sort((a, b) => b.engagementNum - a.engagementNum);
-    if (sortBy === "cpm") return [...list].sort((a, b) => a.cpmNum - b.cpmNum);
+    if (filters.sortBy === "views") return [...list].sort((a, b) => b.viewsNum - a.viewsNum);
+    if (filters.sortBy === "engajamento") return [...list].sort((a, b) => b.engagementNum - a.engagementNum);
+    if (filters.sortBy === "cpm") return [...list].sort((a, b) => a.cpmNum - b.cpmNum);
     return list;
-  }, [category, platform, region, onlyTop, query, sortBy]);
+  }, [category, filters, query, savedIds]);
+
+  const activeChips = useMemo(() => {
+    const chips: { key: string; label: string; remove: () => void }[] = [];
+    if (filters.sortBy !== "recomendados") {
+      const s = SORT_OPTIONS.find((o) => o.id === filters.sortBy);
+      if (s) chips.push({ key: "sort", label: `Ordenar: ${s.label}`, remove: () => setFilters((f) => ({ ...f, sortBy: "recomendados" })) });
+    }
+    if (filters.platform !== "todos") {
+      const label = filters.platform === "tiktok" ? "TikTok" : filters.platform === "instagram" ? "Instagram" : "YouTube";
+      chips.push({ key: "platform", label, remove: () => setFilters((f) => ({ ...f, platform: "todos" })) });
+    }
+    for (const r of filters.regions) {
+      chips.push({ key: `r-${r}`, label: r, remove: () => setFilters((f) => ({ ...f, regions: f.regions.filter((x) => x !== r) })) });
+    }
+    for (const id of filters.niches) {
+      const n = FILTER_NICHES.find((x) => x.id === id);
+      if (n) chips.push({ key: `n-${id}`, label: n.label, remove: () => setFilters((f) => ({ ...f, niches: f.niches.filter((x) => x !== id) })) });
+    }
+    if (filters.minViews > 0) {
+      const v = MIN_VIEWS_OPTIONS.find((o) => o.value === filters.minViews);
+      if (v) chips.push({ key: "views", label: `${v.label} views`, remove: () => setFilters((f) => ({ ...f, minViews: 0 })) });
+    }
+    if (filters.maxCpm < MAX_CPM_LIMIT) {
+      chips.push({ key: "cpm", label: `CPM ≤ ${filters.maxCpm.toLocaleString("pt-PT")} Kz`, remove: () => setFilters((f) => ({ ...f, maxCpm: MAX_CPM_LIMIT })) });
+    }
+    if (filters.onlyTop) {
+      chips.push({ key: "top", label: "Top Criadores", remove: () => setFilters((f) => ({ ...f, onlyTop: false })) });
+    }
+    if (filters.onlyRated) {
+      chips.push({ key: "rated", label: "Com avaliações", remove: () => setFilters((f) => ({ ...f, onlyRated: false })) });
+    }
+    if (filters.onlySaved) {
+      chips.push({ key: "saved", label: "Guardados", remove: () => setFilters((f) => ({ ...f, onlySaved: false })) });
+    }
+    return chips;
+  }, [filters]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -160,12 +174,7 @@ export default function DiscoverView() {
     setSavedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
-  const clearFilters = () => {
-    setPlatform("todos");
-    setRegion("Todas");
-    setOnlyTop(false);
-    setSortBy("recomendados");
-  };
+  const clearFilters = () => setFilters(DEFAULT_FILTERS);
 
   // Fecha menu de contexto ao clicar fora
   useEffect(() => {
@@ -271,89 +280,44 @@ export default function DiscoverView() {
         </button>
       </div>
 
-      {/* Painel expansível de filtros */}
-      {filtersOpen && (
-        <div className="nuvi-step lg-surface sq flex flex-wrap items-center gap-x-5 gap-y-3 rounded-[24px] p-4">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="mr-1 text-[12px] font-semibold text-(--nv-text-3)">Rede</span>
-            {(
-              [
-                { id: "todos", label: "Todas" },
-                { id: "tiktok", label: "TikTok" },
-                { id: "instagram", label: "Instagram" },
-                { id: "youtube", label: "YouTube" },
-              ] as const
-            ).map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setPlatform(p.id)}
-                className={`sq h-8 cursor-pointer rounded-full px-3 text-[12.5px] font-semibold transition-all ${
-                  platform === p.id
-                    ? "bg-[#4EA7EB] text-white"
-                    : "bg-(--nv-fill) text-(--nv-text-2) hover:text-(--nv-text)"
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="mr-1 text-[12px] font-semibold text-(--nv-text-3)">Região</span>
-            {REGIONS.map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setRegion(r)}
-                className={`sq h-8 cursor-pointer rounded-full px-3 text-[12.5px] font-semibold transition-all ${
-                  region === r
-                    ? "bg-[#4EA7EB] text-white"
-                    : "bg-(--nv-fill) text-(--nv-text-2) hover:text-(--nv-text)"
-                }`}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+      {/* Chips dos filtros ativos (removíveis num toque) */}
+      {activeChips.length > 0 && (
+        <div className="nuvi-step flex flex-wrap items-center gap-2">
+          {activeChips.map((chip) => (
             <button
+              key={chip.key}
               type="button"
-              onClick={() => setOnlyTop((v) => !v)}
-              aria-pressed={onlyTop}
-              className={`sq inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-[12.5px] font-semibold transition-all ${
-                onlyTop ? "bg-[#4EA7EB] text-white" : "bg-(--nv-fill) text-(--nv-text-2) hover:text-(--nv-text)"
-              }`}
+              onClick={chip.remove}
+              aria-label={`Remover filtro ${chip.label}`}
+              className="lg-control sq inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full pr-2.5 pl-3.5 text-[12.5px] font-semibold text-(--nv-text)"
             >
-              <HugeiconsIcon icon={CrownIcon} size={13} strokeWidth={2.2} />
-              Top Criadores
+              <span>{chip.label}</span>
+              <HugeiconsIcon icon={Cancel01Icon} size={12} strokeWidth={2.4} className="text-(--nv-text-3)" />
             </button>
-
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortKey)}
-              aria-label="Ordenar criadores"
-              className="sq h-8 cursor-pointer rounded-full border border-(--nv-line) bg-(--nv-solid) px-3 text-[12.5px] font-semibold text-(--nv-text) outline-none"
-            >
-              <option value="recomendados">Ordenar: Recomendados</option>
-              <option value="views">Mais visualizações</option>
-              <option value="engajamento">Maior engajamento</option>
-              <option value="cpm">Menor CPM</option>
-            </select>
-
-            {activeFilterCount > 0 && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="cursor-pointer text-[12.5px] font-semibold text-[#4EA7EB] hover:underline"
-              >
-                Limpar
-              </button>
-            )}
-          </div>
+          ))}
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="cursor-pointer px-1 text-[12.5px] font-semibold text-[#4EA7EB] hover:underline"
+          >
+            Limpar tudo
+          </button>
+          <span className="ml-auto text-[12.5px] font-medium text-(--nv-text-3) tabular-nums">
+            {filteredCreators.length} {filteredCreators.length === 1 ? "criador" : "criadores"}
+          </span>
         </div>
       )}
+
+      {/* Folha lateral de filtros estilo Apple / Nuvi */}
+      <DiscoverFilterSheet
+        open={filtersOpen}
+        filters={filters}
+        resultCount={filteredCreators.length}
+        savedCount={savedIds.length}
+        onChange={setFilters}
+        onReset={clearFilters}
+        onClose={() => setFiltersOpen(false)}
+      />
 
       {/* Aviso de limite / upgrade */}
       {limitNotice && (
@@ -377,22 +341,42 @@ export default function DiscoverView() {
 
       {/* Grelha de criadores */}
       {filteredCreators.length === 0 ? (
-        <div className="lg-surface sq flex flex-col items-center justify-center rounded-[26px] px-6 py-16 text-center">
-          <p className="text-[16px] font-bold text-(--nv-text)">Nenhum criador encontrado</p>
-          <p className="mt-1 text-[13.5px] text-(--nv-text-3)">
-            Tenta outra pesquisa ou limpa os filtros aplicados.
+        <section className="lg-surface sq flex min-h-[420px] flex-col items-center justify-center rounded-[28px] px-6 py-16 text-center">
+          <Image
+            src={category === "criadores" ? "/icons/discovery.svg" : "/icons/profile.svg"}
+            alt=""
+            width={82}
+            height={72}
+            className="select-none"
+            draggable={false}
+          />
+          <h2 className="mt-5 text-[20px] font-bold tracking-[-0.025em] text-(--nv-text)">
+            {ALL_CREATORS.length === 0
+              ? category === "criadores"
+                ? "Sem criadores ainda"
+                : "Sem influenciadores ainda"
+              : "Nenhum resultado encontrado"}
+          </h2>
+          <p className="mt-1.5 max-w-[360px] text-[13.5px] leading-relaxed text-(--nv-text-3)">
+            {ALL_CREATORS.length === 0
+              ? category === "criadores"
+                ? "Os criadores vão aparecer aqui assim que se registarem na Nuvi."
+                : "Os influenciadores vão aparecer aqui assim que se registarem na Nuvi."
+              : "Tenta outra pesquisa ou limpa os filtros aplicados."}
           </p>
-          <button
-            type="button"
-            onClick={() => {
-              setQuery("");
-              clearFilters();
-            }}
-            className="lg-control sq mt-4 h-10 cursor-pointer rounded-full px-5 text-[13.5px] font-semibold text-(--nv-text)"
-          >
-            Limpar filtros
-          </button>
-        </div>
+          {(query || activeFilterCount > 0) && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                clearFilters();
+              }}
+              className="lg-control sq mt-5 h-10 cursor-pointer rounded-full px-5 text-[13.5px] font-semibold text-(--nv-text)"
+            >
+              Limpar filtros
+            </button>
+          )}
+        </section>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {filteredCreators.map((creator) => (

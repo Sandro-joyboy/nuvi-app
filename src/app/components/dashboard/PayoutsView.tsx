@@ -15,8 +15,8 @@ import {
   Wallet02Icon,
 } from "@hugeicons/core-free-icons";
 import SquircleTile from "@/app/components/squircle/SquircleTile";
-import { useCampaign } from "@/app/components/onboarding/campaign";
 import { useDashboard } from "./dashboard-context";
+import { useProfile } from "./prefs";
 import { Card, SectionHeader } from "./ui";
 
 type PayoutTab = "pendentes" | "historico" | "disputas";
@@ -63,7 +63,7 @@ const fmtKz = (n: number) => `${n.toLocaleString("pt-PT")} Kz`;
 
 export default function PayoutsView() {
   const { balance, openWallet } = useDashboard();
-  const campaign = useCampaign();
+  const profile = useProfile();
 
   const [tab, setTab] = useState<PayoutTab>("pendentes");
   const [filter, setFilter] = useState<StatusFilter>("todos");
@@ -227,18 +227,9 @@ export default function PayoutsView() {
 
             {tab === "pendentes" && (
               <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
-                <Link
-                  href={campaign ? "/painel/descobrir" : "/onboarding"}
-                  className="nuvi-btn-sm sq !h-11 !px-6"
-                >
-                  {campaign ? (
-                    "Descobrir criadores"
-                  ) : (
-                    <>
-                      <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2.4} />
-                      Criar campanha
-                    </>
-                  )}
+                <Link href="/onboarding" className="nuvi-btn-sm sq !h-11 !px-6">
+                  <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2.4} />
+                  Criar campanha
                 </Link>
               </div>
             )}
@@ -263,7 +254,7 @@ export default function PayoutsView() {
                 Carteira
               </h2>
               <p className="text-[12.5px] font-medium text-white/75">
-                {campaign?.brandName || "Nuvi"} · AOA
+                {profile.name || "Nuvi"} · AOA
               </p>
             </div>
             <span className="lg-tint rounded-full px-2.5 py-1 text-[11px] font-semibold">

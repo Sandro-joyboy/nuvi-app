@@ -647,6 +647,7 @@ html[data-theme="dark"] .nuvi-dash .nuvi-scroll::-webkit-scrollbar-thumb {
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
 }
 
+.nuvi-dash input.nuvi-range:focus-visible,
 .nuvi-ui input.nuvi-range:focus-visible {
   outline: 2px solid #4ea7eb;
   outline-offset: 6px;
