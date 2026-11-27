@@ -37,12 +37,17 @@ const NICHE_ICONS: Record<NicheIconKey, typeof Film01Icon> = {
 
 interface CreatorPickerStepProps {
   brandName: string;
-  onFinish: (invitedIds: string[]) => void;
+  initialInvitedIds?: string[];
+  onContinue: (invitedIds: string[]) => void;
 }
 
-export default function CreatorPickerStep({ brandName, onFinish }: CreatorPickerStepProps) {
+export default function CreatorPickerStep({
+  brandName,
+  initialInvitedIds = [],
+  onContinue,
+}: CreatorPickerStepProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [invitedIds, setInvitedIds] = useState<string[]>([]);
+  const [invitedIds, setInvitedIds] = useState<string[]>(initialInvitedIds);
   const [skippedIds, setSkippedIds] = useState<string[]>([]);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [completedDeck, setCompletedDeck] = useState(false);
@@ -106,10 +111,10 @@ export default function CreatorPickerStep({ brandName, onFinish }: CreatorPicker
       <header className="relative z-10 mx-auto flex w-full max-w-[960px] items-center justify-end px-4 pt-5 sm:px-6 sm:pt-6">
         <button
           type="button"
-          onClick={() => onFinish(invitedIds)}
+          onClick={() => onContinue(invitedIds)}
           className="lg-control inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-full px-4 text-[13.5px] font-semibold text-(--nv-text)"
         >
-          {invitedIds.length > 0 ? "Ir para o painel" : "Saltar por agora"}
+          {invitedIds.length > 0 ? "Continuar para lançar" : "Saltar por agora"}
         </button>
       </header>
 
@@ -173,7 +178,7 @@ export default function CreatorPickerStep({ brandName, onFinish }: CreatorPicker
             invitedIds={invitedIds}
             brandName={brandName}
             onSelectCreator={selectCreator}
-            onSendAll={() => onFinish(invitedIds)}
+            onContinue={() => onContinue(invitedIds)}
           />
         ) : (
           <div className="relative mt-8 w-full max-w-[920px] pt-4">
@@ -207,8 +212,8 @@ export default function CreatorPickerStep({ brandName, onFinish }: CreatorPicker
         {/* Barra de ação rápida quando já há criadores convidados */}
         {!completedDeck && invitedIds.length > 0 && (
           <div className="nuvi-step mt-6 flex flex-wrap items-center justify-center gap-3">
-            <PrimaryButton type="button" onClick={() => onFinish(invitedIds)} className="!w-auto !px-7">
-              Enviar mensagem a {invitedIds.length} {invitedIds.length === 1 ? "criador" : "criadores"}
+            <PrimaryButton type="button" onClick={() => onContinue(invitedIds)} className="!w-auto !px-7">
+              Continuar com {invitedIds.length} {invitedIds.length === 1 ? "criador" : "criadores"}
               <HugeiconsIcon icon={ArrowRight01Icon} size={17} strokeWidth={2.2} />
             </PrimaryButton>
           </div>
@@ -571,12 +576,12 @@ function CompletedBench({
   invitedIds,
   brandName,
   onSelectCreator,
-  onSendAll,
+  onContinue,
 }: {
   invitedIds: string[];
   brandName: string;
   onSelectCreator: (index: number) => void;
-  onSendAll: () => void;
+  onContinue: () => void;
 }) {
   const picked = TOP_CREATORS.filter((c) => invitedIds.includes(c.id));
 
@@ -592,8 +597,8 @@ function CompletedBench({
       </h2>
       <p className="mt-1.5 text-[14.5px] text-(--nv-text-2)">
         {picked.length > 0
-          ? "Enviamos o convite da tua campanha a todos de uma só vez. Toca em qualquer avatar acima para rever."
-          : "Podes tocar em qualquer avatar acima para convidar, ou avançar já para o painel."}
+          ? "Tudo pronto para rever e lançar a tua campanha. Toca em qualquer avatar acima se quiseres ajustar."
+          : "Podes tocar em qualquer avatar acima para convidar, ou avançar já para lançar a campanha."}
       </p>
 
       {picked.length > 0 && (
@@ -621,10 +626,10 @@ function CompletedBench({
       )}
 
       <div className="mt-7 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
-        <PrimaryButton type="button" onClick={onSendAll} className="sm:!w-auto sm:!px-8">
+        <PrimaryButton type="button" onClick={onContinue} className="sm:!w-auto sm:!px-8">
           {picked.length > 0
-            ? `Enviar mensagem a todos (${picked.length})`
-            : "Abrir o painel"}
+            ? `Rever e lançar campanha (${picked.length})`
+            : "Avançar para lançar"}
           <HugeiconsIcon icon={ArrowRight01Icon} size={17} strokeWidth={2.2} />
         </PrimaryButton>
       </div>

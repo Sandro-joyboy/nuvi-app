@@ -99,12 +99,18 @@ export interface CampaignDraft {
   plannedPosts: number | null;
 }
 
+export type CampaignPlatform = "tiktok" | "instagram";
+
 export interface Campaign extends Omit<CampaignDraft, "step"> {
   createdAt: string;
   /** Mostrar a confirmação no painel uma vez. */
   justCreated: boolean;
   /** Criadores convidados no ecrã pós-onboarding. */
   invitedCreators?: string[];
+  /** Personalização feita no ecrã de lançamento da campanha. */
+  campaignTitle?: string;
+  campaignBrief?: string;
+  platforms?: CampaignPlatform[];
 }
 
 const DRAFT_KEY = "nuvi-campaign-draft";
@@ -160,11 +166,16 @@ export function createCampaign(d: CampaignDraft) {
   window.dispatchEvent(new Event(EVENT));
 }
 
-export function saveInvitedCreators(creatorIds: string[]) {
+export function saveCampaignLaunch(data: {
+  invitedCreators: string[];
+  campaignTitle: string;
+  campaignBrief: string;
+  platforms: CampaignPlatform[];
+}) {
   const c = safeParse<Campaign>(localStorage.getItem(CAMPAIGN_KEY));
   if (!c) return;
   try {
-    localStorage.setItem(CAMPAIGN_KEY, JSON.stringify({ ...c, invitedCreators: creatorIds }));
+    localStorage.setItem(CAMPAIGN_KEY, JSON.stringify({ ...c, ...data }));
   } catch {
     /* ignora */
   }

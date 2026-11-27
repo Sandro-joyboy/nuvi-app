@@ -32,14 +32,15 @@ import {
   getPresetPostsForBudget,
   getSliderBounds,
   loadDraft,
+  saveCampaignLaunch,
   saveDraft,
-  saveInvitedCreators,
   useHydrated,
   type Budget,
   type CampaignDraft,
   type Experience,
   type Goal,
 } from "./campaign";
+import CampaignLaunchStep from "./CampaignLaunchStep";
 import CreatorPickerStep from "./CreatorPickerStep";
 
 type Icon = typeof InstagramIcon;
@@ -105,13 +106,14 @@ function Wizard() {
   const router = useRouter();
   const [d, setD] = useState<CampaignDraft>(() => loadDraft());
   const [touched, setTouched] = useState(false);
-  const [showCreators, setShowCreators] = useState(false);
+  const [phase, setPhase] = useState<"wizard" | "creators" | "launch">("wizard");
+  const [invitedIds, setInvitedIds] = useState<string[]>([]);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const step = Math.min(Math.max(0, d.step), STEPS.length - 1);
 
   useEffect(() => {
-    if (!showCreators) saveDraft(d);
-  }, [d, showCreators]);
+    if (phase === "wizard") saveDraft(d);
+  }, [d, phase]);
 
   // Foco no título ao mudar de passo (leitores de ecrã anunciam a mudança).
   useEffect(() => {
@@ -166,18 +168,40 @@ function Wizard() {
     }
     if (step === STEPS.length - 1) {
       createCampaign({ ...d, plannedPosts: activePosts });
-      setShowCreators(true);
+      setPhase("creators");
       return;
     }
     goStep(step + 1);
   };
 
-  if (showCreators) {
+  if (phase === "creators") {
     return (
       <CreatorPickerStep
         brandName={d.brandName.trim()}
-        onFinish={(invitedIds) => {
-          if (invitedIds.length > 0) saveInvitedCreators(invitedIds);
+        initialInvitedIds={invitedIds}
+        onContinue={(ids) => {
+          setInvitedIds(ids);
+          setPhase("launch");
+        }}
+      />
+    );
+  }
+
+  if (phase === "launch") {
+    return (
+      <CampaignLaunchStep
+        draft={d}
+        posts={plan.posts}
+        spendKz={plan.spendKz}
+        invitedIds={invitedIds}
+        onBack={() => setPhase("creators")}
+        onLaunch={({ campaignTitle, campaignBrief, platforms }) => {
+          saveCampaignLaunch({
+            invitedCreators: invitedIds,
+            campaignTitle,
+            campaignBrief,
+            platforms,
+          });
           router.push("/painel");
         }}
       />

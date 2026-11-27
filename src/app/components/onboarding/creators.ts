@@ -1,4 +1,5 @@
 export type NicheIconKey = "film" | "money" | "bag" | "phone" | "heart" | "camera" | "music" | "sparkles";
+export type DiscoverCategory = "criadores" | "influenciadores" | "gestores" | "agencias" | "clipping";
 
 export interface CreatorReel {
   caption: string;
@@ -25,12 +26,20 @@ export interface CreatorProfile {
   avatarBg: string;
   flag: string;
   location: string;
+  regionKey: string;
+  categories: DiscoverCategory[];
   topCreator: boolean;
   verified: boolean;
+  rating?: number;
+  reviewsCount?: number;
+  newToNuvi?: string;
   platforms: ("instagram" | "tiktok" | "youtube")[];
   views: string;
+  viewsNum: number;
   engagement: string;
+  engagementNum: number;
   cpm: string;
+  cpmNum: number;
   niches: { label: string; icon: NicheIconKey }[];
   reels: [CreatorReel, CreatorReel, CreatorReel];
   experiences: CreatorExperience[];
@@ -41,7 +50,7 @@ export interface CreatorProfile {
   countries: { flag: string; code: string; pct: number }[];
 }
 
-export const TOP_CREATORS: CreatorProfile[] = [
+export const ALL_CREATORS: CreatorProfile[] = [
   {
     id: "kelvin-tavares",
     name: "Kelvin Tavares",
@@ -50,12 +59,19 @@ export const TOP_CREATORS: CreatorProfile[] = [
     avatarBg: "linear-gradient(135deg, #2563EB 0%, #4EA7EB 100%)",
     flag: "🇦🇴",
     location: "Luanda, AO",
+    regionKey: "Luanda",
+    categories: ["criadores", "influenciadores"],
     topCreator: true,
     verified: true,
+    rating: 5.0,
+    reviewsCount: 4,
     platforms: ["instagram", "tiktok", "youtube"],
     views: "4,7M",
+    viewsNum: 4_700_000,
     engagement: "6,4%",
+    engagementNum: 6.4,
     cpm: "1 200 Kz",
+    cpmNum: 1200,
     niches: [
       { label: "Entretenimento & Mídia", icon: "film" },
       { label: "Finanças & Comércio", icon: "money" },
@@ -113,12 +129,19 @@ export const TOP_CREATORS: CreatorProfile[] = [
     avatarBg: "linear-gradient(135deg, #EC4899 0%, #F43F5E 100%)",
     flag: "🇦🇴",
     location: "Luanda, AO",
+    regionKey: "Luanda",
+    categories: ["criadores", "influenciadores"],
     topCreator: true,
     verified: true,
+    rating: 5.0,
+    reviewsCount: 2,
     platforms: ["instagram", "tiktok"],
     views: "3,2M",
+    viewsNum: 3_200_000,
     engagement: "8,1%",
+    engagementNum: 8.1,
     cpm: "1 450 Kz",
+    cpmNum: 1450,
     niches: [
       { label: "Moda & Beleza", icon: "sparkles" },
       { label: "Lifestyle & Compras", icon: "bag" },
@@ -169,6 +192,75 @@ export const TOP_CREATORS: CreatorProfile[] = [
     ],
   },
   {
+    id: "stephanie-gomes",
+    name: "Stéfanie Gomes",
+    handle: "@stefaniegomes",
+    initials: "SG",
+    avatarBg: "linear-gradient(135deg, #A855F7 0%, #7C3AED 100%)",
+    flag: "🇦🇴",
+    location: "Luanda, AO",
+    regionKey: "Luanda",
+    categories: ["criadores"],
+    topCreator: false,
+    verified: true,
+    newToNuvi: "Entrou esta semana · 18,4K no TikTok",
+    platforms: ["tiktok", "instagram"],
+    views: "184K",
+    viewsNum: 184_000,
+    engagement: "9,4%",
+    engagementNum: 9.4,
+    cpm: "850 Kz",
+    cpmNum: 850,
+    niches: [
+      { label: "Skincare & Rotina", icon: "sparkles" },
+      { label: "UGC Autêntico", icon: "camera" },
+    ],
+    reels: [
+      {
+        caption: "Primeira impressão honesta",
+        tag: "TikTok · 0:26",
+        views: "92K",
+        gradient: "linear-gradient(160deg, #3D2B56 0%, #7D5BA6 48%, #191124 100%)",
+        accent: "#E9D5FF",
+      },
+      {
+        caption: "Rotina de manhã em 60s",
+        tag: "Reels · 0:48",
+        views: "54K",
+        gradient: "linear-gradient(160deg, #274046 0%, #4E808C 48%, #101C1F 100%)",
+        accent: "#99F6E4",
+      },
+      {
+        caption: "Dica rápida para marcas",
+        tag: "TikTok · 0:21",
+        views: "38K",
+        gradient: "linear-gradient(160deg, #4F3629 0%, #9E6E54 48%, #211610 100%)",
+        accent: "#FDE68A",
+      },
+    ],
+    experiences: [
+      { brand: "Diva Cosmetics", monogram: "DC", bg: "linear-gradient(135deg, #A855F7, #7E22CE)", tiktok: "92K" },
+      { brand: "Bela Vida", monogram: "BV", bg: "linear-gradient(135deg, #14B8A6, #0F766E)", platformOnly: "Instagram" },
+    ],
+    moreExperiences: 0,
+    audienceSource: "Do TikTok · Instagram",
+    ages: [
+      { label: "13–17", pct: 7 },
+      { label: "18–24", pct: 41 },
+      { label: "25–34", pct: 37 },
+      { label: "35–44", pct: 11 },
+      { label: "45–54", pct: 3 },
+      { label: "55–64", pct: 1 },
+      { label: "65+", pct: 0 },
+    ],
+    gender: { female: 79, male: 15, unknown: 6 },
+    countries: [
+      { flag: "🇦🇴", code: "AO", pct: 85 },
+      { flag: "🇵🇹", code: "PT", pct: 10 },
+      { flag: "🇧🇷", code: "BR", pct: 3 },
+    ],
+  },
+  {
     id: "diogo-kiala",
     name: "Diogo Kiala",
     handle: "@diogokiala",
@@ -176,12 +268,19 @@ export const TOP_CREATORS: CreatorProfile[] = [
     avatarBg: "linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)",
     flag: "🇦🇴",
     location: "Benguela, AO",
+    regionKey: "Benguela",
+    categories: ["criadores", "clipping"],
     topCreator: true,
     verified: true,
+    rating: 5.0,
+    reviewsCount: 1,
     platforms: ["tiktok", "instagram", "youtube"],
     views: "2,9M",
+    viewsNum: 2_900_000,
     engagement: "7,2%",
+    engagementNum: 7.2,
     cpm: "1 100 Kz",
+    cpmNum: 1100,
     niches: [
       { label: "Tecnologia & Apps", icon: "phone" },
       { label: "Finanças & Comércio", icon: "money" },
@@ -239,12 +338,17 @@ export const TOP_CREATORS: CreatorProfile[] = [
     avatarBg: "linear-gradient(135deg, #F59E0B 0%, #EA580C 100%)",
     flag: "🇦🇴",
     location: "Luanda, AO",
+    regionKey: "Luanda",
+    categories: ["criadores", "influenciadores"],
     topCreator: false,
     verified: true,
     platforms: ["instagram", "tiktok"],
     views: "2,4M",
+    viewsNum: 2_400_000,
     engagement: "9,0%",
+    engagementNum: 9.0,
     cpm: "1 050 Kz",
+    cpmNum: 1050,
     niches: [
       { label: "Gastronomia & Café", icon: "heart" },
       { label: "Lifestyle & Rotina", icon: "camera" },
@@ -302,12 +406,17 @@ export const TOP_CREATORS: CreatorProfile[] = [
     avatarBg: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
     flag: "🇦🇴",
     location: "Huíla, AO",
+    regionKey: "Huíla",
+    categories: ["criadores", "influenciadores"],
     topCreator: true,
     verified: true,
     platforms: ["tiktok", "instagram"],
     views: "3,8M",
+    viewsNum: 3_800_000,
     engagement: "6,8%",
+    engagementNum: 6.8,
     cpm: "1 150 Kz",
+    cpmNum: 1150,
     niches: [
       { label: "Fitness & Bem-estar", icon: "heart" },
       { label: "Entretenimento & Mídia", icon: "film" },
@@ -365,12 +474,19 @@ export const TOP_CREATORS: CreatorProfile[] = [
     avatarBg: "linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)",
     flag: "🇵🇹",
     location: "Lisboa · Público AO",
+    regionKey: "Lisboa",
+    categories: ["criadores", "gestores"],
     topCreator: true,
     verified: true,
+    rating: 5.0,
+    reviewsCount: 3,
     platforms: ["instagram", "tiktok", "youtube"],
     views: "5,1M",
+    viewsNum: 5_100_000,
     engagement: "5,9%",
+    engagementNum: 5.9,
     cpm: "1 600 Kz",
+    cpmNum: 1600,
     niches: [
       { label: "UGC & Anúncios", icon: "camera" },
       { label: "Moda & Compras", icon: "bag" },
@@ -428,12 +544,19 @@ export const TOP_CREATORS: CreatorProfile[] = [
     avatarBg: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
     flag: "🇦🇴",
     location: "Luanda, AO",
+    regionKey: "Luanda",
+    categories: ["criadores", "influenciadores", "clipping"],
     topCreator: false,
     verified: true,
+    rating: 5.0,
+    reviewsCount: 2,
     platforms: ["tiktok", "instagram"],
     views: "6,2M",
+    viewsNum: 6_200_000,
     engagement: "7,6%",
+    engagementNum: 7.6,
     cpm: "980 Kz",
+    cpmNum: 980,
     niches: [
       { label: "Humor & Cultura", icon: "film" },
       { label: "Música & Eventos", icon: "music" },
@@ -491,12 +614,17 @@ export const TOP_CREATORS: CreatorProfile[] = [
     avatarBg: "linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)",
     flag: "🇦🇴",
     location: "Huambo, AO",
+    regionKey: "Huambo",
+    categories: ["criadores"],
     topCreator: false,
     verified: true,
     platforms: ["instagram", "tiktok"],
     views: "1,9M",
+    viewsNum: 1_900_000,
     engagement: "8,7%",
+    engagementNum: 8.7,
     cpm: "950 Kz",
+    cpmNum: 950,
     niches: [
       { label: "UGC & Reviews", icon: "sparkles" },
       { label: "Casa & Comércio", icon: "bag" },
@@ -546,4 +674,147 @@ export const TOP_CREATORS: CreatorProfile[] = [
       { flag: "🇧🇷", code: "BR", pct: 2 },
     ],
   },
+  {
+    id: "luanda-ugc-studio",
+    name: "Luanda UGC Studio",
+    handle: "@luandaugc",
+    initials: "LU",
+    avatarBg: "linear-gradient(135deg, #0284C7 0%, #1D4ED8 100%)",
+    flag: "🇦🇴",
+    location: "Luanda, AO",
+    regionKey: "Luanda",
+    categories: ["criadores", "agencias", "gestores"],
+    topCreator: true,
+    verified: true,
+    rating: 5.0,
+    reviewsCount: 6,
+    platforms: ["instagram", "tiktok", "youtube"],
+    views: "9,5M",
+    viewsNum: 9_500_000,
+    engagement: "6,1%",
+    engagementNum: 6.1,
+    cpm: "1 350 Kz",
+    cpmNum: 1350,
+    niches: [
+      { label: "Agência UGC", icon: "camera" },
+      { label: "Anúncios em Escala", icon: "money" },
+    ],
+    reels: [
+      {
+        caption: "Pack 15 criativos/mês para marcas",
+        tag: "Reels · 0:32",
+        views: "4,1M",
+        gradient: "linear-gradient(160deg, #102A43 0%, #245B8A 48%, #081521 100%)",
+        accent: "#60A5FA",
+      },
+      {
+        caption: "Estúdio no Talatona",
+        tag: "TikTok · 0:24",
+        views: "3,2M",
+        gradient: "linear-gradient(160deg, #33254D 0%, #634994 48%, #150F21 100%)",
+        accent: "#C4B5FD",
+      },
+      {
+        caption: "Case study · +4x ROAS",
+        tag: "Shorts · 0:49",
+        views: "2,2M",
+        gradient: "linear-gradient(160deg, #143B34 0%, #267869 48%, #091C18 100%)",
+        accent: "#5EEAD4",
+      },
+    ],
+    experiences: [
+      { brand: "BAI Directo", monogram: "BD", bg: "linear-gradient(135deg, #2563EB, #1E40AF)", instagram: "3,6M", tiktok: "2,4M" },
+      { brand: "Unitel", monogram: "UN", bg: "linear-gradient(135deg, #F97316, #C2410C)", instagram: "2,1M" },
+    ],
+    moreExperiences: 7,
+    audienceSource: "Do Instagram · TikTok",
+    ages: [
+      { label: "13–17", pct: 8 },
+      { label: "18–24", pct: 40 },
+      { label: "25–34", pct: 37 },
+      { label: "35–44", pct: 11 },
+      { label: "45–54", pct: 3 },
+      { label: "55–64", pct: 1 },
+      { label: "65+", pct: 0 },
+    ],
+    gender: { female: 52, male: 42, unknown: 6 },
+    countries: [
+      { flag: "🇦🇴", code: "AO", pct: 83 },
+      { flag: "🇵🇹", code: "PT", pct: 11 },
+      { flag: "🇧🇷", code: "BR", pct: 4 },
+    ],
+  },
+  {
+    id: "tomas-ferreira",
+    name: "Tomás Ferreira",
+    handle: "@tomasclips",
+    initials: "TF",
+    avatarBg: "linear-gradient(135deg, #4F46E5 0%, #3730A3 100%)",
+    flag: "🇦🇴",
+    location: "Benguela, AO",
+    regionKey: "Benguela",
+    categories: ["criadores", "clipping", "gestores"],
+    topCreator: false,
+    verified: true,
+    rating: 4.9,
+    reviewsCount: 3,
+    platforms: ["tiktok", "youtube", "instagram"],
+    views: "3,4M",
+    viewsNum: 3_400_000,
+    engagement: "7,4%",
+    engagementNum: 7.4,
+    cpm: "920 Kz",
+    cpmNum: 920,
+    niches: [
+      { label: "Clipping & Podcasts", icon: "film" },
+      { label: "Edição Viral", icon: "sparkles" },
+    ],
+    reels: [
+      {
+        caption: "Corte viral · Podcast Negócios AO",
+        tag: "TikTok · 0:44",
+        views: "1,6M",
+        gradient: "linear-gradient(160deg, #1F1D47 0%, #433E99 48%, #0D0C1F 100%)",
+        accent: "#818CF8",
+      },
+      {
+        caption: "Legendas dinâmicas que prendem",
+        tag: "Reels · 0:23",
+        views: "1,1M",
+        gradient: "linear-gradient(160deg, #1E3847 0%, #3A6D8A 48%, #0C181F 100%)",
+        accent: "#38BDF8",
+      },
+      {
+        caption: "Antes/Depois de edição",
+        tag: "Shorts · 0:31",
+        views: "720K",
+        gradient: "linear-gradient(160deg, #3D243B 0%, #824B7E 48%, #1A0F19 100%)",
+        accent: "#F0ABFC",
+      },
+    ],
+    experiences: [
+      { brand: "Kamba Cast", monogram: "KC", bg: "linear-gradient(135deg, #4F46E5, #3730A3)", tiktok: "2,1M", instagram: "780K" },
+      { brand: "Moco", monogram: "MC", bg: "linear-gradient(135deg, #4EA7EB, #0076E8)", platformOnly: "TikTok" },
+    ],
+    moreExperiences: 3,
+    audienceSource: "Do TikTok · YouTube",
+    ages: [
+      { label: "13–17", pct: 15 },
+      { label: "18–24", pct: 46 },
+      { label: "25–34", pct: 29 },
+      { label: "35–44", pct: 7 },
+      { label: "45–54", pct: 2 },
+      { label: "55–64", pct: 1 },
+      { label: "65+", pct: 0 },
+    ],
+    gender: { female: 34, male: 59, unknown: 7 },
+    countries: [
+      { flag: "🇦🇴", code: "AO", pct: 77 },
+      { flag: "🇵🇹", code: "PT", pct: 13 },
+      { flag: "🇧🇷", code: "BR", pct: 6 },
+    ],
+  },
 ];
+
+/** Top 8 criadores usados na seleção pós-onboarding. */
+export const TOP_CREATORS: CreatorProfile[] = ALL_CREATORS.filter((c) => c.id !== "stephanie-gomes" && c.id !== "tomas-ferreira").slice(0, 8);

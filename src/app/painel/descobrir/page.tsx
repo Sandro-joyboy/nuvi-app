@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import UnderConstruction from "@/app/components/dashboard/UnderConstruction";
+import DiscoverView from "@/app/components/dashboard/DiscoverView";
 
 export const metadata: Metadata = { title: "Descobrir" };
 
 export default function DescobrirPage() {
-  return <UnderConstruction section="Descobrir" />;
+  return <DiscoverView />;
 }
