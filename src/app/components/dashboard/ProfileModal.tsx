@@ -141,7 +141,7 @@ function ModalBody({ profile, onClose }: ProfileModalProps) {
               onChange={(e) => setName(e.target.value)}
               placeholder="Nome pessoal"
               aria-describedby="profile-name-hint"
-              className="sq mt-2 h-12 w-full rounded-[14px] border border-(--nv-line-strong) bg-(--nv-solid) px-4 text-[15px] text-(--nv-text) outline-none transition-shadow placeholder:text-(--nv-text-3) focus:border-[#0082F6] focus:shadow-[0_0_0_4px_rgba(0,130,246,0.15)]"
+              className="sq mt-2 h-12 w-full rounded-[14px] border border-(--nv-line-strong) bg-(--nv-solid) px-4 text-[15px] text-(--nv-text) outline-none transition-shadow placeholder:text-(--nv-text-3) focus:border-[#4EA7EB] focus:shadow-[0_0_0_4px_rgba(78,167,235,0.15)]"
             />
             <p id="profile-name-hint" className="mt-2 text-[12.5px] text-(--nv-text-3)">
               Aparece quando falas com criadores.

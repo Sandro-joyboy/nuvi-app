@@ -99,7 +99,7 @@ export function Sidebar({
                     strokeWidth={isActive ? 1.9 : 1.6}
                   />
                   {item.badge && (
-                    <span className="absolute -top-1.5 -right-2 rounded-full bg-[#0082F6] px-1.5 py-px text-[9px] font-semibold leading-[14px] text-white ring-2 ring-(--nv-bg)">
+                    <span className="absolute -top-1.5 -right-2 rounded-full bg-[#4EA7EB] px-1.5 py-px text-[9px] font-semibold leading-[14px] text-white ring-2 ring-(--nv-bg)">
                       {item.badge}
                     </span>
                   )}
@@ -165,7 +165,7 @@ export function MobileTabBar({
 
   const tab = (isActive: boolean) =>
     `relative flex h-12 flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-full text-[10px] font-medium transition-colors ${
-      isActive ? "bg-[#0082F6]/10 text-[#0076E8]" : "text-(--nv-text-2)"
+      isActive ? "bg-[#4EA7EB]/10 text-[#0076E8]" : "text-(--nv-text-2)"
     }`;
 
   return (
@@ -186,13 +186,13 @@ export function MobileTabBar({
                 setMoreOpen(false);
               }}
               className={`flex w-full cursor-pointer items-center gap-3 rounded-[16px] px-3 py-2.5 text-[14px] font-medium ${
-                active === item.key ? "bg-[#0082F6]/10 text-[#0076E8]" : "text-(--nv-text) hover:bg-(--nv-fill)"
+                active === item.key ? "bg-[#4EA7EB]/10 text-[#0076E8]" : "text-(--nv-text) hover:bg-(--nv-fill)"
               }`}
             >
               <HugeiconsIcon icon={item.icon} size={20} strokeWidth={1.7} />
               {item.label}
               {item.badge && (
-                <span className="ml-auto rounded-full bg-[#0082F6] px-2 py-0.5 text-[10px] font-semibold text-white">
+                <span className="ml-auto rounded-full bg-[#4EA7EB] px-2 py-0.5 text-[10px] font-semibold text-white">
                   {item.badge}
                 </span>
               )}
@@ -244,7 +244,7 @@ export function MobileTabBar({
           <HugeiconsIcon icon={MoreHorizontalIcon} size={21} strokeWidth={1.9} />
           Mais
           {moreBadge && (
-            <span className="absolute top-1.5 right-[calc(50%-14px)] h-2 w-2 rounded-full bg-[#0082F6] ring-2 ring-(--nv-solid)" />
+            <span className="absolute top-1.5 right-[calc(50%-14px)] h-2 w-2 rounded-full bg-[#4EA7EB] ring-2 ring-(--nv-solid)" />
           )}
         </button>
       </nav>

@@ -18,7 +18,7 @@ interface Metric {
 }
 
 const METRICS: Metric[] = [
-  { key: "views", label: "Visualizações", color: "#0082F6", icon: "/Show.svg" },
+  { key: "views", label: "Visualizações", color: "#4EA7EB", icon: "/Show.svg" },
   { key: "engagement", label: "Engajamento", color: "#FF9500", icon: "/Chart.svg" },
   { key: "likes", label: "Curtidas", color: "#FF2D55", icon: "/Heart.svg" },
   { key: "comments", label: "Comentários", color: "#34C759", icon: "/Chat.svg" },

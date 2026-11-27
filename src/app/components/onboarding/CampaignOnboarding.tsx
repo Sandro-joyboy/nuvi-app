@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -13,17 +12,10 @@ import {
   InstagramIcon,
   Link01Icon,
   Location01Icon,
-  Megaphone01Icon,
-  Rocket01Icon,
   Search01Icon,
-  SparklesIcon,
-  StarIcon,
-  Target02Icon,
   Tick02Icon,
   TiktokIcon,
-  TradeUpIcon,
   UserGroupIcon,
-  Wallet01Icon,
 } from "@hugeicons/core-free-icons";
 import { Field, PrimaryButton, secondaryBtn } from "@/app/components/auth/ui";
 import {
@@ -37,20 +29,20 @@ import {
   type Goal,
 } from "./campaign";
 
-type Icon = typeof Target02Icon;
+type Icon = typeof InstagramIcon;
 
 const STEPS = ["Objetivo", "Experiência", "Público", "Marca", "Origem", "Orçamento", "Rever"] as const;
 
-const GOALS: { id: Goal; title: string; body: string; icon: Icon }[] = [
-  { id: "anuncios", title: "Criativos para anúncios", body: "Vídeos feitos para correr como anúncios pagos.", icon: Target02Icon },
-  { id: "organico", title: "Conteúdo orgânico", body: "Publicações que geram alcance no TikTok e no Instagram.", icon: TradeUpIcon },
-  { id: "influenciadores", title: "Publicações de influenciadores", body: "Criadores publicam nas próprias contas.", icon: Megaphone01Icon },
+const GOALS: { id: Goal; title: string; body: string }[] = [
+  { id: "anuncios", title: "Criativos para anúncios", body: "Vídeos feitos para correr como anúncios pagos." },
+  { id: "organico", title: "Conteúdo orgânico", body: "Publicações que geram alcance no TikTok e no Instagram." },
+  { id: "influenciadores", title: "Publicações de influenciadores", body: "Criadores publicam nas próprias contas." },
 ];
 
-const EXPERIENCE: { id: Experience; title: string; body: string; icon: Icon }[] = [
-  { id: "primeira", title: "É a primeira vez", body: "Guiamos-te em cada passo.", icon: SparklesIcon },
-  { id: "algumas", title: "Já fiz algumas campanhas", body: "Conheço o básico.", icon: Rocket01Icon },
-  { id: "regular", title: "Trabalho com criadores regularmente", body: "Quero escalar e poupar tempo.", icon: StarIcon },
+const EXPERIENCE: { id: Experience; title: string; body: string }[] = [
+  { id: "primeira", title: "É a primeira vez", body: "Guiamos-te em cada passo." },
+  { id: "algumas", title: "Já fiz algumas campanhas", body: "Conheço o básico." },
+  { id: "regular", title: "Trabalho com criadores regularmente", body: "Quero escalar e poupar tempo." },
 ];
 
 const AGES = ["18–24", "25–34", "35–44", "45+"];
@@ -148,17 +140,18 @@ function Wizard() {
         className="pointer-events-none fixed inset-x-0 top-0 h-[520px] bg-[radial-gradient(55%_60%_at_20%_0%,rgba(78,167,235,0.2),transparent_70%),radial-gradient(40%_50%_at_85%_5%,rgba(175,82,222,0.1),transparent_70%)]"
       />
 
-      {/* Topo: sair + progresso */}
-      <header className="relative z-10 mx-auto flex w-full max-w-[760px] items-center gap-4 px-4 pt-4 sm:pt-6">
-        <Link
-          href="/painel"
-          aria-label="Sair e continuar depois"
-          title="Sair e continuar depois"
-          className="lg-control flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-(--nv-text)"
-        >
-          <HugeiconsIcon icon={Cancel01Icon} size={17} strokeWidth={2} />
-        </Link>
-        <div className="flex-1">
+      {/* Topo: progresso · guardar e sair */}
+      <header className="relative z-10 mx-auto flex w-full max-w-[560px] items-center gap-4 px-4 py-4 sm:gap-6 sm:py-6">
+        {/* Progresso: passo e contador por cima da barra, que ocupa toda a largura até ao botão */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-2 text-[12.5px]">
+            <span key={step} className="nuvi-step truncate font-semibold text-(--nv-text)">
+              {STEPS[step]}
+            </span>
+            <span aria-hidden className="shrink-0 font-medium text-(--nv-text-3) tabular-nums">
+              {step + 1}/{STEPS.length}
+            </span>
+          </div>
           <div
             role="progressbar"
             aria-label="Progresso da campanha"
@@ -166,24 +159,31 @@ function Wizard() {
             aria-valuemax={STEPS.length}
             aria-valuenow={step + 1}
             aria-valuetext={`Passo ${step + 1} de ${STEPS.length}: ${STEPS[step]}`}
-            className="flex gap-1"
+            className="mt-2 flex gap-1.5"
           >
             {STEPS.map((s, i) => (
-              <span
-                key={s}
-                className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${i <= step ? "bg-[#0082F6]" : "bg-(--nv-fill)"}`}
-              />
+              <span key={s} className="h-1 flex-1 overflow-hidden rounded-full bg-(--nv-fill)">
+                <span
+                  className="block h-full rounded-full bg-[#4EA7EB] transition-[width] duration-500 ease-out motion-reduce:transition-none"
+                  style={{ width: i <= step ? "100%" : "0%" }}
+                />
+              </span>
             ))}
           </div>
-          <p className="mt-2 text-[12.5px] font-medium text-(--nv-text-3)">
-            Passo {step + 1} de {STEPS.length} · {STEPS[step]}
-          </p>
         </div>
-        <Image src="/nuvi-cloud.png" alt="Nuvi" width={36} height={36} className="hidden h-9 w-9 rounded-full sm:block" />
+
+        <Link
+          href="/painel"
+          aria-label="Guardar e sair"
+          className="lg-control flex h-10 w-10 shrink-0 items-center justify-center gap-1.5 rounded-full text-[13.5px] font-semibold text-(--nv-text) sm:w-auto sm:px-4"
+        >
+          <HugeiconsIcon icon={Cancel01Icon} size={16} strokeWidth={2} className="sm:hidden" />
+          <span className="hidden sm:inline">Guardar e sair</span>
+        </Link>
       </header>
 
-      <form onSubmit={next} noValidate className="relative z-10 mx-auto flex w-full max-w-[560px] flex-1 flex-col px-4 pt-10 pb-32 sm:pt-14">
-        <p className="mb-2 text-[12.5px] font-semibold text-[#0082F6]">A tua primeira campanha</p>
+      <form onSubmit={next} noValidate className="relative z-10 mx-auto flex w-full max-w-[560px] flex-1 flex-col px-4 pt-10 pb-16 sm:pt-14">
+        <p className="mb-2 text-[12.5px] font-semibold text-[#4EA7EB]">A tua primeira campanha</p>
 
         {step === 0 && (
           <Step headingRef={headingRef} title="O que queres que os criadores façam?" subtitle="Escolhe uma. Podes juntar as outras depois.">
@@ -258,7 +258,7 @@ function Wizard() {
                     onClick={() => set("source", s.id)}
                     className={`sq flex cursor-pointer items-center gap-2.5 rounded-[18px] px-4 py-3.5 text-left text-[14px] font-semibold transition-all ${selCls(sel)}`}
                   >
-                    <HugeiconsIcon icon={s.icon} size={18} strokeWidth={1.8} className={sel ? "text-[#0082F6]" : "text-(--nv-text-3)"} />
+                    <HugeiconsIcon icon={s.icon} size={18} strokeWidth={1.8} className={sel ? "text-[#4EA7EB]" : "text-(--nv-text-3)"} />
                     {s.label}
                   </button>
                 );
@@ -269,7 +269,7 @@ function Wizard() {
 
         {step === 5 && (
           <Step headingRef={headingRef} title="Quanto queres investir por mês?" subtitle="Uma estimativa. Podes mudar quando quiseres.">
-            <OptionList label="Orçamento" items={BUDGETS.map((b) => ({ ...b, icon: Wallet01Icon }))} value={d.budget} onChange={(v) => set("budget", v)} />
+            <OptionList label="Orçamento" items={BUDGETS} value={d.budget} onChange={(v) => set("budget", v)} />
           </Step>
         )}
 
@@ -294,26 +294,21 @@ function Wizard() {
             Escolhe uma opção para continuar.
           </p>
         )}
-      </form>
 
-      {/* Ações fixas no fundo */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-(--nv-line) bg-(--nv-glass-strong) backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[560px] items-center gap-3 px-4 py-3.5">
+        {/* Ações logo a seguir ao conteúdo */}
+        <div className="mt-8 flex items-center gap-3">
           {step > 0 ? (
             <button type="button" onClick={() => goStep(step - 1)} className={`${secondaryBtn} !w-auto px-4`} aria-label="Passo anterior">
               <HugeiconsIcon icon={ArrowLeft01Icon} size={18} strokeWidth={2} />
               <span className="hidden sm:inline">Voltar</span>
             </button>
-          ) : (
-            <Link href="/painel" className="px-1 text-[13.5px] font-medium whitespace-nowrap text-(--nv-text-3) hover:text-(--nv-text)">
-              Fazer mais tarde
-            </Link>
-          )}
-          <PrimaryButton type="button" onClick={() => next()} aria-disabled={!valid} className={`ml-auto sm:!w-auto sm:!px-8 ${valid ? "" : "!opacity-60"}`}>
+          ) : null}
+          <PrimaryButton type="submit" aria-disabled={!valid} className={`ml-auto sm:!w-auto sm:!px-8 ${valid ? "" : "!opacity-60"}`}>
             {step === STEPS.length - 1 ? "Criar campanha" : "Continuar"}
           </PrimaryButton>
         </div>
-      </div>
+      </form>
+
     </div>
   );
 }
@@ -322,7 +317,7 @@ function Wizard() {
 
 const selCls = (sel: boolean) =>
   sel
-    ? "bg-(--nv-solid) shadow-[0_0_0_2px_#0082F6,0_8px_24px_-12px_rgba(0,130,246,0.45)]"
+    ? "bg-(--nv-solid) shadow-[0_0_0_2px_#4EA7EB,0_8px_24px_-12px_rgba(78,167,235,0.45)]"
     : "lg-surface hover:shadow-[0_0_0_1px_var(--nv-line-strong)]";
 
 function Step({
@@ -354,7 +349,7 @@ function OptionList<T extends string>({
   onChange,
 }: {
   label: string;
-  items: { id: T; title: string; body: string; icon: Icon }[];
+  items: { id: T; title: string; body: string }[];
   value: T | null;
   onChange: (v: T) => void;
 }) {
@@ -369,18 +364,15 @@ function OptionList<T extends string>({
             role="radio"
             aria-checked={sel}
             onClick={() => onChange(it.id)}
-            className={`sq flex w-full cursor-pointer items-center gap-4 rounded-[22px] p-4 text-left transition-all duration-200 ${selCls(sel)}`}
+            className={`sq flex w-full cursor-pointer items-center gap-4 rounded-[22px] px-5 py-4 text-left transition-all duration-200 ${selCls(sel)}`}
           >
-            <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${sel ? "bg-[#0082F6] text-white" : "bg-(--nv-accent-soft) text-[#0082F6]"}`}>
-              <HugeiconsIcon icon={it.icon} size={20} strokeWidth={1.9} />
-            </span>
             <span className="min-w-0 flex-1">
               <span className="block text-[15.5px] font-semibold tracking-[-0.01em]">{it.title}</span>
               <span className="mt-0.5 block text-[13.5px] leading-snug text-(--nv-text-3)">{it.body}</span>
             </span>
             <span
               aria-hidden
-              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-all ${sel ? "bg-[#0082F6] text-white" : "border-[1.5px] border-(--nv-line-strong)"}`}
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-all ${sel ? "bg-[#4EA7EB] text-white" : "border-[1.5px] border-(--nv-line-strong)"}`}
             >
               {sel && <HugeiconsIcon icon={Tick02Icon} size={14} strokeWidth={3} />}
             </span>
@@ -424,7 +416,7 @@ function ChipGroup({
               aria-checked={multi ? undefined : sel}
               onClick={() => onToggle(o)}
               className={`sq inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-full px-4 text-[14px] font-semibold transition-all ${
-                sel ? "bg-[#0082F6] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]" : "lg-control text-(--nv-text)"
+                sel ? "bg-[#4EA7EB] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]" : "lg-control text-(--nv-text)"
               }`}
             >
               {sel && multi && <HugeiconsIcon icon={Tick02Icon} size={14} strokeWidth={3} />}
@@ -449,7 +441,7 @@ function Review({ label, value, onEdit }: { label: string; value?: string; onEdi
         <dt className="text-[12.5px] font-medium text-(--nv-text-3)">{label}</dt>
         <dd className="mt-0.5 text-[14.5px] font-semibold break-words">{value || "—"}</dd>
       </div>
-      <button type="button" onClick={onEdit} className="shrink-0 cursor-pointer text-[13.5px] font-semibold text-[#0082F6] hover:underline" aria-label={`Editar ${label.toLowerCase()}`}>
+      <button type="button" onClick={onEdit} className="shrink-0 cursor-pointer text-[13.5px] font-semibold text-[#4EA7EB] hover:underline" aria-label={`Editar ${label.toLowerCase()}`}>
         Editar
       </button>
     </div>

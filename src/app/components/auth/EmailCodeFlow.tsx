@@ -25,6 +25,8 @@ interface EmailCodeFlowProps {
   eyebrow?: string;
   submitLabel: string;
   emailLabel?: string;
+  /** Exemplo no campo (marca: e-mail de trabalho; criador: pessoal). */
+  emailPlaceholder?: string;
   /** Conteúdo extra por baixo do formulário (links, termos). */
   below?: React.ReactNode;
   onVerified: (email: string) => void;
@@ -38,6 +40,7 @@ export default function EmailCodeFlow({
   eyebrow,
   submitLabel,
   emailLabel = "E-mail",
+  emailPlaceholder = "nome@email.com",
   below,
   onVerified,
   onStepChange,
@@ -82,7 +85,7 @@ export default function EmailCodeFlow({
     e.preventDefault();
     const value = email.trim();
     if (!EMAIL_RE.test(value)) {
-      setEmailError("Escreve um e-mail válido, ex.: nome@empresa.ao");
+      setEmailError(`Escreve um e-mail válido, ex.: ${emailPlaceholder}`);
       return;
     }
     setEmail(value);
@@ -121,7 +124,7 @@ export default function EmailCodeFlow({
             setEmailError(null);
             setSendError(null);
           }}
-          placeholder="nome@empresa.ao"
+          placeholder={emailPlaceholder}
           error={emailError}
           hint="Enviamos um código de 6 dígitos para confirmar."
         />
@@ -203,7 +206,7 @@ function CodeStep({
 
   return (
     <div>
-      <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-[18px] bg-(--nv-accent-soft) text-[#0082F6]">
+      <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-[18px] bg-(--nv-accent-soft) text-[#4EA7EB]">
         <HugeiconsIcon icon={SentIcon} size={26} strokeWidth={1.8} />
       </span>
       <PageTitle
@@ -329,7 +332,7 @@ function OtpInput({
                 invalid
                   ? "border-[#FF3B30]"
                   : isCurrent
-                    ? "border-[#0082F6] shadow-[0_0_0_4px_rgba(0,130,246,0.15)]"
+                    ? "border-[#4EA7EB] shadow-[0_0_0_4px_rgba(78,167,235,0.15)]"
                     : "border-(--nv-line-strong)"
               }`}
             >

@@ -62,7 +62,7 @@ export default function WalletModal({
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="sq flex h-11 w-11 items-center justify-center rounded-[14px] bg-(--nv-accent-soft) text-[#0082F6]">
+            <span className="sq flex h-11 w-11 items-center justify-center rounded-[14px] bg-(--nv-accent-soft) text-[#4EA7EB]">
               <HugeiconsIcon icon={Wallet02Icon} size={22} strokeWidth={1.8} />
             </span>
             <div>

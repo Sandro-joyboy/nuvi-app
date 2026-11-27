@@ -10,7 +10,7 @@ import { AuthShell, PageTitle, secondaryBtn } from "./ui";
 export default function LegalPage({ title }: { title: string }) {
   return (
     <AuthShell back={{ href: "/" }} width="md">
-      <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-[18px] bg-(--nv-accent-soft) text-[#0082F6]">
+      <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-[18px] bg-(--nv-accent-soft) text-[#4EA7EB]">
         <HugeiconsIcon icon={File01Icon} size={26} strokeWidth={1.8} />
       </span>
       <PageTitle

@@ -261,7 +261,7 @@ export default function NuviDashboard() {
                               icon={Video01Icon}
                               size={22}
                               strokeWidth={1.8}
-                              className="text-[#0082F6]"
+                              className="text-[#4EA7EB]"
                             />
                           </SquircleTile>
                         }

@@ -8,45 +8,24 @@ import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import EmailCodeFlow from "./EmailCodeFlow";
 import { AuthShell, PageTitle, secondaryBtn, textLink } from "./ui";
 
-function Terms() {
-  return (
-    <p className="text-center text-[12px] leading-relaxed text-(--nv-text-3)">
-      Ao continuar, aceitas os{" "}
-      <Link href="/termos" className="underline underline-offset-2 hover:text-(--nv-text)">
-        Termos
-      </Link>{" "}
-      e a{" "}
-      <Link href="/privacidade" className="underline underline-offset-2 hover:text-(--nv-text)">
-        Política de Privacidade
-      </Link>
-      .
-    </p>
-  );
-}
-
 /* ---------------- Entrar ---------------- */
 
 export function LoginScreen() {
   const router = useRouter();
+  const [codeStep, setCodeStep] = useState(false);
   return (
     <AuthShell
       back={{ href: "/" }}
-      aside={
-        <span className="hidden sm:inline">
-          Novo na Nuvi?{" "}
-          <Link href="/" className={textLink}>
-            Criar conta
-          </Link>
-        </span>
-      }
+      logo={!codeStep}
     >
       <EmailCodeFlow
         title="Entrar na Nuvi"
         subtitle="Sem senhas: enviamos um código para o teu e-mail."
         submitLabel="Continuar"
         onVerified={() => router.push("/painel")}
+        onStepChange={(s) => setCodeStep(s === "code")}
         below={
-          <p className="text-center text-[13.5px] text-(--nv-text-3) sm:hidden">
+          <p className="text-center text-[13.5px] text-(--nv-text-3)">
             Novo na Nuvi?{" "}
             <Link href="/" className={textLink}>
               Criar conta
@@ -66,6 +45,7 @@ const COPY = {
     title: "Cria a conta da tua marca",
     subtitle: "Lança campanhas com criadores e paga em Kwanzas. Grátis para começar.",
     emailLabel: "E-mail de trabalho",
+    emailPlaceholder: "nome@empresa.ao",
     switch: { text: "És criador?", cta: "Criar conta de criador", href: "/cadastro/criador" },
   },
   criador: {
@@ -73,6 +53,7 @@ const COPY = {
     title: "Cria a tua conta de criador",
     subtitle: "Cria conteúdo para marcas de que gostas e recebe por isso.",
     emailLabel: "E-mail",
+    emailPlaceholder: "nome@email.com",
     switch: { text: "Tens uma marca?", cta: "Criar conta de marca", href: "/cadastro/marca" },
   },
 } as const;
@@ -80,33 +61,25 @@ const COPY = {
 export function SignupScreen({ role }: { role: "marca" | "criador" }) {
   const router = useRouter();
   const [done, setDone] = useState<string | null>(null);
+  const [codeStep, setCodeStep] = useState(false);
   const c = COPY[role];
 
   if (done) return <CreatorWelcome email={done} />;
 
   return (
-    <AuthShell
-      back={{ href: "/" }}
-      aside={
-        <span className="hidden sm:inline">
-          Já tens conta?{" "}
-          <Link href="/entrar" className={textLink}>
-            Entrar
-          </Link>
-        </span>
-      }
-    >
+    <AuthShell back={{ href: "/" }} logo={!codeStep}>
       <EmailCodeFlow
         eyebrow={c.eyebrow}
         title={c.title}
         subtitle={c.subtitle}
         emailLabel={c.emailLabel}
+        emailPlaceholder={c.emailPlaceholder}
         submitLabel="Criar conta"
         onVerified={(email) => (role === "marca" ? router.push("/onboarding") : setDone(email))}
+        onStepChange={(s) => setCodeStep(s === "code")}
         below={
-          <div className="flex flex-col gap-5">
-            <div className="flex flex-col items-center gap-1.5 text-[13.5px] text-(--nv-text-3)">
-              <p className="sm:hidden">
+          <div className="flex flex-col items-center gap-1.5 text-[13.5px] text-(--nv-text-3)">
+              <p>
                 Já tens conta?{" "}
                 <Link href="/entrar" className={textLink}>
                   Entrar
@@ -118,8 +91,6 @@ export function SignupScreen({ role }: { role: "marca" | "criador" }) {
                   {c.switch.cta}
                 </Link>
               </p>
-            </div>
-            <Terms />
           </div>
         }
       />
@@ -131,7 +102,7 @@ export function SignupScreen({ role }: { role: "marca" | "criador" }) {
 
 function CreatorWelcome({ email }: { email: string }) {
   return (
-    <AuthShell>
+    <AuthShell logo={false}>
       <div className="text-center">
         <span className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-(--nv-success-soft) text-[#34C759]">
           <HugeiconsIcon icon={CheckmarkCircle02Icon} size={32} strokeWidth={1.8} />
@@ -153,7 +124,7 @@ function CreatorWelcome({ email }: { email: string }) {
             ["Cria e recebe", "Pagamento em Kwanzas após aprovação."],
           ].map(([t, d], i) => (
             <li key={t} className="flex items-start gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--nv-accent-soft) text-[13px] font-bold text-[#0082F6]">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--nv-accent-soft) text-[13px] font-bold text-[#4EA7EB]">
                 {i + 1}
               </span>
               <span>

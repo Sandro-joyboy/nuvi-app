@@ -29,7 +29,7 @@
   --nv-fill-2: rgba(15, 23, 42, 0.03);
   --nv-line: rgba(15, 23, 42, 0.08);
   --nv-line-strong: rgba(15, 23, 42, 0.16);
-  --nv-accent-soft: #eaf4ff;
+  --nv-accent-soft: #e6f3fc;
   --nv-success-soft: #eaf9ee;
   --nv-tile: #f1f3f6;
   --nv-chart-a: #f8fafd;
@@ -64,7 +64,7 @@ html[data-theme="dark"] .nuvi-ui {
   --nv-fill-2: rgba(255, 255, 255, 0.04);
   --nv-line: rgba(255, 255, 255, 0.09);
   --nv-line-strong: rgba(255, 255, 255, 0.18);
-  --nv-accent-soft: rgba(0, 130, 246, 0.18);
+  --nv-accent-soft: rgba(78, 167, 235, 0.2);
   --nv-success-soft: rgba(52, 199, 89, 0.16);
   --nv-tile: rgba(255, 255, 255, 0.07);
   --nv-chart-a: #13161c;
@@ -456,14 +456,16 @@ html[data-theme="dark"] .nuvi-ui {
 /* Foco visível consistente (teclado) */
 .nuvi-dash :focus-visible,
 .nuvi-ui :focus-visible {
-  outline: 2px solid #0082f6;
+  outline: 2px solid #4ea7eb;
   outline-offset: 2px;
 }
 /* Campos de texto mostram o foco no próprio contentor, sem contorno extra */
 .nuvi-dash input:focus-visible,
 .nuvi-dash textarea:focus-visible,
 .nuvi-ui input:focus-visible,
-.nuvi-ui textarea:focus-visible {
+.nuvi-ui textarea:focus-visible,
+.nuvi-ui [tabindex="-1"]:focus-visible {
+  /* títulos recebem foco por código (leitor de ecrã), não por teclado */
   outline: none;
 }
 

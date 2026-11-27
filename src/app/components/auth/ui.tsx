@@ -12,16 +12,18 @@ interface AuthShellProps {
   children: ReactNode;
   /** Botão voltar: link ou ação. */
   back?: { href: string; label?: string } | { onClick: () => void; label?: string };
-  /** Conteúdo à direita do topo (ex.: "Já tens conta? Entrar"). */
+  /** Ligação secundária por baixo do conteúdo (ex.: "Já tens conta? Entrar"). */
   aside?: ReactNode;
   /** Largura máxima do conteúdo. */
   width?: "sm" | "md" | "lg";
   footer?: boolean;
+  /** Esconder a nuvem quando o ecrã já tem o seu próprio ícone. */
+  logo?: boolean;
 }
 
 const WIDTHS = { sm: "max-w-[400px]", md: "max-w-[560px]", lg: "max-w-[760px]" };
 
-export function AuthShell({ children, back, aside, width = "sm", footer = true }: AuthShellProps) {
+export function AuthShell({ children, back, aside, width = "sm", footer = true, logo = true }: AuthShellProps) {
   return (
     <div className="nuvi-ui relative flex min-h-dvh flex-col bg-(--nv-panel) font-sans text-(--nv-text)">
       {/* Luz ambiente — a mesma do painel */}
@@ -31,19 +33,21 @@ export function AuthShell({ children, back, aside, width = "sm", footer = true }
         className="pointer-events-none fixed inset-x-0 top-0 h-[560px] bg-[radial-gradient(55%_60%_at_20%_0%,rgba(78,167,235,0.2),transparent_70%),radial-gradient(40%_50%_at_85%_5%,rgba(175,82,222,0.1),transparent_70%)]"
       />
 
-      <header className="relative z-10 flex items-center justify-between gap-3 px-4 py-4 sm:px-8 sm:py-6">
-        <div className="flex items-center gap-3">
-          {back && <BackButton {...back} />}
-          <Link href="/" aria-label="Nuvi — início" className="flex items-center gap-2.5 rounded-full">
-            <Image src="/nuvi-cloud.png" alt="" width={36} height={36} priority className="h-9 w-9 rounded-full" />
-            <span className="font-title text-[20px] font-bold tracking-[-0.03em]">nuvi</span>
-          </Link>
+      <main className="relative z-10 flex flex-1 flex-col items-center px-4 pt-10 pb-12 sm:pt-24">
+        <div className={`w-full ${WIDTHS[width]}`}>
+          {/* Marca por cima do título, na mesma coluna */}
+          <div className="mb-6 flex items-center gap-3 sm:mb-8">
+            {/* Voltar: ao lado da marca no telemóvel, no canto superior esquerdo em ecrãs largos */}
+            {back && (
+              <div className="sm:absolute sm:top-6 sm:left-8">
+                <BackButton {...back} />
+              </div>
+            )}
+            {logo && <Logo wordmark={false} size="lg" />}
+          </div>
+          {children}
+          {aside && <div className="mt-8 text-center text-[13.5px] text-(--nv-text-3)">{aside}</div>}
         </div>
-        {aside && <div className="text-[13.5px] text-(--nv-text-3)">{aside}</div>}
-      </header>
-
-      <main className="relative z-10 flex flex-1 flex-col items-center px-4 pt-4 pb-12 sm:pt-10">
-        <div className={`w-full ${WIDTHS[width]}`}>{children}</div>
       </main>
 
       {footer && (
@@ -54,6 +58,37 @@ export function AuthShell({ children, back, aside, width = "sm", footer = true }
         </footer>
       )}
     </div>
+  );
+}
+
+/** Logótipo principal da Nuvi (nuvem branca). A nuvem azul é só o ícone da plataforma. */
+export function Logo({
+  href = "/",
+  wordmark = true,
+  size = "sm",
+}: {
+  href?: string;
+  wordmark?: "sm" | boolean;
+  /** sm: topo do onboarding · lg: ícone grande por cima do título */
+  size?: "sm" | "lg";
+}) {
+  return (
+    <Link href={href} aria-label="Nuvi — início" className="flex items-center gap-2 rounded-2xl">
+      <Image
+        src="/Logo-icon.svg"
+        alt=""
+        width={250}
+        height={167}
+        priority
+        unoptimized
+        className={size === "lg" ? "-ml-2.5 h-[64px] w-auto sm:h-[72px]" : "-ml-1.5 h-[38px] w-auto"}
+      />
+      {wordmark && (
+        <span className={`font-title text-[20px] font-bold tracking-[-0.03em] ${wordmark === "sm" ? "hidden sm:inline" : ""}`}>
+          nuvi
+        </span>
+      )}
+    </Link>
   );
 }
 
@@ -79,7 +114,7 @@ export function PageTitle({ eyebrow, title, subtitle }: { eyebrow?: string; titl
   return (
     <div>
       {eyebrow && (
-        <p className="mb-2 text-[12.5px] font-semibold text-[#0082F6]">{eyebrow}</p>
+        <p className="mb-2 text-[12.5px] font-semibold text-[#4EA7EB]">{eyebrow}</p>
       )}
       <h1 className="text-[28px] leading-[1.15] font-bold tracking-[-0.03em] text-balance sm:text-[32px]">
         {title}
@@ -130,7 +165,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
           } pr-4 ${
             error
               ? "border-[#FF3B30] shadow-[0_0_0_4px_rgba(255,59,48,0.12)]"
-              : "border-(--nv-line-strong) focus:border-[#0082F6] focus:shadow-[0_0_0_4px_rgba(0,130,246,0.15)]"
+              : "border-(--nv-line-strong) focus:border-[#4EA7EB] focus:shadow-[0_0_0_4px_rgba(78,167,235,0.15)]"
           }`}
           {...props}
         />

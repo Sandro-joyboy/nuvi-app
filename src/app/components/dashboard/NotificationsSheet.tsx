@@ -124,7 +124,7 @@ function SheetBody({ items, onClose, onMarkRead, onMarkAllRead }: NotificationsS
                       onClick={() => onMarkRead(n.id)}
                       className="lg-surface sq flex w-full cursor-pointer items-start gap-3 rounded-[20px] p-4 text-left transition-transform active:scale-[0.99]"
                     >
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-(--nv-accent-soft) text-[#0082F6]">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-(--nv-accent-soft) text-[#4EA7EB]">
                         <HugeiconsIcon icon={InformationCircleIcon} size={19} strokeWidth={1.9} />
                       </span>
                       <span className="min-w-0 flex-1">
@@ -134,7 +134,7 @@ function SheetBody({ items, onClose, onMarkRead, onMarkAllRead }: NotificationsS
                       </span>
                       <span className="flex items-center gap-2 self-center">
                         {!n.read && (
-                          <span className="h-2 w-2 rounded-full bg-[#0082F6]">
+                          <span className="h-2 w-2 rounded-full bg-[#4EA7EB]">
                             <span className="sr-only">Não lida</span>
                           </span>
                         )}
