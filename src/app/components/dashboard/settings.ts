@@ -35,6 +35,12 @@ export interface TeamMember {
   status: "ativo" | "convidado";
 }
 
+/** Conector de e-mail: para onde a Nuvi envia avisos e resumos. */
+export interface EmailConnector {
+  address: string;
+  connectedAt: string;
+}
+
 export interface WorkspaceSettings {
   email: string;
   twoFactor: boolean;
@@ -54,6 +60,7 @@ export interface WorkspaceSettings {
   mocoStores: MocoStore[];
   pixelSites: PixelSite[];
   members: TeamMember[];
+  emailConnector: EmailConnector | null;
 }
 
 const SETTINGS_KEY = "nuvi-workspace-settings";
@@ -100,6 +107,7 @@ export const DEFAULT_SETTINGS: WorkspaceSettings = {
   mocoStores: [],
   pixelSites: [],
   members: [],
+  emailConnector: null,
 };
 
 function subscribe(cb: () => void) {
@@ -135,6 +143,10 @@ function readSettings(): WorkspaceSettings {
       mocoStores: Array.isArray(parsed.mocoStores) ? parsed.mocoStores : [],
       pixelSites: Array.isArray(parsed.pixelSites) ? parsed.pixelSites : [],
       members: Array.isArray(parsed.members) ? parsed.members : [],
+      emailConnector:
+        parsed.emailConnector && typeof parsed.emailConnector.address === "string"
+          ? parsed.emailConnector
+          : null,
     };
     return cacheVal;
   } catch {

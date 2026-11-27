@@ -224,8 +224,8 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                 </button>
 
                 <div className="ml-auto flex items-center gap-2.5 md:ml-0">
-                  {/* Em Mensagens, no telemóvel, a ação principal é escrever: o "Criar" sai para caber o título */}
-                  <span className={isMessages ? "hidden sm:contents" : "contents"}>
+                  {/* Em Mensagens e Definições, no telemóvel, o "Criar" sai para caber o título */}
+                  <span className={isMessages || active === "definicoes" ? "hidden sm:contents" : "contents"}>
                     <Link href="/onboarding" className="nuvi-create-btn">
                       Criar
                     </Link>
