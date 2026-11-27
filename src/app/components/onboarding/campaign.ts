@@ -6,93 +6,62 @@ import { useSyncExternalStore } from "react";
 export type Goal = "anuncios" | "organico" | "influenciadores";
 export type Experience = "primeira" | "algumas" | "regular";
 export type Budget = "ate-100" | "100-500" | "500-mais" | "nao-sei";
-export type WinMetric = "views" | "installs" | "customers";
 
-export interface TargetOption {
-  value: number;
-  label: string;
-  shortLabel: string;
-}
-
-export const METRIC_META: Record<
-  WinMetric,
+export const BUDGET_META: Record<
+  Budget,
   {
-    label: string;
-    unitPerMonth: string;
-    info: string;
-    targets: TargetOption[];
+    shortLabel: string;
+    unitLabel: string;
+    presetPosts: number;
+    maxKz: number | null;
   }
 > = {
-  views: {
-    label: "Visualizações",
-    unitPerMonth: "visualizações / mês",
-    info: "Otimizamos a campanha para máximo alcance e visualizações orgânicas.",
-    targets: [
-      { value: 100_000, label: "100K visualizações", shortLabel: "100K" },
-      { value: 500_000, label: "500K visualizações", shortLabel: "500K" },
-      { value: 1_000_000, label: "1M visualizações", shortLabel: "1M" },
-      { value: 5_000_000, label: "5M visualizações", shortLabel: "5M" },
-      { value: 10_000_000, label: "10M visualizações", shortLabel: "10M" },
-      { value: 25_000_000, label: "25M+ visualizações", shortLabel: "25M+" },
-    ],
+  "ate-100": {
+    shortLabel: "Até 100K",
+    unitLabel: "Kz / mês",
+    presetPosts: 10,
+    maxKz: 100_000,
   },
-  installs: {
-    label: "Instalações",
-    unitPerMonth: "instalações / mês",
-    info: "Focamos em criadores que geram cliques e descargas diretas da tua app.",
-    targets: [
-      { value: 500, label: "500 instalações", shortLabel: "500" },
-      { value: 2_000, label: "2K instalações", shortLabel: "2K" },
-      { value: 5_000, label: "5K instalações", shortLabel: "5K" },
-      { value: 15_000, label: "15K instalações", shortLabel: "15K" },
-      { value: 50_000, label: "50K instalações", shortLabel: "50K" },
-      { value: 100_000, label: "100K+ instalações", shortLabel: "100K+" },
-    ],
+  "100-500": {
+    shortLabel: "100K – 500K",
+    unitLabel: "Kz / mês",
+    presetPosts: 30,
+    maxKz: 500_000,
   },
-  customers: {
-    label: "Clientes",
-    unitPerMonth: "clientes / mês",
-    info: "Selecionamos criadores com alta intenção de compra e conversão real.",
-    targets: [
-      { value: 25, label: "25 clientes", shortLabel: "25" },
-      { value: 50, label: "50 clientes", shortLabel: "50" },
-      { value: 150, label: "150 clientes", shortLabel: "150" },
-      { value: 500, label: "500 clientes", shortLabel: "500" },
-      { value: 1_500, label: "1,5K clientes", shortLabel: "1,5K" },
-      { value: 5_000, label: "5K+ clientes", shortLabel: "5K+" },
-    ],
+  "500-mais": {
+    shortLabel: "500K+",
+    unitLabel: "Kz / mês",
+    presetPosts: 60,
+    maxKz: null,
+  },
+  "nao-sei": {
+    shortLabel: "Flexível",
+    unitLabel: "plano sugerido",
+    presetPosts: 30,
+    maxKz: null,
   },
 };
 
 const VIEWS_PER_POST = 14_553;
-const INSTALL_RATE = 0.012;
-const CUSTOMER_RATE = 0.001867;
 const POSTS_PER_CREATOR = 30;
-const COST_PER_POST_KZ = 15_000;
+const COST_PER_POST_KZ = 10_000;
 
-export function getPresetPosts(metric: WinMetric, targetValue: number): number {
-  const rate = metric === "views" ? 1 : metric === "installs" ? INSTALL_RATE : CUSTOMER_RATE;
-  const neededViews = targetValue / rate;
-  const raw = Math.ceil(neededViews / VIEWS_PER_POST);
-  // Mínimo 30 publicações/mês (1 criador ativo), arredondado em múltiplos de 10.
-  return Math.max(30, Math.ceil(raw / 10) * 10);
+export function getPresetPostsForBudget(budget: Budget | null): number {
+  return BUDGET_META[budget ?? "nao-sei"].presetPosts;
 }
 
 export function getSliderBounds(presetPosts: number): { min: number; max: number; step: number } {
-  const step = presetPosts >= 300 ? 30 : 10;
-  const min = Math.min(30, presetPosts);
-  const max = Math.max(300, Math.ceil((presetPosts * 2.5) / step) * step);
+  const step = presetPosts >= 60 ? 10 : 5;
+  const min = presetPosts <= 10 ? 5 : 10;
+  const max = Math.max(150, Math.ceil((presetPosts * 3) / step) * step);
   return { min, max, step };
 }
 
-export function computePlanProjection(metric: WinMetric, posts: number) {
+export function computePlanProjection(posts: number) {
   const creators = Math.max(1, Math.ceil(posts / POSTS_PER_CREATOR));
   const views = Math.round(posts * VIEWS_PER_POST);
-  const installs = Math.round(views * INSTALL_RATE);
-  const customers = Math.round(views * CUSTOMER_RATE);
   const spendKz = posts * COST_PER_POST_KZ;
-  const projectedOutcome = metric === "views" ? views : metric === "installs" ? installs : customers;
-  return { creators, posts, views, installs, customers, spendKz, projectedOutcome };
+  return { creators, posts, views, spendKz };
 }
 
 export function formatCompactNumber(n: number): string {
@@ -118,9 +87,6 @@ export function formatKwanzas(amount: number): string {
 export interface CampaignDraft {
   step: number;
   goal: Goal | null;
-  metric: WinMetric;
-  targetValue: number | null;
-  plannedPosts: number | null;
   experience: Experience | null;
   ages: string[];
   gender: "todos" | "mulheres" | "homens";
@@ -130,12 +96,15 @@ export interface CampaignDraft {
   instagram: string;
   source: string | null;
   budget: Budget | null;
+  plannedPosts: number | null;
 }
 
 export interface Campaign extends Omit<CampaignDraft, "step"> {
   createdAt: string;
   /** Mostrar a confirmação no painel uma vez. */
   justCreated: boolean;
+  /** Criadores convidados no ecrã pós-onboarding. */
+  invitedCreators?: string[];
 }
 
 const DRAFT_KEY = "nuvi-campaign-draft";
@@ -145,9 +114,6 @@ const EVENT = "nuvi-campaign-change";
 export const EMPTY_DRAFT: CampaignDraft = {
   step: 0,
   goal: null,
-  metric: "views",
-  targetValue: 100_000,
-  plannedPosts: null,
   experience: null,
   ages: [],
   gender: "todos",
@@ -157,6 +123,7 @@ export const EMPTY_DRAFT: CampaignDraft = {
   instagram: "",
   source: null,
   budget: null,
+  plannedPosts: null,
 };
 
 function safeParse<T>(raw: string | null): T | null {
@@ -187,6 +154,17 @@ export function createCampaign(d: CampaignDraft) {
   try {
     localStorage.setItem(CAMPAIGN_KEY, JSON.stringify(c));
     localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    /* ignora */
+  }
+  window.dispatchEvent(new Event(EVENT));
+}
+
+export function saveInvitedCreators(creatorIds: string[]) {
+  const c = safeParse<Campaign>(localStorage.getItem(CAMPAIGN_KEY));
+  if (!c) return;
+  try {
+    localStorage.setItem(CAMPAIGN_KEY, JSON.stringify({ ...c, invitedCreators: creatorIds }));
   } catch {
     /* ignora */
   }

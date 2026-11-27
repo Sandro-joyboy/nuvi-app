@@ -13,7 +13,6 @@ import {
   Cancel01Icon,
   Edit02Icon,
   EyeIcon,
-  InformationCircleIcon,
   InstagramIcon,
   Link01Icon,
   Location01Icon,
@@ -25,28 +24,28 @@ import {
 } from "@hugeicons/core-free-icons";
 import { Field, PrimaryButton, secondaryBtn } from "@/app/components/auth/ui";
 import {
-  METRIC_META,
+  BUDGET_META,
   computePlanProjection,
   createCampaign,
   formatCompactNumber,
   formatKwanzas,
-  getPresetPosts,
+  getPresetPostsForBudget,
   getSliderBounds,
   loadDraft,
   saveDraft,
+  saveInvitedCreators,
   useHydrated,
   type Budget,
   type CampaignDraft,
   type Experience,
   type Goal,
-  type WinMetric,
 } from "./campaign";
+import CreatorPickerStep from "./CreatorPickerStep";
 
 type Icon = typeof InstagramIcon;
 
 const STEPS = [
   "Objetivo",
-  "Meta",
   "Experiência",
   "Público",
   "Marca",
@@ -55,8 +54,6 @@ const STEPS = [
   "Plano",
   "Rever",
 ] as const;
-
-const METRIC_ORDER: WinMetric[] = ["views", "installs", "customers"];
 
 const GOALS: { id: Goal; title: string; body: string; image: string }[] = [
   { id: "anuncios", title: "Criativos para anúncios", body: "Vídeos feitos para correr como anúncios pagos.", image: "/icons/video.svg" },
@@ -108,10 +105,13 @@ function Wizard() {
   const router = useRouter();
   const [d, setD] = useState<CampaignDraft>(() => loadDraft());
   const [touched, setTouched] = useState(false);
+  const [showCreators, setShowCreators] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const step = Math.min(Math.max(0, d.step), STEPS.length - 1);
 
-  useEffect(() => saveDraft(d), [d]);
+  useEffect(() => {
+    if (!showCreators) saveDraft(d);
+  }, [d, showCreators]);
 
   // Foco no título ao mudar de passo (leitores de ecrã anunciam a mudança).
   useEffect(() => {
@@ -127,33 +127,23 @@ function Wizard() {
       return { ...p, [k]: list };
     });
 
-  // Dados da meta e projeção do plano
-  const metricInfo = METRIC_META[d.metric];
-  const targetOption = metricInfo.targets.find((t) => t.value === d.targetValue) ?? metricInfo.targets[0];
-  const presetPosts = getPresetPosts(d.metric, targetOption.value);
+  // Projeção do plano baseada no orçamento escolhido
+  const budgetKey: Budget = d.budget ?? "nao-sei";
+  const budgetMeta = BUDGET_META[budgetKey];
+  const presetPosts = getPresetPostsForBudget(budgetKey);
   const sliderBounds = getSliderBounds(presetPosts);
   const activePosts = d.plannedPosts ?? presetPosts;
-  const plan = computePlanProjection(d.metric, activePosts);
-  const hitsTarget = plan.projectedOutcome >= targetOption.value;
+  const plan = computePlanProjection(activePosts);
+  const withinBudget = budgetMeta.maxKz === null || plan.spendKz <= budgetMeta.maxKz;
   const isPreset = activePosts === presetPosts;
 
-  const selectMetric = (nextMetric: WinMetric) => {
-    setD((p) => {
-      const prevIdx = METRIC_META[p.metric].targets.findIndex((t) => t.value === p.targetValue);
-      const nextTargets = METRIC_META[nextMetric].targets;
-      const nextTarget = nextTargets[prevIdx >= 0 ? prevIdx : 0]?.value ?? nextTargets[0].value;
-      return { ...p, metric: nextMetric, targetValue: nextTarget, plannedPosts: null };
-    });
-  };
-
-  const selectTarget = (value: number) => {
-    setD((p) => ({ ...p, targetValue: value, plannedPosts: null }));
+  const selectBudget = (b: Budget) => {
+    setD((p) => ({ ...p, budget: b, plannedPosts: null }));
   };
 
   const websiteError = d.website.trim() && !URL_RE.test(d.website.trim()) ? "Escreve um endereço válido, ex.: minhamarca.ao" : null;
   const valid = [
     !!d.goal,
-    !!targetOption,
     !!d.experience,
     d.ages.length > 0 && d.regions.length > 0,
     d.brandName.trim().length > 1 && !websiteError,
@@ -175,14 +165,26 @@ function Wizard() {
       return;
     }
     if (step === STEPS.length - 1) {
-      createCampaign({ ...d, targetValue: targetOption.value, plannedPosts: activePosts });
-      router.push("/painel");
+      createCampaign({ ...d, plannedPosts: activePosts });
+      setShowCreators(true);
       return;
     }
     goStep(step + 1);
   };
 
-  const wideStep = step === 7;
+  if (showCreators) {
+    return (
+      <CreatorPickerStep
+        brandName={d.brandName.trim()}
+        onFinish={(invitedIds) => {
+          if (invitedIds.length > 0) saveInvitedCreators(invitedIds);
+          router.push("/painel");
+        }}
+      />
+    );
+  }
+
+  const wideStep = step === 6;
   const containerWidth = wideStep ? "max-w-[720px]" : "max-w-[560px]";
 
   return (
@@ -249,94 +251,12 @@ function Wizard() {
         )}
 
         {step === 1 && (
-          <Step
-            headingRef={headingRef}
-            title="O que faria disto uma vitória?"
-            subtitle="O conteúdo é o motor. Escolhe o resultado que queres gerar."
-          >
-            {/* Métrica (segmented control) */}
-            <fieldset>
-              <div className="flex items-center gap-1.5">
-                <legend className="text-[13.5px] font-semibold text-(--nv-text)">
-                  A tua métrica <span aria-hidden className="text-[#FF3B30]">*</span>
-                </legend>
-                <InfoTip text={metricInfo.info} />
-              </div>
-              <p className="mt-0.5 text-[12.5px] text-(--nv-text-3)">
-                O que otimizamos na tua primeira campanha.
-              </p>
-
-              <div
-                role="radiogroup"
-                aria-label="A tua métrica"
-                className="sq mt-3 grid grid-cols-3 gap-1 rounded-[16px] border border-(--nv-line) bg-(--nv-fill) p-1"
-              >
-                {METRIC_ORDER.map((m) => {
-                  const sel = d.metric === m;
-                  return (
-                    <button
-                      key={m}
-                      type="button"
-                      role="radio"
-                      aria-checked={sel}
-                      onClick={() => selectMetric(m)}
-                      className={`sq h-10 cursor-pointer rounded-[12px] px-2 text-[13.5px] font-semibold transition-all duration-200 sm:text-[14px] ${
-                        sel
-                          ? "bg-(--nv-solid) text-(--nv-text) shadow-[0_1px_2px_rgba(15,23,42,0.06),0_4px_12px_-4px_var(--nv-shadow)]"
-                          : "text-(--nv-text-3) hover:text-(--nv-text)"
-                      }`}
-                    >
-                      {METRIC_META[m].label}
-                    </button>
-                  );
-                })}
-              </div>
-            </fieldset>
-
-            {/* Meta mensal (grelha 2 colunas) */}
-            <fieldset>
-              <div className="flex items-center gap-1.5">
-                <legend className="text-[13.5px] font-semibold text-(--nv-text)">
-                  A tua meta, por mês <span aria-hidden className="text-[#FF3B30]">*</span>
-                </legend>
-                <InfoTip text="Usamos este valor para estimar criadores, volume de publicações e orçamento. Podes ajustar depois." />
-              </div>
-              <p className="mt-0.5 text-[12.5px] text-(--nv-text-3)">
-                Por alto — isto dimensiona o plano, não é um compromisso.
-              </p>
-
-              <div role="radiogroup" aria-label="A tua meta por mês" className="mt-3 grid grid-cols-2 gap-2.5">
-                {metricInfo.targets.map((opt) => {
-                  const sel = targetOption.value === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      role="radio"
-                      aria-checked={sel}
-                      onClick={() => selectTarget(opt.value)}
-                      className={`sq flex h-[54px] cursor-pointer items-center justify-center rounded-[16px] px-3 text-center text-[13.5px] font-semibold tracking-[-0.01em] transition-all duration-200 sm:px-4 sm:text-[14.5px] ${
-                        sel
-                          ? "border border-white/30 bg-gradient-to-b from-[#55B0F4] to-[#2684E6] text-white shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.45),0_10px_24px_-10px_rgba(0,118,232,0.55)]"
-                          : "lg-surface text-(--nv-text) hover:shadow-[0_0_0_1px_var(--nv-line-strong)]"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </fieldset>
-          </Step>
-        )}
-
-        {step === 2 && (
           <Step headingRef={headingRef} title="Já trabalhaste com criadores?" subtitle="Ajustamos as recomendações à tua experiência.">
             <OptionList label="Experiência" items={EXPERIENCE} value={d.experience} onChange={(v) => set("experience", v)} />
           </Step>
         )}
 
-        {step === 3 && (
+        {step === 2 && (
           <Step headingRef={headingRef} title="Quem queres alcançar?" subtitle="Ajuda-nos a sugerir criadores com o público certo.">
             <ChipGroup label="Idades" multi options={AGES} selected={d.ages} onToggle={(v) => toggle("ages", v)} error={touched && d.ages.length === 0 ? "Escolhe pelo menos uma idade." : null} />
             <ChipGroup
@@ -349,7 +269,7 @@ function Wizard() {
           </Step>
         )}
 
-        {step === 4 && (
+        {step === 3 && (
           <Step headingRef={headingRef} title="Fala-nos da tua marca" subtitle="Os criadores veem isto quando recebem o convite.">
             <div className="flex flex-col gap-4">
               <Field
@@ -383,7 +303,7 @@ function Wizard() {
           </Step>
         )}
 
-        {step === 5 && (
+        {step === 4 && (
           <Step headingRef={headingRef} title="Como conheceste a Nuvi?" subtitle="Só para sabermos onde estar.">
             <div role="radiogroup" aria-label="Origem" className="grid grid-cols-2 gap-2.5">
               {SOURCES.map((s) => {
@@ -406,23 +326,23 @@ function Wizard() {
           </Step>
         )}
 
-        {step === 6 && (
+        {step === 5 && (
           <Step headingRef={headingRef} title="Quanto queres investir por mês?" subtitle="Uma estimativa. Podes mudar quando quiseres.">
-            <OptionList label="Orçamento" items={BUDGETS} value={d.budget} onChange={(v) => set("budget", v)} />
+            <OptionList label="Orçamento" items={BUDGETS} value={d.budget} onChange={selectBudget} />
           </Step>
         )}
 
-        {step === 7 && (
+        {step === 6 && (
           <Step
             headingRef={headingRef}
-            title={hitsTarget ? "O teu plano está pronto. Bate a tua meta." : "Ajusta o plano ao teu ritmo."}
+            title={withinBudget ? "O teu plano está pronto. Cabe no teu orçamento." : "Ajusta o plano ao teu ritmo."}
             subtitle="Criado a partir das tuas respostas. Mantém assim ou desliza o que mais importa."
           >
             <PlanCard
-              targetLabel={targetOption.shortLabel}
-              projectedLabel={formatCompactNumber(plan.projectedOutcome)}
-              unitPerMonth={metricInfo.unitPerMonth}
-              hitsTarget={hitsTarget}
+              budgetLabel={budgetMeta.shortLabel}
+              budgetUnit={budgetMeta.unitLabel}
+              projectedViewsLabel={formatCompactNumber(plan.views)}
+              withinBudget={withinBudget}
               creators={plan.creators}
               posts={plan.posts}
               viewsLabel={formatCompactNumber(plan.views)}
@@ -435,29 +355,28 @@ function Wizard() {
           </Step>
         )}
 
-        {step === 8 && (
-          <Step headingRef={headingRef} title="Tudo pronto. Confirma a tua campanha" subtitle="Podes editar qualquer parte antes de criar.">
+        {step === 7 && (
+          <Step headingRef={headingRef} title="Tudo pronto. Confirma a tua campanha" subtitle="Podes editar qualquer parte antes de escolher os criadores.">
             <dl className="lg-surface sq divide-y divide-(--nv-line) rounded-[24px] px-5">
               <Review label="Objetivo" value={GOALS.find((g) => g.id === d.goal)?.title} onEdit={() => goStep(0)} />
-              <Review label="Meta" value={`${targetOption.label} / mês`} onEdit={() => goStep(1)} />
-              <Review label="Experiência" value={EXPERIENCE.find((x) => x.id === d.experience)?.title} onEdit={() => goStep(2)} />
+              <Review label="Experiência" value={EXPERIENCE.find((x) => x.id === d.experience)?.title} onEdit={() => goStep(1)} />
               <Review
                 label="Público"
                 value={`${d.ages.join(", ")} · ${GENDERS.find((g) => g.id === d.gender)?.label} · ${d.regions.join(", ")}`}
-                onEdit={() => goStep(3)}
+                onEdit={() => goStep(2)}
               />
-              <Review label="Marca" value={[d.brandName, d.website, d.instagram].filter(Boolean).join(" · ")} onEdit={() => goStep(4)} />
-              <Review label="Orçamento" value={BUDGETS.find((b) => b.id === d.budget)?.title} onEdit={() => goStep(6)} />
+              <Review label="Marca" value={[d.brandName, d.website, d.instagram].filter(Boolean).join(" · ")} onEdit={() => goStep(3)} />
+              <Review label="Orçamento" value={BUDGETS.find((b) => b.id === d.budget)?.title} onEdit={() => goStep(5)} />
               <Review
                 label="Plano projetado"
                 value={`${plan.creators} ${plan.creators === 1 ? "criador" : "criadores"} · ${plan.posts} posts/mês · ${formatKwanzas(plan.spendKz)}/mês`}
-                onEdit={() => goStep(7)}
+                onEdit={() => goStep(6)}
               />
             </dl>
           </Step>
         )}
 
-        {touched && !valid && step !== 3 && step !== 4 && (
+        {touched && !valid && step !== 2 && step !== 3 && (
           <p role="alert" className="mt-4 text-[13px] font-medium text-[#FF3B30]">
             Escolhe uma opção para continuar.
           </p>
@@ -472,13 +391,16 @@ function Wizard() {
             </button>
           ) : null}
           <PrimaryButton type="submit" aria-disabled={!valid} className={`ml-auto sm:!w-auto sm:!px-8 ${valid ? "" : "!opacity-60"}`}>
-            {step === 7 ? (
+            {step === 6 ? (
               <>
                 Criar e rever campanha
                 <HugeiconsIcon icon={ArrowRight01Icon} size={17} strokeWidth={2.2} />
               </>
             ) : step === STEPS.length - 1 ? (
-              "Criar campanha"
+              <>
+                Ver criadores sugeridos
+                <HugeiconsIcon icon={ArrowRight01Icon} size={17} strokeWidth={2.2} />
+              </>
             ) : (
               "Continuar"
             )}
@@ -518,39 +440,11 @@ function Step({
   );
 }
 
-function InfoTip({ text }: { text: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <span className="relative inline-flex items-center">
-      <button
-        type="button"
-        aria-label={text}
-        onClick={() => setOpen((v) => !v)}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-        className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full text-(--nv-text-3) transition-colors hover:text-(--nv-text)"
-      >
-        <HugeiconsIcon icon={InformationCircleIcon} size={15} strokeWidth={2} />
-      </button>
-      {open && (
-        <span
-          role="tooltip"
-          className="lg-surface sq pointer-events-none absolute bottom-7 left-1/2 z-30 w-56 -translate-x-1/2 rounded-[14px] px-3 py-2 text-[12px] leading-snug font-normal text-(--nv-text-2)"
-        >
-          {text}
-        </span>
-      )}
-    </span>
-  );
-}
-
 function PlanCard({
-  targetLabel,
-  projectedLabel,
-  unitPerMonth,
-  hitsTarget,
+  budgetLabel,
+  budgetUnit,
+  projectedViewsLabel,
+  withinBudget,
   creators,
   posts,
   viewsLabel,
@@ -560,10 +454,10 @@ function PlanCard({
   onChangePosts,
   onResetPreset,
 }: {
-  targetLabel: string;
-  projectedLabel: string;
-  unitPerMonth: string;
-  hitsTarget: boolean;
+  budgetLabel: string;
+  budgetUnit: string;
+  projectedViewsLabel: string;
+  withinBudget: boolean;
   creators: number;
   posts: number;
   viewsLabel: string;
@@ -577,15 +471,15 @@ function PlanCard({
 
   return (
     <div className="lg-surface sq overflow-hidden rounded-[24px]">
-      {/* Topo: Meta vs Projeção */}
+      {/* Topo: Orçamento vs Projeção */}
       <div className="grid grid-cols-1 gap-5 border-b border-(--nv-line) p-5 sm:grid-cols-2 sm:gap-6 sm:p-6">
         <div>
-          <p className="text-[11px] font-semibold tracking-[0.06em] text-(--nv-text-3) uppercase">A tua meta</p>
+          <p className="text-[11px] font-semibold tracking-[0.06em] text-(--nv-text-3) uppercase">O teu orçamento</p>
           <p className="mt-1.5 flex flex-wrap items-baseline gap-2">
-            <span className="font-title text-[28px] leading-none font-bold tracking-[-0.03em] text-(--nv-text) tabular-nums sm:text-[32px]">
-              {targetLabel}
+            <span className="font-title text-[26px] leading-none font-bold tracking-[-0.03em] text-(--nv-text) tabular-nums sm:text-[30px]">
+              {budgetLabel}
             </span>
-            <span className="text-[14px] font-medium text-(--nv-text-3)">{unitPerMonth}</span>
+            <span className="text-[14px] font-medium text-(--nv-text-3)">{budgetUnit}</span>
           </p>
           <p className="mt-2.5 text-[12px] text-(--nv-text-3)">Projeção, não é garantia.</p>
         </div>
@@ -594,16 +488,16 @@ function PlanCard({
           <p className="text-[11px] font-semibold tracking-[0.06em] text-(--nv-text-3) uppercase">Este plano projeta</p>
           <p className="mt-1.5 flex flex-wrap items-baseline gap-2">
             <span
-              className={`font-title text-[28px] leading-none font-bold tracking-[-0.03em] tabular-nums transition-colors sm:text-[32px] ${
-                hitsTarget ? "text-[#4EA7EB]" : "text-[#FF9500]"
+              className={`font-title text-[26px] leading-none font-bold tracking-[-0.03em] tabular-nums transition-colors sm:text-[30px] ${
+                withinBudget ? "text-[#4EA7EB]" : "text-[#FF9500]"
               }`}
             >
-              {projectedLabel}
+              {projectedViewsLabel}
             </span>
-            <span className="text-[14px] font-medium text-(--nv-text-3)">{unitPerMonth}</span>
+            <span className="text-[14px] font-medium text-(--nv-text-3)">visualizações / mês</span>
           </p>
-          {!hitsTarget && (
-            <p className="mt-2.5 text-[12px] font-medium text-[#FF9500]">Abaixo da meta — aumenta as publicações.</p>
+          {!withinBudget && (
+            <p className="mt-2.5 text-[12px] font-medium text-[#FF9500]">Acima da faixa de orçamento escolhida.</p>
           )}
         </div>
       </div>
@@ -643,14 +537,14 @@ function PlanCard({
             Publicações este mês · <span className="tabular-nums">{posts}</span>
           </label>
           {isPreset ? (
-            <span className="text-[12.5px] font-medium text-(--nv-text-3)">Ajustado para bater a tua meta</span>
+            <span className="text-[12.5px] font-medium text-(--nv-text-3)">Ajustado ao teu orçamento</span>
           ) : (
             <button
               type="button"
               onClick={onResetPreset}
               className="cursor-pointer text-[12.5px] font-semibold text-[#4EA7EB] hover:underline"
             >
-              Repor meta sugerida
+              Repor plano sugerido
             </button>
           )}
         </div>
