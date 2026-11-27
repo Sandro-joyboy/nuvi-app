@@ -3,6 +3,7 @@ import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { AuthShell, PageTitle, textLink } from "@/app/components/auth/ui";
+import ThemeToggle from "@/app/components/auth/ThemeToggle";
 
 const OPTIONS = [
   {
@@ -23,6 +24,7 @@ export default function Home() {
   return (
     <AuthShell
       width="md"
+      corner={<ThemeToggle />}
       aside={
         <span>
           Já tens conta?{" "}

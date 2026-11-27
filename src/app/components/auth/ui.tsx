@@ -19,11 +19,13 @@ interface AuthShellProps {
   footer?: boolean;
   /** Esconder a nuvem quando o ecrã já tem o seu próprio ícone. */
   logo?: boolean;
+  /** Controlo no canto superior direito (ex.: tema claro/escuro). */
+  corner?: ReactNode;
 }
 
 const WIDTHS = { sm: "max-w-[400px]", md: "max-w-[560px]", lg: "max-w-[760px]" };
 
-export function AuthShell({ children, back, aside, width = "sm", footer = true, logo = true }: AuthShellProps) {
+export function AuthShell({ children, back, aside, width = "sm", footer = true, logo = true, corner }: AuthShellProps) {
   return (
     <div className="nuvi-ui relative flex min-h-dvh flex-col bg-(--nv-panel) font-sans text-(--nv-text)">
       {/* Luz ambiente — a mesma do painel */}
@@ -34,6 +36,7 @@ export function AuthShell({ children, back, aside, width = "sm", footer = true, 
       />
 
       <main className="relative z-10 flex flex-1 flex-col items-center px-4 pt-16 pb-12 sm:pt-32">
+        {corner && <div className="absolute top-4 right-4 sm:top-6 sm:right-8">{corner}</div>}
         <div className={`w-full ${WIDTHS[width]}`}>
           {/* Marca por cima do título, na mesma coluna */}
           <div className="mb-6 flex items-center gap-3 sm:mb-8">
