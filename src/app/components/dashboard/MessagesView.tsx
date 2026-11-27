@@ -177,7 +177,7 @@ export default function MessagesView({ onCompose, openId, onOpenIdChange }: Mess
               <button
                 type="button"
                 onClick={onCompose}
-                className="nuvi-btn-sm sq mt-4 !h-10 !gap-1.5 !px-5 !text-[13.5px]"
+                className="lg-control sq mt-4 inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold text-(--nv-text)"
               >
                 <HugeiconsIcon icon={PencilEdit02Icon} size={15} strokeWidth={2} />
                 Nova mensagem
