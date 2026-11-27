@@ -596,3 +596,65 @@ html[data-theme="dark"] .nuvi-dash .nuvi-scroll::-webkit-scrollbar-thumb {
   .nuvi-welcome,
   .nuvi-step { animation: none; }
 }
+
+/* ============================================================
+   11. Slider do plano de campanha (onboarding)
+   ============================================================ */
+.nuvi-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--nv-line);
+  cursor: pointer;
+}
+
+.nuvi-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #5BB4F5 0%, #2684E6 100%);
+  border: 2px solid #ffffff;
+  box-shadow:
+    0 2px 8px rgba(0, 118, 232, 0.38),
+    0 0 0 0.5px rgba(15, 23, 42, 0.12);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.nuvi-range::-webkit-slider-thumb:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 4px 12px rgba(0, 118, 232, 0.48),
+    0 0 0 0.5px rgba(15, 23, 42, 0.14);
+}
+
+.nuvi-range:active::-webkit-slider-thumb {
+  transform: scale(0.98);
+}
+
+.nuvi-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #5BB4F5 0%, #2684E6 100%);
+  border: 2px solid #ffffff;
+  box-shadow:
+    0 2px 8px rgba(0, 118, 232, 0.38),
+    0 0 0 0.5px rgba(15, 23, 42, 0.12);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.nuvi-ui input.nuvi-range:focus-visible {
+  outline: 2px solid #4ea7eb;
+  outline-offset: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nuvi-range::-webkit-slider-thumb,
+  .nuvi-range::-moz-range-thumb {
+    transition: none;
+  }
+}
