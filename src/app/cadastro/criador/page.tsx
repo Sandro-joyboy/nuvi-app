@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import SignupCard from "@/app/components/SignupCard";
+import { SignupScreen } from "@/app/components/auth/AuthScreens";
 
 export const metadata: Metadata = {
-  title: "Cadastro para Criadores",
+  title: "Criar conta de criador",
 };
 
 export default function CadastroCriadorPage() {
-  return <SignupCard role="criador" />;
+  return <SignupScreen role="criador" />;
 }

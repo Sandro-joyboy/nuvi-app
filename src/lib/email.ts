@@ -32,7 +32,7 @@ function wrapVerificationEmailHtml(code: string): string {
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Verifique o seu e-mail - Nuvi</title>
+      <title>Confirma o teu e-mail - Nuvi</title>
     </head>
     <body style="margin: 0; padding: 0; background-color: #F4F6F9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #F4F6F9; padding: 32px 16px;">
@@ -51,10 +51,10 @@ function wrapVerificationEmailHtml(code: string): string {
               <tr>
                 <td align="center" style="padding: 36px 32px 38px 32px; text-align: center;">
                   <h1 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #111827;">
-                    Verifique o seu e-mail
+                    Confirma o teu e-mail
                   </h1>
                   <p style="margin: 0 0 28px 0; font-size: 14px; color: #6B7280; line-height: 1.5;">
-                    Insira este código para continuar na Nuvi
+                    Usa este código para continuar na Nuvi
                   </p>
 
                   <!-- Caixa do Código -->
@@ -68,7 +68,7 @@ function wrapVerificationEmailHtml(code: string): string {
                     Este código expira em 10 minutos.
                   </p>
                   <p style="margin: 0; font-size: 13px; color: #6B7280; line-height: 1.5;">
-                    Se você não solicitou este código, pode ignorar este e-mail com segurança.
+                    Se não pediste este código, podes ignorar este e-mail.
                   </p>
                 </td>
               </tr>
@@ -92,7 +92,7 @@ export async function sendVerificationCodeEmail({
   const { host, port, user, pass, from } = getEmailConfig();
 
   const html = wrapVerificationEmailHtml(code);
-  const text = `Verifique o seu e-mail\n\nInsira este código para continuar na Nuvi: ${code}\n\nEste código expira em 10 minutos.\nSe você não solicitou este código, pode ignorar este e-mail com segurança.`;
+  const text = `Confirma o teu e-mail\n\nUsa este código para continuar na Nuvi: ${code}\n\nEste código expira em 10 minutos.\nSe não pediste este código, podes ignorar este e-mail.`;
 
   if (user && pass) {
     try {
@@ -106,7 +106,7 @@ export async function sendVerificationCodeEmail({
       const info = await transporter.sendMail({
         from,
         to: email,
-        subject: `${code} é o seu código de verificação Nuvi`,
+        subject: `${code} é o teu código da Nuvi`,
         html,
         text,
         attachments: [getLogoAttachment()],
@@ -128,8 +128,15 @@ export async function sendVerificationCodeEmail({
         email,
         errorMessage
       );
-      return { success: false, error: errorMessage };
+      // O detalhe do SMTP fica nos logs; o utilizador recebe uma mensagem genérica.
+      return { success: false, error: "Não foi possível enviar o e-mail. Tenta de novo daqui a pouco." };
     }
+  }
+
+  // Sem SMTP em produção: falha de forma explícita (nunca finge que enviou).
+  if (process.env.NODE_ENV === "production") {
+    console.error("[Nodemailer] SMTP_USER/SMTP_PASS não configurados em produção.");
+    return { success: false, error: "O envio de e-mails não está disponível de momento." };
   }
 
   // Fallback de desenvolvimento caso SMTP_PASS não esteja configurado
@@ -148,7 +155,7 @@ export async function sendVerificationCodeEmail({
     const info = await transporter.sendMail({
       from,
       to: email,
-      subject: `${code} é o seu código de verificação Nuvi`,
+      subject: `${code} é o teu código da Nuvi`,
       html,
       text,
       attachments: [getLogoAttachment()],

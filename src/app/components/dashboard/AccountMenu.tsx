@@ -101,7 +101,7 @@ function MenuBody({ onClose, onEditProfile, avatar }: AccountMenuProps) {
 
         <div className="my-1.5 h-px bg-(--nv-line)" />
 
-        <Link href="/" className={`${itemBase} text-[#FF3B30]`}>
+        <Link href="/entrar" className={`${itemBase} text-[#FF3B30]`}>
           <HugeiconsIcon icon={Logout01Icon} size={18} strokeWidth={1.8} />
           Terminar sessão
         </Link>

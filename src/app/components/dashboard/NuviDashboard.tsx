@@ -7,6 +7,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Add01Icon,
   ArrowUpRight01Icon,
+  Cancel01Icon,
+  CheckmarkCircle02Icon,
   InboxCheckIcon,
   Notification02Icon,
   Search01Icon,
@@ -23,6 +25,7 @@ import NotificationsSheet, { type NotificationItem } from "./NotificationsSheet"
 import AccountMenu from "./AccountMenu";
 import ProfileModal from "./ProfileModal";
 import { applyTheme, useProfile, useThemePref } from "./prefs";
+import { markCampaignSeen, useCampaign } from "@/app/components/onboarding/campaign";
 
 // Novidades do produto (conteúdo local até existir API de notificações).
 const INITIAL_NOTIFICATIONS: NotificationItem[] = [
@@ -97,6 +100,14 @@ export default function NuviDashboard() {
   const profile = useProfile();
   const themePref = useThemePref();
   const router = useRouter();
+  const campaign = useCampaign();
+
+  // Confirmação "campanha criada": aparece uma vez e some sozinha.
+  useEffect(() => {
+    if (!campaign?.justCreated) return;
+    const t = setTimeout(markCampaignSeen, 6000);
+    return () => clearTimeout(t);
+  }, [campaign?.justCreated]);
   const topRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
@@ -146,7 +157,7 @@ export default function NuviDashboard() {
     if (id === "create-campaign") return router.push("/onboarding");
     if (id === "new-message") return setActiveNav("mensagens");
     if (id === "add-funds") return setWalletOpen(true);
-    if (id === "logout") return router.push("/");
+    if (id === "logout") return router.push("/entrar");
   };
 
   return (
@@ -285,12 +296,14 @@ export default function NuviDashboard() {
                             />
                           </SquircleTile>
                         }
-                        title="Nada por rever"
+                        title={campaign ? `${campaign.brandName}: à espera de criadores` : "Nada por rever"}
                         action={
-                          <Link href="/onboarding" className={ghostCta}>
-                            <HugeiconsIcon icon={Add01Icon} size={15} strokeWidth={2.2} />
-                            Criar campanha
-                          </Link>
+                          campaign ? undefined : (
+                            <Link href="/onboarding" className={ghostCta}>
+                              <HugeiconsIcon icon={Add01Icon} size={15} strokeWidth={2.2} />
+                              Criar campanha
+                            </Link>
+                          )
                         }
                       />
                     </Card>
@@ -402,6 +415,24 @@ export default function NuviDashboard() {
       </div>
 
       <MobileTabBar active={activeNav} onChange={setActiveNav} scrolled={scrolled} />
+
+      {campaign?.justCreated && (
+        <div
+          role="status"
+          className="nuvi-pop lg-surface sq fixed top-4 left-1/2 z-[70] flex -translate-x-1/2 items-center gap-3 rounded-full py-2 pr-2 pl-3.5"
+        >
+          <HugeiconsIcon icon={CheckmarkCircle02Icon} size={20} strokeWidth={2} className="text-[#34C759]" />
+          <span className="text-[14px] font-semibold text-(--nv-text)">Campanha criada</span>
+          <button
+            type="button"
+            onClick={markCampaignSeen}
+            aria-label="Fechar"
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-(--nv-text-3) hover:bg-(--nv-fill)"
+          >
+            <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={2.2} />
+          </button>
+        </div>
+      )}
 
       <CommandPalette open={paletteOpen} onClose={closePalette} onRun={runCommand} />
       <NotificationsSheet

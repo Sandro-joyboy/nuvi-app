@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json(
-        { error: "Informe um endereço de e-mail válido." },
+        { error: "Escreve um e-mail válido." },
         { status: 400 }
       );
     }

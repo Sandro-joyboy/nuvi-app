@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import BrandSignup from "@/app/components/BrandSignup";
+import { SignupScreen } from "@/app/components/auth/AuthScreens";
 
 export const metadata: Metadata = {
-  title: "Cadastro para Marcas",
+  title: "Criar conta de marca",
 };
 
 export default function CadastroMarcaPage() {
-  return <BrandSignup />;
+  return <SignupScreen role="marca" />;
 }

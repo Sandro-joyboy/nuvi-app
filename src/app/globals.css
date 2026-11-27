@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* dark: segue o tema escolhido na app (data-theme), não só o do sistema */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
   --font-title: var(--font-gt-mechanik), sans-serif;
   --font-sans: var(--font-sf-pro), -apple-system, BlinkMacSystemFont, sans-serif;
@@ -9,11 +12,12 @@
 
 
 /* ============================================================
-   0. Tokens do painel (claro / escuro)
+   0. Tokens da app (claro / escuro) — .nuvi-dash (painel) e .nuvi-ui (resto)
    O tema vem de <html data-theme="light|dark">, definido antes da
    página pintar (script em layout.tsx) para não piscar.
    ============================================================ */
-.nuvi-dash {
+.nuvi-dash,
+.nuvi-ui {
   color-scheme: light;
   --nv-bg: #eef1f5;
   --nv-panel: #f7f8fa;
@@ -47,7 +51,8 @@
   --nv-tab-b: rgba(255, 255, 255, 0.28);
 }
 
-html[data-theme="dark"] .nuvi-dash {
+html[data-theme="dark"] .nuvi-dash,
+html[data-theme="dark"] .nuvi-ui {
   color-scheme: dark;
   --nv-bg: #07090d;
   --nv-panel: #0f1217;
@@ -449,13 +454,16 @@ html[data-theme="dark"] .nuvi-dash {
 }
 
 /* Foco visível consistente (teclado) */
-.nuvi-dash :focus-visible {
+.nuvi-dash :focus-visible,
+.nuvi-ui :focus-visible {
   outline: 2px solid #0082f6;
   outline-offset: 2px;
 }
 /* Campos de texto mostram o foco no próprio contentor, sem contorno extra */
 .nuvi-dash input:focus-visible,
-.nuvi-dash textarea:focus-visible {
+.nuvi-dash textarea:focus-visible,
+.nuvi-ui input:focus-visible,
+.nuvi-ui textarea:focus-visible {
   outline: none;
 }
 
@@ -568,9 +576,15 @@ html[data-theme="dark"] .nuvi-dash .nuvi-scroll::-webkit-scrollbar-thumb {
   to { transform: none; opacity: 1; }
 }
 .nuvi-sheet { animation: nuvi-sheet-in 0.32s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes nuvi-step-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.nuvi-step { animation: nuvi-step-in 0.36s cubic-bezier(0.16, 1, 0.3, 1); }
 .nuvi-pop { animation: nuvi-pop-in 0.24s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: bottom left; }
 
 @media (prefers-reduced-motion: reduce) {
   .nuvi-sheet,
-  .nuvi-pop { animation: none; }
+  .nuvi-pop,
+  .nuvi-step { animation: none; }
 }

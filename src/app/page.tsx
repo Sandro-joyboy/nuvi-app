@@ -1,96 +1,61 @@
 import Image from "next/image";
 import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { AuthShell, PageTitle, textLink } from "@/app/components/auth/ui";
+
+const OPTIONS = [
+  {
+    href: "/cadastro/marca",
+    icon: "/Glass-Search.svg",
+    title: "Sou uma marca",
+    body: "Lança campanhas de UGC, aprova vídeos e paga criadores num só lugar.",
+  },
+  {
+    href: "/cadastro/criador",
+    icon: "/Glass-Gallery.svg",
+    title: "Sou criador",
+    body: "Cria conteúdo para marcas de que gostas e recebe por visualização.",
+  },
+];
 
 export default function Home() {
   return (
-    <main
-      className="relative flex min-h-screen w-full items-center justify-center bg-cover bg-center bg-no-repeat px-4 py-8 font-sans"
-      style={{ backgroundImage: "url('/bg-choice.svg')" }}
-    >
-      {/* Container Principal: 757 x 405 */}
-      <div className="flex w-full max-w-[757px] min-h-[405px] flex-col justify-between rounded-[28px] bg-white px-[28px] py-[24px] text-[#111827] shadow-[0_24px_60px_rgba(0,0,0,0.08)]">
-        {/* Topo: Logo Cloud + Título + Subtítulo */}
-        <div>
-          <div className="mb-2 -ml-1">
-            <Image
-              src="/logo-icon-cloud.svg"
-              alt="Nuvi Cloud"
-              width={84}
-              height={56}
-              priority
-            />
-          </div>
-
-          <h1 className="font-title text-[24px] font-bold leading-tight tracking-[-0.02em] text-[#0A0A0A]">
-            Crie sua conta
-          </h1>
-          <p className="mt-1 font-sans text-[14px] font-normal leading-snug tracking-[-0.01em] text-[#71717A]">
-            Escolha como você vai usar a Nuvi. Você pode se cadastrar do outro lado depois.
-          </p>
-        </div>
-
-        {/* Opções: Para marcas / Para criadores */}
-        <div className="my-4 grid grid-cols-1 gap-[14px] sm:grid-cols-2">
-          {/* Card: Para marcas */}
-          <Link
-            href="/cadastro/marca"
-            className="group flex min-h-[168px] flex-col justify-between rounded-[18px] border border-[#EBEBEB] bg-[#F9F9F9] p-[20px] text-left transition-all duration-200 hover:border-[#4EA7EB]/60 hover:bg-[#F4F9FF] hover:shadow-sm cursor-pointer"
-          >
-            <div>
-              <Image
-                src="/Glass-Search.svg"
-                alt="Para marcas"
-                width={49}
-                height={42}
-              />
-            </div>
-
-            <div className="mt-3">
-              <h2 className="font-title text-[16px] font-medium tracking-[-0.01em] text-[#0A0A0A]">
-                Para marcas
-              </h2>
-              <p className="mt-1 font-sans text-[14px] font-normal leading-[1.4] tracking-[-0.01em] text-[#71717A]">
-                Marcas e agências com campanhas de UGC: lance, pague e acompanhe criadores em um só lugar.
-              </p>
-            </div>
-          </Link>
-
-          {/* Card: Para criadores */}
-          <Link
-            href="/cadastro/criador"
-            className="group flex min-h-[168px] flex-col justify-between rounded-[18px] border border-[#EBEBEB] bg-[#F9F9F9] p-[20px] text-left transition-all duration-200 hover:border-[#4EA7EB]/60 hover:bg-[#F4F9FF] hover:shadow-sm cursor-pointer"
-          >
-            <div>
-              <Image
-                src="/Glass-Gallery.svg"
-                alt="Para criadores"
-                width={48}
-                height={46}
-              />
-            </div>
-
-            <div className="mt-3">
-              <h2 className="font-title text-[16px] font-medium tracking-[-0.01em] text-[#0A0A0A]">
-                Para criadores
-              </h2>
-              <p className="mt-1 font-sans text-[14px] font-normal leading-[1.4] tracking-[-0.01em] text-[#71717A]">
-                Criadores que ganham para criar conteúdo: publique para marcas que você curte e receba por visualização.
-              </p>
-            </div>
-          </Link>
-        </div>
-
-        {/* Rodapé: Já tem uma conta? Entrar */}
-        <div className="font-sans text-[14px] tracking-[-0.01em] text-[#71717A]">
-          Já tem uma conta?{" "}
-          <Link
-            href="/painel"
-            className="font-medium text-[#0A0A0A] underline underline-offset-2 transition-opacity hover:opacity-75"
-          >
+    <AuthShell
+      width="md"
+      aside={
+        <span>
+          Já tens conta?{" "}
+          <Link href="/entrar" className={textLink}>
             Entrar
           </Link>
-        </div>
-      </div>
-    </main>
+        </span>
+      }
+    >
+      <PageTitle title="Como vais usar a Nuvi?" subtitle="Escolhe uma. Podes criar a outra conta depois." />
+
+      <ul className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {OPTIONS.map((o) => (
+          <li key={o.href}>
+            <Link
+              href={o.href}
+              className="lg-surface sq group flex h-full flex-col rounded-[28px] p-6 transition-transform duration-300 hover:-translate-y-0.5 active:scale-[0.99] motion-reduce:transform-none"
+            >
+              <Image src={o.icon} alt="" width={52} height={46} className="h-[46px] w-auto" />
+              <span className="mt-6 flex items-center justify-between gap-2 text-[18px] font-bold tracking-[-0.02em]">
+                {o.title}
+                <HugeiconsIcon
+                  icon={ArrowRight01Icon}
+                  size={18}
+                  strokeWidth={2.2}
+                  className="text-(--nv-text-3) transition-transform group-hover:translate-x-0.5 group-hover:text-(--nv-text)"
+                />
+              </span>
+              <span className="mt-1.5 text-[14px] leading-relaxed text-(--nv-text-2)">{o.body}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </AuthShell>
   );
 }

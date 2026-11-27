@@ -75,7 +75,7 @@ export function verifyOtpToken(
   try {
     const parts = token.split(".");
     if (parts.length !== 2) {
-      return { valid: false, reason: "Token inválido." };
+      return { valid: false, reason: "Código inválido. Pede um novo." };
     }
 
     const [encodedPayload, providedSignature] = parts;
@@ -87,7 +87,7 @@ export function verifyOtpToken(
       sigBufA.length !== sigBufB.length ||
       !crypto.timingSafeEqual(sigBufA, sigBufB)
     ) {
-      return { valid: false, reason: "Token adulterado." };
+      return { valid: false, reason: "Código inválido. Pede um novo." };
     }
 
     const payload = JSON.parse(
@@ -95,12 +95,12 @@ export function verifyOtpToken(
     ) as OtpPayload;
 
     if (Date.now() > payload.exp) {
-      return { valid: false, reason: "O código expirou. Solicite um novo." };
+      return { valid: false, reason: "O código expirou. Pede um novo." };
     }
 
     const normalizedEmail = email.toLowerCase().trim();
     if (payload.email !== normalizedEmail) {
-      return { valid: false, reason: "E-mail não corresponde ao código." };
+      return { valid: false, reason: "Este código não é para este e-mail." };
     }
 
     const expectedHash = hashCode(normalizedEmail, code.trim());
@@ -111,11 +111,11 @@ export function verifyOtpToken(
       hashBufA.length !== hashBufB.length ||
       !crypto.timingSafeEqual(hashBufA, hashBufB)
     ) {
-      return { valid: false, reason: "Código incorreto. Tente novamente." };
+      return { valid: false, reason: "Código incorreto. Confirma e tenta de novo." };
     }
 
     return { valid: true };
   } catch {
-    return { valid: false, reason: "Erro ao validar o código." };
+    return { valid: false, reason: "Não foi possível validar o código." };
   }
 }

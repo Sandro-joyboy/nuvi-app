@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     if (!email || !code || !/^\d{6}$/.test(code)) {
       return NextResponse.json(
-        { error: "Insira o código completo de 6 dígitos." },
+        { error: "Escreve os 6 dígitos do código." },
         { status: 400 }
       );
     }
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     if (!token) {
       return NextResponse.json(
-        { error: "Nenhum código ativo encontrado. Solicite um novo código." },
+        { error: "Este código já não é válido. Pede um novo." },
         { status: 400 }
       );
     }
