@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -17,7 +16,6 @@ import {
   Megaphone01Icon,
   Message01Icon,
   MoreHorizontalIcon,
-  Rocket01Icon,
   ScissorIcon,
   Search01Icon,
   SparklesIcon,
@@ -92,7 +90,6 @@ export default function DiscoverView() {
   const [onlyTop, setOnlyTop] = useState(false);
   const [sortBy, setSortBy] = useState<SortKey>("recomendados");
 
-  const [bannerDismissed, setBannerDismissed] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [extraInvitedIds, setExtraInvitedIds] = useState<string[]>([]);
   const [savedIds, setSavedIds] = useState<string[]>([]);
@@ -106,7 +103,6 @@ export default function DiscoverView() {
   }, [campaign?.invitedCreators, extraInvitedIds]);
 
   const invitesLeft = Math.max(0, DAILY_INVITE_LIMIT - extraInvitedIds.length);
-  const activeCat = CATEGORIES.find((c) => c.id === category)!;
 
   const activeFilterCount =
     (platform !== "todos" ? 1 : 0) +
@@ -185,56 +181,65 @@ export default function DiscoverView() {
   }, [openMenuId]);
 
   return (
-    <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-4">
-      {/* Banner superior de campanha pronta para lançar */}
-      {!bannerDismissed && (
-        <div className="lg-surface sq flex flex-wrap items-center justify-between gap-3 rounded-[20px] border border-[#4EA7EB]/25 bg-(--nv-accent-soft)/55 px-4 py-2.5">
-          <div className="flex min-w-0 items-center gap-2.5 text-[13px]">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#4EA7EB]/15 text-[#4EA7EB]">
-              <HugeiconsIcon icon={Rocket01Icon} size={15} strokeWidth={2.1} />
-            </span>
-            <p className="truncate text-(--nv-text)">
-              <strong className="font-semibold">
-                {campaign ? `A campanha da ${campaign.brandName || "tua marca"} está pronta` : "A tua primeira campanha está quase pronta"}
-              </strong>
-              <span className="hidden text-(--nv-text-2) sm:inline">
-                {" "}· Último passo — escolhe os teus criadores e entra no ar
-              </span>
-            </p>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Link
-              href="/onboarding"
-              className="sq inline-flex h-8 items-center rounded-full bg-gradient-to-b from-[#55B0F4] to-[#2684E6] px-3.5 text-[12.5px] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_6px_16px_-8px_rgba(0,118,232,0.55)] transition-all hover:brightness-105"
-            >
-              Terminar lançamento
-            </Link>
-            <button
-              type="button"
-              onClick={() => setBannerDismissed(true)}
-              aria-label="Fechar aviso"
-              className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-(--nv-text-3) transition-colors hover:bg-(--nv-fill) hover:text-(--nv-text)"
-            >
-              <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={2.2} />
-            </button>
-          </div>
+    <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-5">
+      {/* Categorias em controlo segmentado Nuvi + convites restantes */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div
+          role="tablist"
+          aria-label="Categorias de criadores"
+          className="sq inline-flex max-w-full overflow-x-auto rounded-full bg-(--nv-fill) p-[3px]"
+        >
+          {CATEGORIES.map((c) => {
+            const active = category === c.id;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setCategory(c.id)}
+                className={`inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold whitespace-nowrap transition-all duration-200 ${
+                  active ? "lg-control text-(--nv-text)" : "text-(--nv-text-3) hover:text-(--nv-text)"
+                }`}
+              >
+                <HugeiconsIcon
+                  icon={c.icon}
+                  size={15}
+                  strokeWidth={active ? 2.1 : 1.8}
+                  className={active ? "text-[#4EA7EB]" : "text-(--nv-text-3)"}
+                />
+                {c.label}
+              </button>
+            );
+          })}
         </div>
-      )}
 
-      {/* Subtítulo da secção ativa */}
-      <p className="-mt-1 text-[13.5px] text-(--nv-text-3)">{activeCat.subtitle}</p>
+        <div className="lg-surface sq inline-flex items-center gap-2 rounded-full py-1 pr-1.5 pl-3.5 text-[12.5px]">
+          <HugeiconsIcon icon={Mail01Icon} size={14} strokeWidth={2} className="text-[#4EA7EB]" />
+          <span className="font-semibold text-(--nv-text) tabular-nums">
+            {invitesLeft} convites hoje
+          </span>
+          <button
+            type="button"
+            onClick={() => setLimitNotice(true)}
+            className="sq cursor-pointer rounded-full bg-(--nv-accent-soft) px-3 py-1 text-[11.5px] font-semibold text-[#0076E8] transition-opacity hover:opacity-85 dark:text-[#60B5FF]"
+          >
+            Mais
+          </button>
+        </div>
+      </div>
 
       {/* Pesquisa + Filtros */}
       <div className="flex items-center gap-2.5">
-        <div className="lg-surface sq flex h-11 flex-1 items-center gap-2.5 rounded-full px-4 transition-shadow focus-within:shadow-[0_0_0_2px_#4EA7EB]">
+        <label className="lg-control sq flex h-11 flex-1 items-center gap-2.5 rounded-full px-4">
           <HugeiconsIcon icon={Search01Icon} size={17} strokeWidth={2} className="shrink-0 text-(--nv-text-3)" />
+          <span className="sr-only">Pesquisar criadores</span>
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Pesquisar criadores por nome, nicho ou cidade…"
-            aria-label="Pesquisar criadores"
-            className="h-full w-full bg-transparent text-[14px] text-(--nv-text) outline-none placeholder:text-(--nv-text-3)"
+            placeholder="Pesquisar criadores por nome, nicho ou cidade"
+            className="h-full w-full bg-transparent text-[14px] text-(--nv-text) outline-none placeholder:text-(--nv-text-3) [&::-webkit-search-cancel-button]:hidden"
           />
           {query && (
             <button
@@ -246,14 +251,14 @@ export default function DiscoverView() {
               <HugeiconsIcon icon={Cancel01Icon} size={13} strokeWidth={2.2} />
             </button>
           )}
-        </div>
+        </label>
 
         <button
           type="button"
           onClick={() => setFiltersOpen((v) => !v)}
           aria-expanded={filtersOpen}
           className={`lg-control sq inline-flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-full px-4 text-[13.5px] font-semibold transition-colors ${
-            filtersOpen || activeFilterCount > 0 ? "text-[#4EA7EB]" : "text-(--nv-text)"
+            filtersOpen || activeFilterCount > 0 ? "text-[#0076E8] dark:text-[#60B5FF]" : "text-(--nv-text)"
           }`}
         >
           <HugeiconsIcon icon={FilterHorizontalIcon} size={16} strokeWidth={2} />
@@ -268,7 +273,7 @@ export default function DiscoverView() {
 
       {/* Painel expansível de filtros */}
       {filtersOpen && (
-        <div className="nuvi-step lg-surface sq flex flex-wrap items-center gap-x-5 gap-y-3 rounded-[22px] p-4">
+        <div className="nuvi-step lg-surface sq flex flex-wrap items-center gap-x-5 gap-y-3 rounded-[24px] p-4">
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="mr-1 text-[12px] font-semibold text-(--nv-text-3)">Rede</span>
             {(
@@ -349,59 +354,6 @@ export default function DiscoverView() {
           </div>
         </div>
       )}
-
-      {/* Separadores de categoria + Pílula de convites restantes */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--nv-line)">
-        <div
-          role="tablist"
-          aria-label="Categorias de criadores"
-          className="flex items-center gap-1 overflow-x-auto pb-0.5 sm:gap-2"
-        >
-          {CATEGORIES.map((c) => {
-            const active = category === c.id;
-            return (
-              <button
-                key={c.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setCategory(c.id)}
-                className={`relative inline-flex shrink-0 cursor-pointer items-center gap-2 px-3 py-2.5 text-[13.5px] font-semibold whitespace-nowrap transition-colors ${
-                  active ? "text-(--nv-text)" : "text-(--nv-text-3) hover:text-(--nv-text)"
-                }`}
-              >
-                <HugeiconsIcon
-                  icon={c.icon}
-                  size={16}
-                  strokeWidth={active ? 2.1 : 1.8}
-                  className={active ? "text-[#4EA7EB]" : "text-(--nv-text-3)"}
-                />
-                {c.label}
-                {active && (
-                  <span className="absolute inset-x-2 -bottom-0.5 h-[2.5px] rounded-full bg-[#4EA7EB]" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Convites restantes hoje */}
-        <div className="mb-2 flex items-center gap-2">
-          <div className="lg-surface sq inline-flex items-center gap-2 rounded-full border border-(--nv-line) py-1 pr-1.5 pl-3.5 text-[12.5px]">
-            <HugeiconsIcon icon={Mail01Icon} size={14} strokeWidth={2} className="text-(--nv-text-2)" />
-            <span className="font-semibold text-(--nv-text) tabular-nums">
-              {invitesLeft} convites restantes hoje
-            </span>
-            <button
-              type="button"
-              onClick={() => setLimitNotice(true)}
-              className="sq cursor-pointer rounded-full bg-(--nv-text) px-3 py-1 text-[11.5px] font-semibold text-(--nv-solid) transition-opacity hover:opacity-85"
-            >
-              Obter mais
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Aviso de limite / upgrade */}
       {limitNotice && (

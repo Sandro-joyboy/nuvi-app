@@ -1,14 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AnalyticsUpIcon,
-  Calendar01Icon,
   Download01Icon,
   EyeIcon,
-  File01Icon,
   Globe02Icon,
   Money01Icon,
   Search01Icon,
@@ -25,11 +24,11 @@ import { Card, EmptyState, SectionHeader } from "./ui";
 type AnalyticsTab = "visao" | "publicacoes" | "criadores" | "atribuicao";
 type PostSort = "views" | "engajamento";
 
-const TABS: { id: AnalyticsTab; label: string; icon: typeof AnalyticsUpIcon }[] = [
-  { id: "visao", label: "Visão geral", icon: AnalyticsUpIcon },
-  { id: "publicacoes", label: "Publicações", icon: File01Icon },
-  { id: "criadores", label: "Criadores", icon: UserGroupIcon },
-  { id: "atribuicao", label: "Atribuição", icon: TrendingUpIcon },
+const TABS: { id: AnalyticsTab; label: string }[] = [
+  { id: "visao", label: "Visão geral" },
+  { id: "publicacoes", label: "Publicações" },
+  { id: "criadores", label: "Criadores" },
+  { id: "atribuicao", label: "Atribuição" },
 ];
 
 const WEEKDAYS = ["S", "T", "Q", "Q", "S", "S", "D"];
@@ -82,76 +81,53 @@ export default function AnalyticsView() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-5">
-      {/* Subtítulo */}
-      <p className="-mt-2 text-[13.5px] font-medium text-(--nv-text-3)">
-        Visão clara do desempenho das tuas campanhas, publicações e criadores.
-      </p>
-
-      {/* Separadores + ações */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--nv-line)">
+      {/* Barra superior em vidro líquido (controlo segmentado + exportar) */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div
           role="tablist"
           aria-label="Secções de análises"
-          className="flex items-center gap-1 overflow-x-auto sm:gap-2"
+          className="sq inline-flex max-w-full overflow-x-auto rounded-full bg-(--nv-fill) p-[3px]"
         >
           {TABS.map((t) => {
-            const active = tab === t.id;
+            const sel = tab === t.id;
             return (
               <button
                 key={t.id}
                 type="button"
                 role="tab"
-                aria-selected={active}
+                aria-selected={sel}
                 onClick={() => setTab(t.id)}
-                className={`relative inline-flex shrink-0 cursor-pointer items-center gap-2 px-3 py-2.5 text-[13.5px] font-semibold whitespace-nowrap transition-colors ${
-                  active ? "text-(--nv-text)" : "text-(--nv-text-3) hover:text-(--nv-text)"
+                className={`h-9 shrink-0 cursor-pointer rounded-full px-4 text-[13.5px] font-semibold whitespace-nowrap transition-all duration-200 ${
+                  sel ? "lg-control text-(--nv-text)" : "text-(--nv-text-3) hover:text-(--nv-text)"
                 }`}
               >
-                <HugeiconsIcon
-                  icon={t.icon}
-                  size={16}
-                  strokeWidth={active ? 2.1 : 1.8}
-                  className={active ? "text-[#4EA7EB]" : "text-(--nv-text-3)"}
-                />
                 {t.label}
-                {active && (
-                  <span className="absolute inset-x-2 -bottom-px h-[2.5px] rounded-full bg-[#4EA7EB]" />
-                )}
               </button>
             );
           })}
         </div>
 
-        <div className="mb-2 flex items-center gap-2">
-          <span className="lg-surface sq inline-flex h-9 items-center gap-2 rounded-full border border-(--nv-line) px-3.5 text-[12.5px] font-semibold text-(--nv-text-2)">
-            <HugeiconsIcon icon={Calendar01Icon} size={14} strokeWidth={2} className="text-(--nv-text-3)" />
-            Últimos 30 dias
-          </span>
-
-          <button
-            type="button"
-            onClick={handleExport}
-            className="lg-control sq inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full px-3.5 text-[12.5px] font-semibold text-(--nv-text)"
-          >
-            <HugeiconsIcon icon={Download01Icon} size={14} strokeWidth={2.1} className="text-[#4EA7EB]" />
-            {exported ? "Exportado" : "Exportar"}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handleExport}
+          className="lg-control sq inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold text-(--nv-text)"
+        >
+          <HugeiconsIcon icon={Download01Icon} size={15} strokeWidth={2.1} className="text-[#4EA7EB]" />
+          {exported ? "Exportado" : "Exportar CSV"}
+        </button>
       </div>
 
       {/* Tab: Visão geral */}
       {tab === "visao" && (
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_328px]">
-          {/* Coluna principal */}
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
           <div className="flex min-w-0 flex-col gap-5">
             <PerformanceCard />
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-              {/* Top publicações */}
               <Card className="flex min-h-[260px] flex-col">
                 <SectionHeader
                   title="Top publicações"
-                  subtitle="Ordenado por impacto"
+                  subtitle="Por desempenho"
                   actions={
                     <div className="sq inline-flex rounded-full bg-(--nv-fill) p-[2px]">
                       {(
@@ -178,8 +154,8 @@ export default function AnalyticsView() {
                 />
                 <EmptyState
                   icon={
-                    <SquircleTile size={46} colors={["var(--nv-accent-soft)", "var(--nv-accent-soft)"]} glass={false}>
-                      <HugeiconsIcon icon={Video01Icon} size={21} strokeWidth={1.8} className="text-[#4EA7EB]" />
+                    <SquircleTile size={48} colors={["var(--nv-accent-soft)", "var(--nv-accent-soft)"]} glass={false}>
+                      <HugeiconsIcon icon={Video01Icon} size={22} strokeWidth={1.8} className="text-[#4EA7EB]" />
                     </SquircleTile>
                   }
                   title="Sem publicações ainda"
@@ -191,16 +167,15 @@ export default function AnalyticsView() {
                 />
               </Card>
 
-              {/* Top criadores */}
               <Card className="flex min-h-[260px] flex-col">
                 <SectionHeader
                   title="Top criadores"
-                  subtitle={roster.length > 0 ? `${roster.length} convidados na campanha` : "Desempenho individual"}
+                  subtitle={roster.length > 0 ? `${roster.length} convidados` : "Equipa ativa"}
                   actions={
                     <button
                       type="button"
                       onClick={() => setTab("criadores")}
-                      className="cursor-pointer text-[12.5px] font-semibold text-[#4EA7EB] hover:underline"
+                      className="lg-control sq inline-flex h-8 cursor-pointer items-center rounded-full px-3 text-[12px] font-semibold text-(--nv-text)"
                     >
                       Ver todos
                     </button>
@@ -222,7 +197,7 @@ export default function AnalyticsView() {
                             <p className="truncate text-[11.5px] text-(--nv-text-3)">{c.handle}</p>
                           </div>
                         </div>
-                        <span className="sq rounded-full bg-(--nv-accent-soft) px-2.5 py-0.5 text-[11px] font-semibold text-[#4EA7EB]">
+                        <span className="sq rounded-full bg-(--nv-accent-soft) px-2.5 py-0.5 text-[11px] font-semibold text-[#0076E8] dark:text-[#60B5FF]">
                           Convidado
                         </span>
                       </li>
@@ -231,8 +206,8 @@ export default function AnalyticsView() {
                 ) : (
                   <EmptyState
                     icon={
-                      <SquircleTile size={46} colors={["var(--nv-tile)", "var(--nv-tile)"]} glass={false}>
-                        <HugeiconsIcon icon={UserGroupIcon} size={21} strokeWidth={1.8} className="text-(--nv-text-2)" />
+                      <SquircleTile size={48} colors={["var(--nv-tile)", "var(--nv-tile)"]} glass={false}>
+                        <HugeiconsIcon icon={UserGroupIcon} size={22} strokeWidth={1.8} className="text-(--nv-text-2)" />
                       </SquircleTile>
                     }
                     title="Sem criadores ativos"
@@ -246,11 +221,10 @@ export default function AnalyticsView() {
               </Card>
             </div>
 
-            {/* Visualizações por país */}
             <Card>
               <SectionHeader
                 title="Audiência por país"
-                subtitle="Explora onde os teus vídeos geram mais alcance"
+                subtitle="Onde os teus conteúdos geram mais alcance"
                 actions={
                   <div className="flex items-center gap-1.5 text-[11px] font-medium text-(--nv-text-3)">
                     <span>Menos</span>
@@ -274,11 +248,10 @@ export default function AnalyticsView() {
             </Card>
           </div>
 
-          {/* Coluna direita — Resumo + Atividade */}
+          {/* Coluna direita */}
           <div className="flex flex-col gap-5 md:grid md:grid-cols-2 xl:flex">
-            {/* Resumo financeiro & CPM */}
             <Card>
-              <SectionHeader title="Resumo do período" subtitle="Custos e eficiência" />
+              <SectionHeader title="Resumo" subtitle="Custos e eficiência" />
               <div className="mt-4 grid grid-cols-2 gap-2.5">
                 {[
                   { label: "Média / vídeo", value: "0 Kz", icon: Money01Icon },
@@ -290,7 +263,7 @@ export default function AnalyticsView() {
                 ].map((m) => (
                   <div
                     key={m.label}
-                    className="sq rounded-[18px] border border-(--nv-line) bg-(--nv-solid) p-3.5"
+                    className="sq rounded-[20px] bg-(--nv-solid) p-3.5 shadow-[0_0_0_0.5px_var(--nv-hairline),0_4px_14px_-8px_var(--nv-shadow)]"
                   >
                     <div className="flex items-center gap-1.5 text-(--nv-text-3)">
                       <HugeiconsIcon icon={m.icon} size={13} strokeWidth={2} className="text-[#4EA7EB]" />
@@ -304,9 +277,8 @@ export default function AnalyticsView() {
               </div>
             </Card>
 
-            {/* Atividade de publicações (heatmap minimalista) */}
             <Card>
-              <SectionHeader title="Atividade de publicações" subtitle="Últimas 14 semanas" />
+              <SectionHeader title="Atividade" subtitle="Últimas 14 semanas" />
               <div className="mt-4 overflow-x-auto">
                 <div className="inline-flex flex-col gap-1.5">
                   {WEEKDAYS.map((day, row) => (
@@ -317,7 +289,7 @@ export default function AnalyticsView() {
                           <span
                             key={col}
                             aria-hidden
-                            className="h-3 w-3 rounded-[3.5px] bg-(--nv-fill)"
+                            className="h-3 w-3 rounded-[4px] bg-(--nv-fill)"
                           />
                         ))}
                       </div>
@@ -335,82 +307,68 @@ export default function AnalyticsView() {
 
       {/* Tab: Publicações */}
       {tab === "publicacoes" && (
-        <Card className="overflow-hidden !p-0">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--nv-line) px-5 py-4 sm:px-6">
-            <div>
-              <h2 className="text-[17px] font-bold tracking-[-0.02em] text-(--nv-text)">Todas as publicações</h2>
-              <p className="text-[12.5px] text-(--nv-text-3)">Entregas e métricas vídeo a vídeo</p>
-            </div>
-            <div className="lg-surface sq flex h-9 w-full items-center gap-2 rounded-full px-3.5 sm:w-64">
+        <Card className="flex min-h-[420px] flex-col">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <SectionHeader title="Publicações" subtitle="Métricas vídeo a vídeo" />
+            <label className="lg-control sq flex h-9 w-full items-center gap-2 rounded-full px-3.5 sm:w-60">
               <HugeiconsIcon icon={Search01Icon} size={15} strokeWidth={2} className="shrink-0 text-(--nv-text-3)" />
+              <span className="sr-only">Pesquisar publicações</span>
               <input
                 type="search"
                 value={postQuery}
                 onChange={(e) => setPostQuery(e.target.value)}
-                placeholder="Pesquisar por legenda…"
-                aria-label="Pesquisar publicações"
-                className="h-full w-full bg-transparent text-[13px] text-(--nv-text) outline-none placeholder:text-(--nv-text-3)"
+                placeholder="Pesquisar legenda"
+                className="w-full min-w-0 bg-transparent text-[13.5px] text-(--nv-text) outline-none placeholder:text-(--nv-text-3) [&::-webkit-search-cancel-button]:hidden"
               />
-            </div>
+            </label>
           </div>
-          <EmptyState
-            icon={
-              <SquircleTile size={52} colors={["var(--nv-accent-soft)", "var(--nv-accent-soft)"]} glass={false}>
-                <HugeiconsIcon icon={File01Icon} size={23} strokeWidth={1.8} className="text-[#4EA7EB]" />
-              </SquircleTile>
-            }
-            title="Sem publicações ainda"
-            action={
-              <Link href="/painel/descobrir" className={ghostCta}>
-                Convidar criadores
-              </Link>
-            }
-          />
+
+          <div className="flex flex-1 flex-col items-center justify-center py-14 text-center">
+            <Image src="/icons/video.svg" alt="" width={78} height={68} className="select-none" draggable={false} />
+            <h2 className="mt-5 text-[20px] font-bold tracking-[-0.025em] text-(--nv-text)">Sem publicações ainda</h2>
+            <p className="mt-1.5 max-w-[340px] text-[13.5px] text-(--nv-text-3)">
+              Os vídeos publicados pelos teus criadores aparecem aqui com métricas diárias.
+            </p>
+            <Link href="/painel/descobrir" className="nuvi-btn-sm sq mt-6 !h-11 !px-6">
+              Descobrir criadores
+            </Link>
+          </div>
         </Card>
       )}
 
       {/* Tab: Criadores */}
       {tab === "criadores" && (
-        <Card className="overflow-hidden !p-0">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--nv-line) px-5 py-4 sm:px-6">
-            <div>
-              <h2 className="text-[17px] font-bold tracking-[-0.02em] text-(--nv-text)">Criadores na tua equipa</h2>
-              <p className="text-[12.5px] text-(--nv-text-3)">
-                {roster.length} {roster.length === 1 ? "criador convidado" : "criadores convidados"}
-              </p>
-            </div>
+        <Card className="flex min-h-[420px] flex-col">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <SectionHeader
+              title="Criadores"
+              subtitle={roster.length > 0 ? `${roster.length} na tua lista` : "Desempenho da equipa"}
+            />
             <div className="flex items-center gap-2">
-              <div className="lg-surface sq flex h-9 w-52 items-center gap-2 rounded-full px-3.5">
+              <label className="lg-control sq flex h-9 w-52 items-center gap-2 rounded-full px-3.5">
                 <HugeiconsIcon icon={Search01Icon} size={15} strokeWidth={2} className="shrink-0 text-(--nv-text-3)" />
+                <span className="sr-only">Pesquisar criadores</span>
                 <input
                   type="search"
                   value={creatorQuery}
                   onChange={(e) => setCreatorQuery(e.target.value)}
-                  placeholder="Pesquisar criador…"
-                  aria-label="Pesquisar criadores"
-                  className="h-full w-full bg-transparent text-[13px] text-(--nv-text) outline-none placeholder:text-(--nv-text-3)"
+                  placeholder="Pesquisar"
+                  className="w-full min-w-0 bg-transparent text-[13.5px] text-(--nv-text) outline-none placeholder:text-(--nv-text-3) [&::-webkit-search-cancel-button]:hidden"
                 />
-              </div>
+              </label>
               <Link href="/painel/descobrir" className={ghostCta}>
                 Descobrir
               </Link>
             </div>
           </div>
 
-          <div className="grid grid-cols-5 gap-3 border-b border-(--nv-line) bg-(--nv-fill-2) px-6 py-3 text-[12px] font-semibold text-(--nv-text-3)">
-            <span className="col-span-2">Criador</span>
-            <span>Estado</span>
-            <span>Views (est.)</span>
-            <span className="text-right">CPM médio</span>
-          </div>
-
           {filteredRoster.length > 0 ? (
-            <ul className="divide-y divide-(--nv-line)">
+            <ul className="mt-5 divide-y divide-(--nv-line)">
               {filteredRoster.map((c) => (
-                <li key={c.id} className="grid grid-cols-5 items-center gap-3 px-6 py-3.5 text-[13.5px]">
-                  <div className="col-span-2 flex min-w-0 items-center gap-3">
+                <li key={c.id} className="flex flex-wrap items-center justify-between gap-4 py-3.5 text-[13.5px]">
+                  <div className="flex min-w-0 items-center gap-3">
                     <span
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-white"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-white"
                       style={{ background: c.avatarBg }}
                     >
                       {c.initials}
@@ -422,54 +380,48 @@ export default function AnalyticsView() {
                       </p>
                     </div>
                   </div>
-                  <div>
-                    <span className="sq inline-flex items-center gap-1.5 rounded-full bg-(--nv-accent-soft) px-2.5 py-0.5 text-[11.5px] font-semibold text-[#4EA7EB]">
+                  <div className="flex items-center gap-5 tabular-nums">
+                    <span className="sq rounded-full bg-(--nv-accent-soft) px-2.5 py-0.5 text-[11.5px] font-semibold text-[#0076E8] dark:text-[#60B5FF]">
                       Convidado
                     </span>
+                    <div className="text-right">
+                      <p className="font-semibold text-(--nv-text)">{c.views}</p>
+                      <p className="text-[11px] text-(--nv-text-3)">Views</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-(--nv-text)">{c.cpm}</p>
+                      <p className="text-[11px] text-(--nv-text-3)">CPM</p>
+                    </div>
                   </div>
-                  <span className="font-semibold text-(--nv-text) tabular-nums">{c.views}</span>
-                  <span className="text-right font-semibold text-(--nv-text-2) tabular-nums">{c.cpm}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <EmptyState
-              icon={
-                <SquircleTile size={52} colors={["var(--nv-tile)", "var(--nv-tile)"]} glass={false}>
-                  <HugeiconsIcon icon={UserGroupIcon} size={23} strokeWidth={1.8} className="text-(--nv-text-2)" />
-                </SquircleTile>
-              }
-              title="Sem criadores ativos ainda"
-              action={
-                <Link href="/painel/descobrir" className={ghostCta}>
-                  Descobrir criadores
-                </Link>
-              }
-            />
+            <div className="flex flex-1 flex-col items-center justify-center py-14 text-center">
+              <Image src="/icons/profile.svg" alt="" width={78} height={68} className="select-none" draggable={false} />
+              <h2 className="mt-5 text-[20px] font-bold tracking-[-0.025em] text-(--nv-text)">Sem criadores ativos</h2>
+              <p className="mt-1.5 max-w-[340px] text-[13.5px] text-(--nv-text-3)">
+                Convida criadores para acompanhar visualizações, engajamento e retorno por pessoa.
+              </p>
+              <Link href="/painel/descobrir" className="nuvi-btn-sm sq mt-6 !h-11 !px-6">
+                Descobrir criadores
+              </Link>
+            </div>
           )}
         </Card>
       )}
 
       {/* Tab: Atribuição */}
       {tab === "atribuicao" && (
-        <Card>
-          <SectionHeader
-            title="Atribuição e conversões"
-            subtitle="Liga o teu site ou códigos de desconto para acompanhar vendas geradas por cada criador"
-          />
-          <EmptyState
-            icon={
-              <SquircleTile size={52} colors={["var(--nv-accent-soft)", "var(--nv-accent-soft)"]} glass={false}>
-                <HugeiconsIcon icon={TrendingUpIcon} size={23} strokeWidth={1.8} className="text-[#4EA7EB]" />
-              </SquircleTile>
-            }
-            title="Sem dados de atribuição ainda"
-            action={
-              <Link href="/onboarding" className={ghostCta}>
-                Configurar campanha
-              </Link>
-            }
-          />
+        <Card className="flex min-h-[420px] flex-col items-center justify-center text-center">
+          <Image src="/icons/graph.svg" alt="" width={78} height={68} className="select-none" draggable={false} />
+          <h2 className="mt-5 text-[20px] font-bold tracking-[-0.025em] text-(--nv-text)">Atribuição e vendas</h2>
+          <p className="mt-1.5 max-w-[360px] text-[13.5px] leading-relaxed text-(--nv-text-3)">
+            Liga o teu site ou códigos de desconto para ver que criadores trazem mais clientes.
+          </p>
+          <Link href="/onboarding" className="nuvi-btn-sm sq mt-6 !h-11 !px-6">
+            Configurar campanha
+          </Link>
         </Card>
       )}
     </div>
