@@ -11,7 +11,9 @@ import {
   SentIcon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
+import Image from "next/image";
 import SquircleTile from "@/app/components/squircle/SquircleTile";
+import { useDashboard } from "./dashboard-context";
 import {
   deleteConversation,
   fmtClock,
@@ -58,28 +60,27 @@ export function CreatorAvatar({ name, size = 44 }: { name: string; size?: number
   );
 }
 
-/* ---------- Ícone de vidro azul (família dos do onboarding) ---------- */
-function GlassIcon({ size = 56 }: { size?: number }) {
+/* ---------- Ícone de vidro (família dos do onboarding) ---------- */
+function GlassIcon({ size = 80 }: { size?: number }) {
   return (
-    <SquircleTile size={size} colors={["#6BB8F2", "#0076E8"]}>
-      <HugeiconsIcon
-        icon={BubbleChatIcon}
-        size={Math.round(size * 0.46)}
-        strokeWidth={1.8}
-        className="text-white drop-shadow-[0_1px_2px_rgba(0,60,140,0.35)]"
-      />
-    </SquircleTile>
+    <Image
+      src="/icons/chat.svg"
+      alt=""
+      width={size}
+      height={Math.round((size * 90) / 105)}
+      className="select-none"
+      draggable={false}
+    />
   );
 }
 
-interface MessagesViewProps {
-  onCompose: () => void;
-  /** Conversa a abrir (ex.: acabada de criar no diálogo "Nova mensagem"). */
-  openId: string | null;
-  onOpenIdChange: (id: string | null) => void;
-}
-
-export default function MessagesView({ onCompose, openId, onOpenIdChange }: MessagesViewProps) {
+/** Página /painel/mensagens. */
+export default function MessagesView() {
+  const {
+    openCompose: onCompose,
+    openConvo: openId,
+    setOpenConvo: onOpenIdChange,
+  } = useDashboard();
   const conversations = useConversations();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
@@ -222,7 +223,7 @@ export default function MessagesView({ onCompose, openId, onOpenIdChange }: Mess
           />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
-            <GlassIcon size={64} />
+            <GlassIcon size={84} />
             <h2 className="mt-5 text-[20px] font-bold tracking-[-0.025em] text-(--nv-text)">
               Nenhuma conversa aberta
             </h2>

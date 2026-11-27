@@ -1,31 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Add01Icon,
-  ArrowUpRight01Icon,
   Cancel01Icon,
   CheckmarkCircle02Icon,
-  InboxCheckIcon,
   Notification02Icon,
   Search01Icon,
-  Tick02Icon,
-  Video01Icon,
 } from "@hugeicons/core-free-icons";
-import SquircleTile from "@/app/components/squircle/SquircleTile";
-import PerformanceCard from "./PerformanceCard";
 import WalletModal from "./WalletModal";
-import { MobileTabBar, Sidebar, type NavKey } from "./Sidebar";
-import { Avatar, Card, EmptyState, SectionHeader, ViewAllButton } from "./ui";
+import { MobileTabBar, NAV_ITEMS, navKeyFromPath, Sidebar } from "./Sidebar";
+import { Avatar } from "./ui";
 import CommandPalette, { type CommandId } from "./CommandPalette";
 import NotificationsSheet, { type NotificationItem } from "./NotificationsSheet";
 import AccountMenu from "./AccountMenu";
 import ProfileModal from "./ProfileModal";
-import MessagesView from "./MessagesView";
 import NewMessageDialog from "./NewMessageDialog";
+import { DashboardContext } from "./dashboard-context";
 import { applyTheme, useProfile, useThemePref } from "./prefs";
 import { markCampaignSeen, useCampaign } from "@/app/components/onboarding/campaign";
 import WelcomeDialog from "@/app/components/celebration/WelcomeDialog";
@@ -55,8 +48,6 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
     read: false,
   },
 ];
-
-const fmtKz = (n: number) => `${n.toLocaleString("pt-PT")} Kz`;
 
 /* ---------- Botões de ícone do header ---------- */
 function IconButton({
@@ -88,11 +79,10 @@ function IconButton({
   );
 }
 
-const ghostCta =
-  "lg-control sq inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold text-(--nv-text)";
-
-export default function NuviDashboard() {
-  const [activeNav, setActiveNav] = useState<NavKey>("inicio");
+/** Moldura do painel: barra lateral, cabeçalho e modais partilhados por /painel/*. */
+export default function DashboardShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const active = navKeyFromPath(pathname);
   const [balance, setBalance] = useState(0);
   const [walletOpen, setWalletOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -159,13 +149,25 @@ export default function NuviDashboard() {
   const closeAccount = useCallback(() => setAccountOpen(false), []);
   const closeProfile = useCallback(() => setProfileOpen(false), []);
   const closeCompose = useCallback(() => setComposeOpen(false), []);
-  const isMessages = activeNav === "mensagens";
+  const isMessages = active === "mensagens";
+  const title = active === "inicio" ? "Início" : NAV_ITEMS.find((i) => i.key === active)?.label ?? "Início";
+
+  const ctx = useMemo(
+    () => ({
+      balance,
+      openWallet: () => setWalletOpen(true),
+      openCompose: () => setComposeOpen(true),
+      openConvo,
+      setOpenConvo,
+    }),
+    [balance, openConvo]
+  );
 
   const runCommand = (id: CommandId) => {
-    if (id.startsWith("nav:")) return setActiveNav(id.slice(4) as NavKey);
+    if (id.startsWith("nav:")) return router.push(`/painel/${id.slice(4)}`);
     if (id === "create-campaign") return router.push("/onboarding");
     if (id === "new-message") {
-      setActiveNav("mensagens");
+      router.push("/painel/mensagens");
       return setComposeOpen(true);
     }
     if (id === "add-funds") return setWalletOpen(true);
@@ -173,10 +175,10 @@ export default function NuviDashboard() {
   };
 
   return (
+    <DashboardContext.Provider value={ctx}>
     <div className="nuvi-dash flex min-h-dvh w-full bg-(--nv-bg) lg:h-dvh lg:min-h-0 lg:overflow-hidden font-sans text-(--nv-text)">
       <Sidebar
-        active={activeNav}
-        onChange={setActiveNav}
+        active={active}
         avatar={<Avatar profile={profile} size={40} />}
         accountOpen={accountOpen}
         onAccount={() => setAccountOpen((v) => !v)}
@@ -198,7 +200,7 @@ export default function NuviDashboard() {
             <header className="relative z-30 -mt-px px-4 py-4 sm:px-6 lg:px-8">
               <div className="relative mx-auto flex max-w-[1360px] items-center gap-4">
                 <h1 className="text-[28px] font-bold leading-none tracking-[-0.03em]">
-                  {isMessages ? "Mensagens" : "Início"}
+                  {title}
                 </h1>
 
                 {/* Pesquisa: abre a paleta de comandos */}
@@ -257,191 +259,17 @@ export default function NuviDashboard() {
 
             {/* Conteúdo */}
             <main
-              className={`w-full flex-1 px-4 pt-2 pb-28 sm:px-6 lg:px-8 ${
-                isMessages ? "flex flex-col lg:min-h-0 lg:pb-8" : "lg:pb-10"
+              className={`flex w-full flex-1 flex-col px-4 pt-2 pb-28 sm:px-6 lg:px-8 ${
+                isMessages ? "lg:min-h-0 lg:pb-8" : "lg:pb-10"
               }`}
             >
-              {isMessages ? (
-                <MessagesView
-                  onCompose={() => setComposeOpen(true)}
-                  openId={openConvo}
-                  onOpenIdChange={setOpenConvo}
-                />
-              ) : (
-                <div className="mx-auto grid max-w-[1360px] grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-                  <div className="flex min-w-0 flex-col gap-5">
-                    <PerformanceCard />
-
-                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                      <Card aria-labelledby="top-title" className="flex min-h-[260px] flex-col">
-                        <SectionHeader
-                          id="top-title"
-                          title="Top conteúdos"
-                          subtitle="Últimos 30 dias"
-                          actions={<ViewAllButton label="Ver todos os conteúdos" />}
-                        />
-                        <EmptyState
-                          icon={
-                            <SquircleTile size={48} colors={["var(--nv-accent-soft)", "var(--nv-accent-soft)"]} glass={false}>
-                              <HugeiconsIcon
-                                icon={Video01Icon}
-                                size={22}
-                                strokeWidth={1.8}
-                                className="text-[#4EA7EB]"
-                              />
-                            </SquircleTile>
-                          }
-                          title="Sem vídeos ainda"
-                          action={
-                            <button
-                              type="button"
-                              onClick={() => setActiveNav("descobrir")}
-                              className={ghostCta}
-                            >
-                              Descobrir criadores
-                            </button>
-                          }
-                        />
-                      </Card>
-
-                      <Card aria-labelledby="sub-title" className="flex min-h-[260px] flex-col">
-                        <SectionHeader
-                          id="sub-title"
-                          title="Novas entregas"
-                          subtitle="Por rever"
-                          actions={<ViewAllButton label="Ver todas as entregas" />}
-                        />
-                        <EmptyState
-                          icon={
-                            <SquircleTile size={48} colors={["var(--nv-tile)", "var(--nv-tile)"]} glass={false}>
-                              <HugeiconsIcon
-                                icon={InboxCheckIcon}
-                                size={22}
-                                strokeWidth={1.8}
-                                className="text-(--nv-text-2)"
-                              />
-                            </SquircleTile>
-                          }
-                          title={campaign ? `${campaign.brandName}: à espera de criadores` : "Nada por rever"}
-                          action={
-                            campaign ? undefined : (
-                              <Link href="/onboarding" className={ghostCta}>
-                                <HugeiconsIcon icon={Add01Icon} size={15} strokeWidth={2.2} />
-                                Criar campanha
-                              </Link>
-                            )
-                          }
-                        />
-                      </Card>
-                    </div>
-                  </div>
-
-                  {/* Coluna direita */}
-                  <div className="flex flex-col gap-5 md:grid md:grid-cols-2 xl:flex">
-                    {/* Carteira — vidro azul */}
-                    <section
-                      id="carteira"
-                      aria-labelledby="wallet-title"
-                      className="sq relative overflow-hidden rounded-[28px] bg-gradient-to-b from-[#4EA7EB] to-[#0076E8] p-5 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.55),inset_0_0_0_0.5px_rgba(255,255,255,0.3),0_18px_40px_-18px_rgba(0,118,232,0.6)] sm:p-6 md:col-span-2 xl:col-span-1"
-                    >
-                      <div
-                        aria-hidden
-                        className="pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-white/20 blur-3xl"
-                      />
-                      <div className="relative flex items-start justify-between">
-                        <div>
-                          <h2 id="wallet-title" className="text-[17px] font-bold tracking-[-0.022em]">
-                            Carteira
-                          </h2>
-                          <p className="text-[12.5px] font-medium text-white/70">Moco · AOA</p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setActiveNav("pagamentos")}
-                          aria-label="Abrir pagamentos"
-                          className="lg-tint flex h-9 w-9 cursor-pointer items-center justify-center rounded-full"
-                        >
-                          <HugeiconsIcon icon={ArrowUpRight01Icon} size={16} strokeWidth={2.2} />
-                        </button>
-                      </div>
-
-                      <p className="font-title relative mt-6 text-[40px] font-bold leading-none tracking-[-0.04em] tabular-nums">
-                        {fmtKz(balance)}
-                      </p>
-                      <p className="relative mt-1.5 text-[12.5px] font-medium text-white/70">
-                        Disponível
-                      </p>
-
-                      <dl className="relative mt-5 divide-y divide-white/15 border-t border-white/15 text-[13px]">
-                        <div className="flex justify-between py-2.5">
-                          <dt className="text-white/75">A pagar</dt>
-                          <dd className="font-semibold tabular-nums">{fmtKz(0)}</dd>
-                        </div>
-                        <div className="flex justify-between py-2.5">
-                          <dt className="text-white/75">Pendente</dt>
-                          <dd className="font-semibold tabular-nums">{fmtKz(0)}</dd>
-                        </div>
-                      </dl>
-
-                      <button
-                        type="button"
-                        onClick={() => setWalletOpen(true)}
-                        className="sq relative mt-2 flex h-11 w-full cursor-pointer items-center justify-center gap-1.5 rounded-full bg-white text-[14px] font-semibold text-[#0A0A0A] shadow-[inset_0_-1px_0_rgba(15,23,42,0.06),0_6px_16px_-6px_rgba(0,40,100,0.4)] transition-transform duration-300 hover:scale-[1.01] active:scale-[0.98]"
-                      >
-                        <HugeiconsIcon
-                          icon={Add01Icon}
-                          size={16}
-                          strokeWidth={2.4}
-                          className="text-[#0076E8]"
-                        />
-                        Carregar
-                      </button>
-                    </section>
-
-                    <Card aria-labelledby="att-title">
-                      <SectionHeader id="att-title" title="Atenção" />
-                      <EmptyState
-                        compact
-                        icon={
-                          <SquircleTile size={40} colors={["var(--nv-success-soft)", "var(--nv-success-soft)"]} glass={false}>
-                            <HugeiconsIcon
-                              icon={Tick02Icon}
-                              size={20}
-                              strokeWidth={2.4}
-                              className="text-[#34C759]"
-                            />
-                          </SquircleTile>
-                        }
-                        title="Tudo em dia"
-                      />
-                    </Card>
-
-                    <Card aria-labelledby="act-title">
-                      <SectionHeader id="act-title" title="Atividade" />
-                      <EmptyState
-                        compact
-                        icon={
-                          <SquircleTile size={40} colors={["var(--nv-tile)", "var(--nv-tile)"]} glass={false}>
-                            <HugeiconsIcon
-                              icon={Notification02Icon}
-                              size={19}
-                              strokeWidth={1.9}
-                              className="text-(--nv-text-3)"
-                            />
-                          </SquircleTile>
-                        }
-                        title="Sem atividade"
-                      />
-                    </Card>
-                  </div>
-                </div>
-              )}
+              {children}
             </main>
           </div>
         </div>
       </div>
 
-      <MobileTabBar active={activeNav} onChange={setActiveNav} scrolled={scrolled} />
+      <MobileTabBar active={active} scrolled={scrolled} />
 
       {welcome?.role === "marca" && (
         <WelcomeDialog
@@ -498,8 +326,8 @@ export default function NuviDashboard() {
         onClose={closeCompose}
         onSent={(id) => {
           setComposeOpen(false);
-          setActiveNav("mensagens");
           setOpenConvo(id);
+          router.push("/painel/mensagens");
         }}
       />
 
@@ -509,5 +337,6 @@ export default function NuviDashboard() {
         onAddFunds={(amount) => setBalance((prev) => prev + amount)}
       />
     </div>
+    </DashboardContext.Provider>
   );
 }

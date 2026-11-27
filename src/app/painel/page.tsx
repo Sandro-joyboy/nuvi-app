@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import NuviDashboard from "@/app/components/dashboard/NuviDashboard";
+import HomeView from "@/app/components/dashboard/HomeView";
 
 export const metadata: Metadata = {
   title: "Painel",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function PainelPage() {
-  return <NuviDashboard />;
+  return <HomeView />;
 }

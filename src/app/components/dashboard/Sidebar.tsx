@@ -12,6 +12,7 @@ import {
   MoreHorizontalIcon,
 } from "@hugeicons/core-free-icons";
 import Image from "next/image";
+import Link from "next/link";
 
 export type NavKey =
   | "inicio"
@@ -40,14 +41,20 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "pagamentos", label: "Pagamentos", icon: DollarCircleIcon, primary: true },
 ];
 
+/** Cada secção tem a sua rota: /painel/<chave>; o Início é /painel. */
+export const hrefOf = (key: NavKey) => (key === "inicio" ? "/painel" : `/painel/${key}`);
+
+export function navKeyFromPath(pathname: string | null): NavKey {
+  const seg = pathname?.split("/")[2];
+  return NAV_ITEMS.find((i) => i.key === seg)?.key ?? "inicio";
+}
+
 interface SidebarProps {
   active: NavKey;
-  onChange: (key: NavKey) => void;
 }
 
 export function Sidebar({
   active,
-  onChange,
   avatar,
   accountOpen,
   onAccount,
@@ -58,9 +65,8 @@ export function Sidebar({
       className="hidden h-dvh w-[84px] shrink-0 flex-col items-center justify-between py-4 lg:flex"
     >
       <div className="flex w-full flex-col items-center">
-        <button
-          type="button"
-          onClick={() => onChange("inicio")}
+        <Link
+          href="/painel"
           aria-label="Início"
           aria-current={active === "inicio" ? "page" : undefined}
           className="rounded-full transition-transform duration-300 hover:scale-[1.05] active:scale-95"
@@ -73,16 +79,15 @@ export function Sidebar({
             priority
             className="h-[46px] w-[46px] rounded-full shadow-[0_4px_12px_-4px_rgba(0,90,180,0.35)]"
           />
-        </button>
+        </Link>
 
         <nav className="mt-6 flex w-full flex-col items-center gap-1">
           {NAV_ITEMS.map((item) => {
             const isActive = active === item.key;
             return (
-              <button
+              <Link
                 key={item.key}
-                type="button"
-                onClick={() => onChange(item.key)}
+                href={hrefOf(item.key)}
                 aria-current={isActive ? "page" : undefined}
                 className="group flex w-[72px] cursor-pointer flex-col items-center gap-1 rounded-[16px] py-1.5"
               >
@@ -113,7 +118,7 @@ export function Sidebar({
                 >
                   {item.label}
                 </span>
-              </button>
+              </Link>
             );
           })}
         </nav>
@@ -139,7 +144,6 @@ export function Sidebar({
 /** Tab bar flutuante em vidro (mobile): o essencial + "Mais". */
 export function MobileTabBar({
   active,
-  onChange,
   scrolled = false,
 }: SidebarProps & { scrolled?: boolean }) {
   const [moreOpen, setMoreOpen] = useState(false);
@@ -177,14 +181,12 @@ export function MobileTabBar({
           className="lg-surface sq absolute right-0 bottom-[68px] w-56 rounded-[22px] p-1.5"
         >
           {secondary.map((item) => (
-            <button
+            <Link
               key={item.key}
-              type="button"
+              href={hrefOf(item.key)}
               role="menuitem"
-              onClick={() => {
-                onChange(item.key);
-                setMoreOpen(false);
-              }}
+              aria-current={active === item.key ? "page" : undefined}
+              onClick={() => setMoreOpen(false)}
               className={`flex w-full cursor-pointer items-center gap-3 rounded-[16px] px-3 py-2.5 text-[14px] font-medium ${
                 active === item.key ? "bg-[#4EA7EB]/10 text-[#0076E8]" : "text-(--nv-text) hover:bg-(--nv-fill)"
               }`}
@@ -196,7 +198,7 @@ export function MobileTabBar({
                   {item.badge}
                 </span>
               )}
-            </button>
+            </Link>
           ))}
         </div>
       )}
@@ -221,16 +223,15 @@ export function MobileTabBar({
         {primary.map((item) => {
           const isActive = active === item.key;
           return (
-            <button
+            <Link
               key={item.key}
-              type="button"
-              onClick={() => onChange(item.key)}
+              href={hrefOf(item.key)}
               aria-current={isActive ? "page" : undefined}
               className={tab(isActive)}
             >
               <HugeiconsIcon icon={item.icon} size={21} strokeWidth={isActive ? 1.9 : 1.6} />
               {item.label}
-            </button>
+            </Link>
           );
         })}
         <button
