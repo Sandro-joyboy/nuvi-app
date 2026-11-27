@@ -84,7 +84,7 @@ export default function Home() {
         <div className="font-sans text-[14px] tracking-[-0.01em] text-[#71717A]">
           Já tem uma conta?{" "}
           <Link
-            href="/login"
+            href="/painel"
             className="font-medium text-[#0A0A0A] underline underline-offset-2 transition-opacity hover:opacity-75"
           >
             Entrar

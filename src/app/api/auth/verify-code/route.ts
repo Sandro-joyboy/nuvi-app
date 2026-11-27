@@ -1,0 +1,49 @@
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { OTP_COOKIE_NAME, verifyOtpToken } from "@/lib/otp";
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = (await request.json()) as { email?: string; code?: string };
+    const email = body.email?.trim().toLowerCase();
+    const code = body.code?.trim();
+
+    if (!email || !code || !/^\d{6}$/.test(code)) {
+      return NextResponse.json(
+        { error: "Insira o código completo de 6 dígitos." },
+        { status: 400 }
+      );
+    }
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get(OTP_COOKIE_NAME)?.value;
+
+    if (!token) {
+      return NextResponse.json(
+        { error: "Nenhum código ativo encontrado. Solicite um novo código." },
+        { status: 400 }
+      );
+    }
+
+    const result = verifyOtpToken(token, email, code);
+    if (!result.valid) {
+      return NextResponse.json(
+        { error: result.reason || "Código inválido." },
+        { status: 400 }
+      );
+    }
+
+    cookieStore.delete(OTP_COOKIE_NAME);
+
+    return NextResponse.json({
+      ok: true,
+      message: "E-mail confirmado com sucesso.",
+    });
+  } catch (error) {
+    console.error("Erro ao verificar código OTP:", error);
+    return NextResponse.json(
+      { error: "Não foi possível validar o código." },
+      { status: 500 }
+    );
+  }
+}
