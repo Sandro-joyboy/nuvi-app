@@ -41,7 +41,7 @@ export default function Home() {
               href={o.href}
               className="lg-surface sq group flex h-full flex-col rounded-[28px] p-6 transition-transform duration-300 hover:-translate-y-0.5 active:scale-[0.99] motion-reduce:transform-none"
             >
-              <Image src={o.icon} alt="" width={52} height={46} className="h-[46px] w-auto" />
+              <Image src={o.icon} alt="" width={52} height={46} className="h-[46px] w-auto self-start" />
               <span className="mt-6 flex items-center justify-between gap-2 text-[18px] font-bold tracking-[-0.02em]">
                 {o.title}
                 <HugeiconsIcon
